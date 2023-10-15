@@ -22,12 +22,13 @@ namespace Nemocnice
     /// </summary>
     public partial class MainWindow : Window
     {
+        OracleConnection connection;
         public MainWindow()
         {
             InitializeComponent();
-            OracleConnection connection = GetConnection();
+            connection = GetConnection();
             connection.Open();
-            PrintNameColumnValues(connection, "pacienti");
+            ComboBoxHandle("pacienti");
         }
         public static OracleConnection GetConnection()
         {
@@ -36,20 +37,47 @@ namespace Nemocnice
                 "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=fei-sql3.upceucebny.cz)(PORT=1521))(CONNECT_DATA=(SID=BDAS)(SERVER=DEDICATED)))";
             return new OracleConnection(connectionString);
         }
-        public void PrintNameColumnValues(OracleConnection connection, string tableName)
+        public void ComboBoxHandle(string tableName)
         {
-            using (var command = new OracleCommand($"SELECT jmeno FROM {tableName} WHERE id_doktor = 10 ORDER BY id_pacient ", connection))
+            using (var command = new OracleCommand($"SELECT table_name FROM user_tables", connection))
             {
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
                         string name = reader.GetString(0);
-                        //Console.WriteLine("Name: " + name);
-                        label123.Content += name + "\n";
+                        comboBox.Items.Add(name);
+                    }
+                    comboBox.SelectedIndex = 0;
+                }
+            }
+        }
+        private void printButtonOnAction(object sender, RoutedEventArgs e)
+        {
+            resultLabel.Content = string.Empty;
+            using (var command = new OracleCommand($"SELECT * FROM {comboBox.SelectedValue}", connection))
+            {
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        try
+                        {
+                            string column1 = read(reader, 1);
+                            string column2 = read(reader, 2);
+                            resultLabel.Content += column1 + "\t" + column2 + "\n";
+                        }
+                        catch (IndexOutOfRangeException)
+                        {
+                            resultLabel.Content = "Chybný počet sloupců";
+                        }
                     }
                 }
             }
+        }
+        private string read(OracleDataReader reader, int columnIndex)
+        {
+            return reader.IsDBNull(columnIndex) ? "..." : reader.GetString(columnIndex);
         }
     }
 }
