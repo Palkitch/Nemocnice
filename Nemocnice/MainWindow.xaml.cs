@@ -84,7 +84,7 @@ namespace Nemocnice
                                 {
                                     int id = int.Parse(read(reader, 0));
                                     string name = read(reader, 1);
-                                    int? floors = ParseNullableInt(read(reader, 2));    
+                                    int? floors = ParseNullableInt(read(reader, 2));
                                     int addressId = int.Parse(read(reader, 3));
                                     Building building = new Building(id, name, floors, addressId);
                                     collection.Add(building);
@@ -141,19 +141,36 @@ namespace Nemocnice
                                 break;
 
                             case "RECEPTY":
-                                // Zpracování pro tabulku "RECEPTY"
-                                Console.WriteLine("Zpracování tabulky 'RECEPTY'");
-                                break;
+                                {
+                                    int id = int.Parse(read(reader, 0));
+                                    int docId = int.Parse(read(reader, 1));
+                                    int patId = int.Parse(read(reader, 2));
+                                    DateTime date = DateTime.Parse(read(reader, 3));
+                                    Prescription prescription = new Prescription(id, docId, patId, date);
+                                    collection.Add(prescription);
+                                    break;
+                                }
 
                             case "SESTRY":
                                 // Zpracování pro tabulku "SESTRY"
-                                Console.WriteLine("Zpracování tabulky 'SESTRY'");
+
                                 break;
 
                             case "ZAMESTNANCI":
-                                // Zpracování pro tabulku "ZAMESTNANCI"
-                                Console.WriteLine("Zpracování tabulky 'ZAMESTNANCI'");
-                                break;
+                                {
+                                    // Zpracování pro tabulku "ZAMESTNANCI"
+                                    int id = int.Parse(read(reader, 0));
+                                    string name = read(reader, 1);
+                                    string surname = read(reader, 2);
+                                    int salary = int.Parse(read(reader, 3));
+                                    int wardId = int.Parse(read(reader, 4));
+                                    int? superiorId = ParseNullableInt(read(reader, 5));
+                                    int addressId = int.Parse(read(reader, 6));
+                                    char type = char.Parse(read(reader, 7));
+                                    Employee employee = new Employee(id, name, surname, salary, wardId, superiorId, addressId, type);
+                                    collection.Add(employee);
+                                    break;
+                                }
 
                             default:
                                 // Pokud název tabulky neodpovídá žádné z hodnot
