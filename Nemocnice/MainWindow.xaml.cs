@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Windows;
+using Nemocnice.ModelObjects;
 using Oracle.ManagedDataAccess.Client;
 
 namespace Nemocnice
@@ -12,7 +14,7 @@ namespace Nemocnice
     public partial class MainWindow : Window
     {
         //OracleConnection connection;
-        private List<String> Tables {  get; set; }
+        private List<String> Tables { get; set; }
         private DatabaseConnection DatabaseConnection { get; }
         private OracleConnection Connection { get; }
         private List<String> MezilehleTabulky { get; set; }
@@ -44,7 +46,7 @@ namespace Nemocnice
                 }
             }
             Tables.RemoveAll(name => MezilehleTabulky.Contains(name));
-            foreach (string name in Tables) 
+            foreach (string name in Tables)
             {
                 comboBox.Items.Add(name);
             }
@@ -53,111 +55,117 @@ namespace Nemocnice
 
         private void printButtonOnAction(object sender, RoutedEventArgs e)
         {
+            ObservableCollection<Object> collection = new ObservableCollection<Object>();
             resultLabel.Content = string.Empty;
             using (var command = new OracleCommand($"SELECT * FROM {comboBox.SelectedValue}", Connection))
             {
                 using (var reader = command.ExecuteReader())
                 {
-                    foreach (string tableName in Tables)
+
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+                        switch (comboBox.SelectedValue)
                         {
-                            switch (tableName)
-                            {
-                                case "ADRESY":
-                                    // Zpracování pro tabulku "ADRESY"
-                                    Console.WriteLine("Zpracování tabulky 'ADRESY'");
+                            case "ADRESY":
+                                {
+                                    int id = int.Parse(read(reader, 0));
+                                    int postNum = int.Parse(read(reader, 1));
+                                    string street = read(reader, 2);
+                                    string city = read(reader, 3);
+                                    int postCode = int.Parse(read(reader, 4));
+                                    string country = read(reader, 5);
+                                    Address address = new Address(id, postNum, street, city, country, postCode);
+                                    collection.Add(address);
+                                    break;
+                                }
+
+
+                            case "BUDOVY":
+                                {
+                                    int id = int.Parse(read(reader, 0));
+                                    string name = read(reader, 1);
+                                    int? floors = ParseNullableInt(read(reader, 2));    
+                                    int addressId = int.Parse(read(reader, 3));
+                                    Building building = new Building(id, name, floors, addressId);
+                                    collection.Add(building);
+                                    break;
+                                }
+
+
+                            case "DIAGNOZY_CISELNIK":
+                                {
+                                    int id = int.Parse(read(reader, 0));
+                                    string name = read(reader, 1);
                                     break;
 
-                                case "BUDOVY":
-                                    // Zpracování pro tabulku "BUDOVY"
-                                    Console.WriteLine("Zpracování tabulky 'BUDOVY'");
-                                    break;
+                                }
 
-                                case "DIAGNOZY_CISELNIK":
-                                    // Zpracování pro tabulku "DIAGNOZY_CISELNIK"
-                                    Console.WriteLine("Zpracování tabulky 'DIAGNOZY_CISELNIK'");
-                                    break;
+                            case "DOKTORI":
+                                // Zpracování pro tabulku "DOKTORI"
+                                Console.WriteLine("Zpracování tabulky 'DOKTORI'");
+                                break;
 
-                                case "DOKTORI":
-                                    // Zpracování pro tabulku "DOKTORI"
-                                    Console.WriteLine("Zpracování tabulky 'DOKTORI'");
-                                    break;
+                            case "LEKY":
+                                // Zpracování pro tabulku "LEKY"
+                                Console.WriteLine("Zpracování tabulky 'LEKY'");
+                                break;
 
-                                case "LEKY":
-                                    // Zpracování pro tabulku "LEKY"
-                                    Console.WriteLine("Zpracování tabulky 'LEKY'");
-                                    break;
+                            case "LUZKA":
+                                // Zpracování pro tabulku "LUZKA"
+                                Console.WriteLine("Zpracování tabulky 'LUZKA'");
+                                break;
 
-                                case "LUZKA":
-                                    // Zpracování pro tabulku "LUZKA"
-                                    Console.WriteLine("Zpracování tabulky 'LUZKA'");
-                                    break;
+                            case "ODDELENI":
+                                // Zpracování pro tabulku "ODDELENI"
+                                Console.WriteLine("Zpracování tabulky 'ODDELENI'");
+                                break;
 
-                                case "ODDELENI":
-                                    // Zpracování pro tabulku "ODDELENI"
-                                    Console.WriteLine("Zpracování tabulky 'ODDELENI'");
-                                    break;
+                            case "PACIENTI":
+                                // Zpracování pro tabulku "PACIENTI"
+                                Console.WriteLine("Zpracování tabulky 'PACIENTI'");
+                                break;
 
-                                case "PACIENTI":
-                                    // Zpracování pro tabulku "PACIENTI"
-                                    Console.WriteLine("Zpracování tabulky 'PACIENTI'");
-                                    break;
+                            case "POJISTOVNY":
+                                // Zpracování pro tabulku "POJISTOVNY"
+                                Console.WriteLine("Zpracování tabulky 'POJISTOVNY'");
+                                break;
 
-                                case "POJISTOVNY":
-                                    // Zpracování pro tabulku "POJISTOVNY"
-                                    Console.WriteLine("Zpracování tabulky 'POJISTOVNY'");
-                                    break;
+                            case "POKOJE":
+                                // Zpracování pro tabulku "POKOJE"
+                                Console.WriteLine("Zpracování tabulky 'POKOJE'");
+                                break;
 
-                                case "POKOJE":
-                                    // Zpracování pro tabulku "POKOJE"
-                                    Console.WriteLine("Zpracování tabulky 'POKOJE'");
-                                    break;
+                            case "POMUCKY":
+                                // Zpracování pro tabulku "POMUCKY"
+                                Console.WriteLine("Zpracování tabulky 'POMUCKY'");
+                                break;
 
-                                case "POMUCKY":
-                                    // Zpracování pro tabulku "POMUCKY"
-                                    Console.WriteLine("Zpracování tabulky 'POMUCKY'");
-                                    break;
+                            case "RECEPTY":
+                                // Zpracování pro tabulku "RECEPTY"
+                                Console.WriteLine("Zpracování tabulky 'RECEPTY'");
+                                break;
 
-                                case "RECEPTY":
-                                    // Zpracování pro tabulku "RECEPTY"
-                                    Console.WriteLine("Zpracování tabulky 'RECEPTY'");
-                                    break;
+                            case "SESTRY":
+                                // Zpracování pro tabulku "SESTRY"
+                                Console.WriteLine("Zpracování tabulky 'SESTRY'");
+                                break;
 
-                                case "SESTRY":
-                                    // Zpracování pro tabulku "SESTRY"
-                                    Console.WriteLine("Zpracování tabulky 'SESTRY'");
-                                    break;
+                            case "ZAMESTNANCI":
+                                // Zpracování pro tabulku "ZAMESTNANCI"
+                                Console.WriteLine("Zpracování tabulky 'ZAMESTNANCI'");
+                                break;
 
-                                case "ZAMESTNANCI":
-                                    // Zpracování pro tabulku "ZAMESTNANCI"
-                                    Console.WriteLine("Zpracování tabulky 'ZAMESTNANCI'");
-                                    break;
-
-                                default:
-                                    // Pokud název tabulky neodpovídá žádné z hodnot
-                                    Console.WriteLine("Neznámá tabulka: ");
-                                    break;
-                            }
+                            default:
+                                // Pokud název tabulky neodpovídá žádné z hodnot
+                                Console.WriteLine("Neznámá tabulka: ");
+                                break;
                         }
 
                     }
 
                     try
                     {
-
-                        DataTable dataTable = new DataTable();
-                        dataTable.Columns.Add("sss");
-                        dataTable.Columns.Add("aaa");
-                        dataTable.Rows.Add("a", "a");
-                        dataTable.Rows.Add("a", "a");
-                        dataTable.Rows.Add("a", "a");
-                        grid.ItemsSource = dataTable.DefaultView;
-
-
-                        string column1 = read(reader, 1);
-                        string column2 = read(reader, 2);
-                        resultLabel.Content += column1 + "\t" + column2 + "\n";
+                        grid.ItemsSource = collection;
                     }
                     catch (IndexOutOfRangeException)
                     {
@@ -166,14 +174,23 @@ namespace Nemocnice
                 }
             }
         }
-        private void printTable(List<Object> list) 
-        {
-            
-        }
+
 
         private string read(OracleDataReader reader, int columnIndex)
         {
             return reader.IsDBNull(columnIndex) ? "..." : reader.GetString(columnIndex);
+        }
+
+        public int? ParseNullableInt(string input)
+        {
+            if (int.TryParse(input, out int result))
+            {
+                return result;
+            }
+            else
+            {
+                return null;
+            }
         }
 
 
