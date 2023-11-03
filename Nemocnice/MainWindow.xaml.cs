@@ -61,8 +61,7 @@ namespace Nemocnice
             {
                 using (var reader = command.ExecuteReader())
                 {
-
-                    while (reader.Read())
+                    while (!reader.IsClosed && reader.Read())
                     {
                         switch (comboBox.SelectedValue)
                         {
@@ -96,19 +95,49 @@ namespace Nemocnice
                                 {
                                     int id = int.Parse(read(reader, 0));
                                     string name = read(reader, 1);
+                                    Diagnosis diagnosis = new Diagnosis(id, name);
+                                    collection.Add(diagnosis);  
                                     break;
-
                                 }
 
                             case "DOKTORI":
-                                // Zpracování pro tabulku "DOKTORI"
-                                Console.WriteLine("Zpracování tabulky 'DOKTORI'");
-                                break;
+                                {
+                                    string sql = "SELECT z.* FROM ZAMESTNANCI z JOIN DOKTORI d ON z.id_zamestnanec = d.id_zamestnanec";
+                                    using (var cmd = new OracleCommand(sql, Connection))
+                                    {
+                                        using (var cmdReader = cmd.ExecuteReader())
+                                        {
+                                            while (cmdReader.Read())
+                                            {
+                                                int id = int.Parse(read(cmdReader, 0));
+                                                string name = read(cmdReader, 1);
+                                                string surName = read(cmdReader, 2);
+                                                int salary = int.Parse(read(cmdReader, 3));
+                                                int hospWardId = int.Parse(read(cmdReader, 4));
+                                                int? superiorId = ParseNullableInt(read(cmdReader, 5));
+                                                int addressId = int.Parse(read(cmdReader, 6));
+                                                char type = read(cmdReader, 7)[0];
+                                                Employee employee = new Employee(id, name, surName, salary, hospWardId, superiorId, addressId, type);
+                                                collection.Add(employee);
+                                            }
+                                            reader.Close();
+                                            break;
+                                        }
+                                    }
+                                }
+
 
                             case "LEKY":
-                                // Zpracování pro tabulku "LEKY"
-                                Console.WriteLine("Zpracování tabulky 'LEKY'");
-                                break;
+                                {
+                                    int id = int.Parse(read(reader, 0));
+                                    string name = read(reader, 1);
+                                    string category = read(reader, 2);
+                                    int price = int.Parse(read(reader, 3));
+                                    Medicament medicament = new Medicament(id, name, category, price);  
+                                    collection.Add(medicament); 
+                                    break;
+                                }
+
 
                             case "LUZKA":
                                 // Zpracování pro tabulku "LUZKA"
