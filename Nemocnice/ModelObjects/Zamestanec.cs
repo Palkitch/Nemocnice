@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nemocnice.ModelObjects
 {
-    public class Employee
+    public class Zamestanec
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -16,7 +16,7 @@ namespace Nemocnice.ModelObjects
         public int? SuperiorId { get; set; }
         public int AddressId { get; set; }
         public char TypeOfEmployment { get; set; }
-        public Employee(int id, string name, string surName, int salary, int hospitalWardId, int? superiorId, int addressId, char typeOfEmployment)
+        public Zamestanec(int id, string name, string surName, int salary, int hospitalWardId, int? superiorId, int addressId, char typeOfEmployment)
         {
             Id = id;
             Name = name;

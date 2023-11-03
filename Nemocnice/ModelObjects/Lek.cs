@@ -6,21 +6,18 @@ using System.Threading.Tasks;
 
 namespace Nemocnice.ModelObjects
 {
-    public class Building
+    public class Lek
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int? NumberOfFloors { get; set; }
-        public int AddressId { get; set; }
-
-        public Building(int id, string name, int? numberOfFloors, int addressId)
+        public string Category { get; set; }
+        public int Price { get; set; }
+        public Lek(int id, string name, string category, int price)
         {
             Id = id;
             Name = name;
-            NumberOfFloors = numberOfFloors;
-            AddressId = addressId;
+            Category = category;
+            Price = price;
         }
-
-
     }
 }

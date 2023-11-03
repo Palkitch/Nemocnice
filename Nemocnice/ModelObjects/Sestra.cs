@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Nemocnice.ModelObjects
 {
-    public class Nurse
+    public class Sestra
     {
         public int EmployeeId { get; set; }
-        public Nurse(int employeeId)
+        public Sestra(int employeeId)
         {
             EmployeeId = employeeId;
         }

@@ -12,6 +12,4 @@
         <Button x:Name="printButton" Content="Print" HorizontalAlignment="Left" Height="25" Margin="62,127,0,0" VerticalAlignment="Top" Width="60" Click="printButtonOnAction"/>
         <DataGrid x:Name="grid" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="300,0,0,0"/>
     </Grid>
-
-
 </Window>

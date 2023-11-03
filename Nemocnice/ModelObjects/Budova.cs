@@ -6,14 +6,19 @@ using System.Threading.Tasks;
 
 namespace Nemocnice.ModelObjects
 {
-    public class Diagnosis
+    public class Budova
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public Diagnosis(int id, string name)
+        public int? NumberOfFloors { get; set; }
+        public int AddressId { get; set; }
+
+        public Budova(int id, string name, int? numberOfFloors, int addressId)
         {
             Id = id;
             Name = name;
+            NumberOfFloors = numberOfFloors;
+            AddressId = addressId;
         }
     }
 }

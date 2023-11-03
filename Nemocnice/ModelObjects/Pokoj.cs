@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Nemocnice.ModelObjects
 {
-    public class Room
+    public class Pokoj
     {
         public int Id { get; set; }
         public int RoomNumber { get; set; }
         public int HospitalWardId { get; set; }
-        public Room(int id, int roomNumber, int hospitalWardId)
+        public Pokoj(int id, int roomNumber, int hospitalWardId)
         {
             Id = id;
             RoomNumber = roomNumber;

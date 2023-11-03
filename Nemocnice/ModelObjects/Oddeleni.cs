@@ -6,16 +6,17 @@ using System.Threading.Tasks;
 
 namespace Nemocnice.ModelObjects
 {
-    public class InsuranceCompany
+    public class Oddeleni
     {
+        public int ID { get; set; }
         public string Name { get; set; }
-        public int Id { get; set; }
-        public int Code { get; set; }
-        public InsuranceCompany(string name, int id, int code)
+        public int BuildingId { get; set; }
+
+        public Oddeleni(int id, string name, int buildingId) 
         {
+            ID = id;
             Name = name;
-            Id = id;
-            Code = code;
+            BuildingId = buildingId;
         }
     }
 }

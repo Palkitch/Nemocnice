@@ -5,6 +5,8 @@ using System.Data;
 using System.Windows;
 using Nemocnice.ModelObjects;
 using Oracle.ManagedDataAccess.Client;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace Nemocnice
 {
@@ -73,10 +75,10 @@ namespace Nemocnice
                                     string city = read(reader, 3);
                                     int postCode = int.Parse(read(reader, 4));
                                     string country = read(reader, 5);
-                                    Address address = new Address(id, postNum, street, city, country, postCode);
+                                    Adresa address = new Adresa(id, postNum, street, city, country, postCode);
                                     collection.Add(address);
-                                    break;
                                 }
+                                break;
 
 
                             case "BUDOVY":
@@ -85,20 +87,20 @@ namespace Nemocnice
                                     string name = read(reader, 1);
                                     int? floors = ParseNullableInt(read(reader, 2));
                                     int addressId = int.Parse(read(reader, 3));
-                                    Building building = new Building(id, name, floors, addressId);
+                                    Budova building = new Budova(id, name, floors, addressId);
                                     collection.Add(building);
-                                    break;
                                 }
+                                break;
 
 
                             case "DIAGNOZY_CISELNIK":
                                 {
                                     int id = int.Parse(read(reader, 0));
                                     string name = read(reader, 1);
-                                    Diagnosis diagnosis = new Diagnosis(id, name);
+                                    Diagnoza diagnosis = new Diagnoza(id, name);
                                     collection.Add(diagnosis);  
-                                    break;
                                 }
+                                break;
 
                             case "DOKTORI":
                                 {
@@ -117,14 +119,15 @@ namespace Nemocnice
                                                 int? superiorId = ParseNullableInt(read(cmdReader, 5));
                                                 int addressId = int.Parse(read(cmdReader, 6));
                                                 char type = read(cmdReader, 7)[0];
-                                                Employee employee = new Employee(id, name, surName, salary, hospWardId, superiorId, addressId, type);
+                                                Zamestanec employee = new Zamestanec(id, name, surName, salary, hospWardId, superiorId, addressId, type);
                                                 collection.Add(employee);
                                             }
                                             reader.Close();
-                                            break;
                                         }
                                     }
                                 }
+                                break;
+
 
 
                             case "LEKY":
@@ -133,40 +136,80 @@ namespace Nemocnice
                                     string name = read(reader, 1);
                                     string category = read(reader, 2);
                                     int price = int.Parse(read(reader, 3));
-                                    Medicament medicament = new Medicament(id, name, category, price);  
+                                    Lek medicament = new Lek(id, name, category, price);  
                                     collection.Add(medicament); 
-                                    break;
                                 }
+                                break;
 
 
                             case "LUZKA":
-                                // Zpracování pro tabulku "LUZKA"
-                                Console.WriteLine("Zpracování tabulky 'LUZKA'");
+                                {
+                                    // TODO: mby tohle nějak rozšiřit, že by se vypisovaly misto sestra_id_zamestanec informace o tom zaměstnanci
+                                    int id = int.Parse(read(reader, 0));
+                                    int bedNumber = int.Parse(read(reader, 1));
+                                    int? nurseId = ParseNullableInt(read(reader, 2));
+                                    int roomId = int.Parse(read(reader, 3));
+                                    Luzko bed = new Luzko(id, bedNumber, nurseId, roomId);
+                                    collection.Add(bed);
+                                }
                                 break;
 
                             case "ODDELENI":
-                                // Zpracování pro tabulku "ODDELENI"
-                                Console.WriteLine("Zpracování tabulky 'ODDELENI'");
+                                {
+                                    int id = int.Parse(read(reader, 0));
+                                    string name = read(reader, 1);
+                                    int buildingId = int.Parse(read(reader, 2));
+                                    Oddeleni oddeleni = new Oddeleni(id, name, buildingId);
+                                    collection.Add(oddeleni);
+                                }
                                 break;
 
                             case "PACIENTI":
-                                // Zpracování pro tabulku "PACIENTI"
-                                Console.WriteLine("Zpracování tabulky 'PACIENTI'");
+                                {
+                                    int id = int.Parse(read(reader, 0));
+                                    string name = read(reader, 1);
+                                    string surName = read(reader, 2);
+                                    DateTime birthDate = DateTime.Parse(read(reader, 3));
+                                    string formattedBirthDate = birthDate.ToString("yyyy-MM-dd");
+                                    string pin = read(reader, 4);
+                                    DateTime startDate = DateTime.Parse(read(reader, 5));
+                                    string formattedStartDate = startDate.ToString("yyyy-MM-dd");
+                                    int doctorId = int.Parse(read(reader, 6));
+                                    int addressId = int.Parse(read(reader, 7));
+                                    int insuranceId = int.Parse(read(reader, 8));
+                                    Pacient pacient = new Pacient(id, name, surName, formattedBirthDate, pin, formattedStartDate, doctorId, addressId, insuranceId);
+                                    collection.Add(pacient);    
+                                }
                                 break;
 
                             case "POJISTOVNY":
-                                // Zpracování pro tabulku "POJISTOVNY"
-                                Console.WriteLine("Zpracování tabulky 'POJISTOVNY'");
+                                {
+                                    int id = int.Parse(read(reader, 0));
+                                    string name = read(reader, 1);
+                                    int code = int.Parse(read(reader, 2));
+                                    Pojistovna pojistovna = new Pojistovna(id, name, code);
+                                    collection.Add(pojistovna);
+                                }
                                 break;
 
                             case "POKOJE":
-                                // Zpracování pro tabulku "POKOJE"
-                                Console.WriteLine("Zpracování tabulky 'POKOJE'");
+                                {
+                                    int id = int.Parse(read(reader, 0));
+                                    int roomNum = int.Parse(read(reader, 1));
+                                    int hospWard = int.Parse(read(reader, 2));
+                                    Pokoj pokoj = new Pokoj(id, roomNum, hospWard);
+                                    collection.Add(pokoj);
+                                }
                                 break;
 
                             case "POMUCKY":
-                                // Zpracování pro tabulku "POMUCKY"
-                                Console.WriteLine("Zpracování tabulky 'POMUCKY'");
+                                {
+                                    int id = int.Parse(read(reader, 0));
+                                    string name = read(reader, 1);
+                                    int count = int.Parse(read(reader, 2));
+                                    Pomucka pomucka = new Pomucka(id, name, count); 
+                                    collection.Add(pomucka);
+                                }
                                 break;
 
                             case "RECEPTY":
@@ -175,10 +218,11 @@ namespace Nemocnice
                                     int docId = int.Parse(read(reader, 1));
                                     int patId = int.Parse(read(reader, 2));
                                     DateTime date = DateTime.Parse(read(reader, 3));
-                                    Prescription prescription = new Prescription(id, docId, patId, date);
+                                    string formattedDate = date.ToString("yyyy-MM-dd");
+                                    Recept prescription = new Recept(id, docId, patId, formattedDate);
                                     collection.Add(prescription);
-                                    break;
                                 }
+                                break;
 
                             case "SESTRY":
                                 // Zpracování pro tabulku "SESTRY"
@@ -196,13 +240,12 @@ namespace Nemocnice
                                     int? superiorId = ParseNullableInt(read(reader, 5));
                                     int addressId = int.Parse(read(reader, 6));
                                     char type = char.Parse(read(reader, 7));
-                                    Employee employee = new Employee(id, name, surname, salary, wardId, superiorId, addressId, type);
+                                    Zamestanec employee = new Zamestanec(id, name, surname, salary, wardId, superiorId, addressId, type);
                                     collection.Add(employee);
-                                    break;
                                 }
+                                break;
 
                             default:
-                                // Pokud název tabulky neodpovídá žádné z hodnot
                                 Console.WriteLine("Neznámá tabulka: ");
                                 break;
                         }
