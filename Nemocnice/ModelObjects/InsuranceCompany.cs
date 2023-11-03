@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nemocnice.ModelObjects
 {
-    internal class InsuranceCompany
+    public class InsuranceCompany
     {
         public string Name { get; set; }
         public int Id { get; set; }

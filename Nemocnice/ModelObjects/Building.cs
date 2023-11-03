@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nemocnice.ModelObjects
 {
-    class Building
+    public class Building
     {
         public int Id { get; set; }
         public string Name { get; set; }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nemocnice.ModelObjects
 {
-    internal class Patient
+    public class Patient
     {
         public int Id { get; set; }
         public string Name { get; set; }
