@@ -33,7 +33,6 @@ namespace Nemocnice
             ComboBoxHandle();
         }
 
-
         public void ComboBoxHandle()
         {
             using (var command = new OracleCommand($"SELECT * FROM user_tables", Connection))
@@ -57,6 +56,7 @@ namespace Nemocnice
 
         private void printButtonOnAction(object sender, RoutedEventArgs e)
         {
+            //TODO: tuhle metodu překopirovat do zvlaštni třidy, v MainWindow se budou čistě jen volat mentody
             ObservableCollection<Object> collection = new ObservableCollection<Object>();
             resultLabel.Content = string.Empty;
             using (var command = new OracleCommand($"SELECT * FROM {comboBox.SelectedValue}", Connection))
@@ -69,12 +69,12 @@ namespace Nemocnice
                         {
                             case "ADRESY":
                                 {
-                                    int id = int.Parse(read(reader, 0));
-                                    int postNum = int.Parse(read(reader, 1));
-                                    string street = read(reader, 2);
-                                    string city = read(reader, 3);
-                                    int postCode = int.Parse(read(reader, 4));
-                                    string country = read(reader, 5);
+                                    int id = int.Parse(ReadString(reader, 0));
+                                    int postNum = int.Parse(ReadString(reader, 1));
+                                    string street = ReadString(reader, 2);
+                                    string city = ReadString(reader, 3);
+                                    int postCode = int.Parse(ReadString(reader, 4));
+                                    string country = ReadString(reader, 5);
                                     Adresa address = new Adresa(id, postNum, street, city, country, postCode);
                                     collection.Add(address);
                                 }
@@ -83,10 +83,10 @@ namespace Nemocnice
 
                             case "BUDOVY":
                                 {
-                                    int id = int.Parse(read(reader, 0));
-                                    string name = read(reader, 1);
-                                    int? floors = ParseNullableInt(read(reader, 2));
-                                    int addressId = int.Parse(read(reader, 3));
+                                    int id = int.Parse(ReadString(reader, 0));
+                                    string name = ReadString(reader, 1);
+                                    int? floors = ParseNullableInt(ReadString(reader, 2));
+                                    int addressId = int.Parse(ReadString(reader, 3));
                                     Budova building = new Budova(id, name, floors, addressId);
                                     collection.Add(building);
                                 }
@@ -95,8 +95,8 @@ namespace Nemocnice
 
                             case "DIAGNOZY_CISELNIK":
                                 {
-                                    int id = int.Parse(read(reader, 0));
-                                    string name = read(reader, 1);
+                                    int id = int.Parse(ReadString(reader, 0));
+                                    string name = ReadString(reader, 1);
                                     Diagnoza diagnosis = new Diagnoza(id, name);
                                     collection.Add(diagnosis);  
                                 }
@@ -111,14 +111,14 @@ namespace Nemocnice
                                         {
                                             while (cmdReader.Read())
                                             {
-                                                int id = int.Parse(read(cmdReader, 0));
-                                                string name = read(cmdReader, 1);
-                                                string surName = read(cmdReader, 2);
-                                                int salary = int.Parse(read(cmdReader, 3));
-                                                int hospWardId = int.Parse(read(cmdReader, 4));
-                                                int? superiorId = ParseNullableInt(read(cmdReader, 5));
-                                                int addressId = int.Parse(read(cmdReader, 6));
-                                                char type = read(cmdReader, 7)[0];
+                                                int id = int.Parse(ReadString(cmdReader, 0));
+                                                string name = ReadString(cmdReader, 1);
+                                                string surName = ReadString(cmdReader, 2);
+                                                int salary = int.Parse(ReadString(cmdReader, 3));
+                                                int hospWardId = int.Parse(ReadString(cmdReader, 4));
+                                                int? superiorId = ParseNullableInt(ReadString(cmdReader, 5));
+                                                int addressId = int.Parse(ReadString(cmdReader, 6));
+                                                char type = ReadString(cmdReader, 7)[0];
                                                 Zamestanec employee = new Zamestanec(id, name, surName, salary, hospWardId, superiorId, addressId, type);
                                                 collection.Add(employee);
                                             }
@@ -132,10 +132,10 @@ namespace Nemocnice
 
                             case "LEKY":
                                 {
-                                    int id = int.Parse(read(reader, 0));
-                                    string name = read(reader, 1);
-                                    string category = read(reader, 2);
-                                    int price = int.Parse(read(reader, 3));
+                                    int id = int.Parse(ReadString(reader, 0));
+                                    string name = ReadString(reader, 1);
+                                    string category = ReadString(reader, 2);
+                                    int price = int.Parse(ReadString(reader, 3));
                                     Lek medicament = new Lek(id, name, category, price);  
                                     collection.Add(medicament); 
                                 }
@@ -145,10 +145,10 @@ namespace Nemocnice
                             case "LUZKA":
                                 {
                                     // TODO: mby tohle nějak rozšiřit, že by se vypisovaly misto sestra_id_zamestanec informace o tom zaměstnanci
-                                    int id = int.Parse(read(reader, 0));
-                                    int bedNumber = int.Parse(read(reader, 1));
-                                    int? nurseId = ParseNullableInt(read(reader, 2));
-                                    int roomId = int.Parse(read(reader, 3));
+                                    int id = int.Parse(ReadString(reader, 0));
+                                    int bedNumber = int.Parse(ReadString(reader, 1));
+                                    int? nurseId = ParseNullableInt(ReadString(reader, 2));
+                                    int roomId = int.Parse(ReadString(reader, 3));
                                     Luzko bed = new Luzko(id, bedNumber, nurseId, roomId);
                                     collection.Add(bed);
                                 }
@@ -156,9 +156,9 @@ namespace Nemocnice
 
                             case "ODDELENI":
                                 {
-                                    int id = int.Parse(read(reader, 0));
-                                    string name = read(reader, 1);
-                                    int buildingId = int.Parse(read(reader, 2));
+                                    int id = int.Parse(ReadString(reader, 0));
+                                    string name = ReadString(reader, 1);
+                                    int buildingId = int.Parse(ReadString(reader, 2));
                                     Oddeleni oddeleni = new Oddeleni(id, name, buildingId);
                                     collection.Add(oddeleni);
                                 }
@@ -166,17 +166,17 @@ namespace Nemocnice
 
                             case "PACIENTI":
                                 {
-                                    int id = int.Parse(read(reader, 0));
-                                    string name = read(reader, 1);
-                                    string surName = read(reader, 2);
-                                    DateTime birthDate = DateTime.Parse(read(reader, 3));
+                                    int id = int.Parse(ReadString(reader, 0));
+                                    string name = ReadString(reader, 1);
+                                    string surName = ReadString(reader, 2);
+                                    DateTime birthDate = DateTime.Parse(ReadString(reader, 3));
                                     string formattedBirthDate = birthDate.ToString("yyyy-MM-dd");
-                                    string pin = read(reader, 4);
-                                    DateTime startDate = DateTime.Parse(read(reader, 5));
+                                    string pin = ReadString(reader, 4);
+                                    DateTime startDate = DateTime.Parse(ReadString(reader, 5));
                                     string formattedStartDate = startDate.ToString("yyyy-MM-dd");
-                                    int doctorId = int.Parse(read(reader, 6));
-                                    int addressId = int.Parse(read(reader, 7));
-                                    int insuranceId = int.Parse(read(reader, 8));
+                                    int doctorId = int.Parse(ReadString(reader, 6));
+                                    int addressId = int.Parse(ReadString(reader, 7));
+                                    int insuranceId = int.Parse(ReadString(reader, 8));
                                     Pacient pacient = new Pacient(id, name, surName, formattedBirthDate, pin, formattedStartDate, doctorId, addressId, insuranceId);
                                     collection.Add(pacient);    
                                 }
@@ -184,9 +184,9 @@ namespace Nemocnice
 
                             case "POJISTOVNY":
                                 {
-                                    int id = int.Parse(read(reader, 0));
-                                    string name = read(reader, 1);
-                                    int code = int.Parse(read(reader, 2));
+                                    int id = int.Parse(ReadString(reader, 0));
+                                    string name = ReadString(reader, 1);
+                                    int code = int.Parse(ReadString(reader, 2));
                                     Pojistovna pojistovna = new Pojistovna(id, name, code);
                                     collection.Add(pojistovna);
                                 }
@@ -194,9 +194,9 @@ namespace Nemocnice
 
                             case "POKOJE":
                                 {
-                                    int id = int.Parse(read(reader, 0));
-                                    int roomNum = int.Parse(read(reader, 1));
-                                    int hospWard = int.Parse(read(reader, 2));
+                                    int id = int.Parse(ReadString(reader, 0));
+                                    int roomNum = int.Parse(ReadString(reader, 1));
+                                    int hospWard = int.Parse(ReadString(reader, 2));
                                     Pokoj pokoj = new Pokoj(id, roomNum, hospWard);
                                     collection.Add(pokoj);
                                 }
@@ -204,9 +204,9 @@ namespace Nemocnice
 
                             case "POMUCKY":
                                 {
-                                    int id = int.Parse(read(reader, 0));
-                                    string name = read(reader, 1);
-                                    int count = int.Parse(read(reader, 2));
+                                    int id = int.Parse(ReadString(reader, 0));
+                                    string name = ReadString(reader, 1);
+                                    int count = int.Parse(ReadString(reader, 2));
                                     Pomucka pomucka = new Pomucka(id, name, count); 
                                     collection.Add(pomucka);
                                 }
@@ -214,10 +214,10 @@ namespace Nemocnice
 
                             case "RECEPTY":
                                 {
-                                    int id = int.Parse(read(reader, 0));
-                                    int docId = int.Parse(read(reader, 1));
-                                    int patId = int.Parse(read(reader, 2));
-                                    DateTime date = DateTime.Parse(read(reader, 3));
+                                    int id = int.Parse(ReadString(reader, 0));
+                                    int docId = int.Parse(ReadString(reader, 1));
+                                    int patId = int.Parse(ReadString(reader, 2));
+                                    DateTime date = DateTime.Parse(ReadString(reader, 3));
                                     string formattedDate = date.ToString("yyyy-MM-dd");
                                     Recept prescription = new Recept(id, docId, patId, formattedDate);
                                     collection.Add(prescription);
@@ -225,21 +225,19 @@ namespace Nemocnice
                                 break;
 
                             case "SESTRY":
-                                // Zpracování pro tabulku "SESTRY"
-
+                                // TODO: vyřešit sestry
                                 break;
 
                             case "ZAMESTNANCI":
                                 {
-                                    // Zpracování pro tabulku "ZAMESTNANCI"
-                                    int id = int.Parse(read(reader, 0));
-                                    string name = read(reader, 1);
-                                    string surname = read(reader, 2);
-                                    int salary = int.Parse(read(reader, 3));
-                                    int wardId = int.Parse(read(reader, 4));
-                                    int? superiorId = ParseNullableInt(read(reader, 5));
-                                    int addressId = int.Parse(read(reader, 6));
-                                    char type = char.Parse(read(reader, 7));
+                                    int id = int.Parse(ReadString(reader, 0));
+                                    string name = ReadString(reader, 1);
+                                    string surname = ReadString(reader, 2);
+                                    int salary = int.Parse(ReadString(reader, 3));
+                                    int wardId = int.Parse(ReadString(reader, 4));
+                                    int? superiorId = ParseNullableInt(ReadString(reader, 5));
+                                    int addressId = int.Parse(ReadString(reader, 6));
+                                    char type = char.Parse(ReadString(reader, 7));
                                     Zamestanec employee = new Zamestanec(id, name, surname, salary, wardId, superiorId, addressId, type);
                                     collection.Add(employee);
                                 }
@@ -251,26 +249,18 @@ namespace Nemocnice
                         }
 
                     }
-
-                    try
-                    {
-                        grid.ItemsSource = collection;
-                    }
-                    catch (IndexOutOfRangeException)
-                    {
-                        resultLabel.Content = "Chybný počet sloupců";
-                    }
+                    grid.ItemsSource = collection;
                 }
             }
         }
 
 
-        private string read(OracleDataReader reader, int columnIndex)
+        private static string ReadString(OracleDataReader reader, int columnIndex)
         {
             return reader.IsDBNull(columnIndex) ? "..." : reader.GetString(columnIndex);
         }
 
-        public int? ParseNullableInt(string input)
+        private static int? ParseNullableInt(string input)
         {
             if (int.TryParse(input, out int result))
             {
@@ -281,7 +271,6 @@ namespace Nemocnice
                 return null;
             }
         }
-
 
         private void MezilehleTabulkyInit()
         {
