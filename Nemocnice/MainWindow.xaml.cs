@@ -18,6 +18,8 @@ namespace Nemocnice
         public MainWindow()
         {
             InitializeComponent();
+            Login login = new Login();
+            login.ShowDialog();
             handler = new DatabaseHandler();
             handler.ComboBoxHandle(ref comboBox);
         }
@@ -29,15 +31,17 @@ namespace Nemocnice
 
         private void menuItemShowClick(object sender, RoutedEventArgs e)
         {
-
+            //TODO: show uvodni okno
         }
+
         private void menuItemAddOrRemoveClick(object sender, RoutedEventArgs e)
         {
-
+            //TODO: show add/edit dialog kde se budou měnit textfields s parametry pro přidání dle tabulky
         }
+
         private void menuItemEditClick(object sender, RoutedEventArgs e)
         {
-
+            //TODO: vzit selected index a ten upravit v dialogu
         }
     }
 
