@@ -7,15 +7,12 @@ using Nemocnice.ModelObjects;
 using Oracle.ManagedDataAccess.Client;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Nemocnice.Database;
 
 namespace Nemocnice
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        //OracleConnection connection;
         private DatabaseHandler handler;
 
         public MainWindow()

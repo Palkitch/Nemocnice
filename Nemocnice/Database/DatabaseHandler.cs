@@ -8,21 +8,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace Nemocnice
+namespace Nemocnice.Database
 {
     internal class DatabaseHandler
     {
-        private List<String> Tables { get; set; }
+        private List<string> Tables { get; set; }
         private DatabaseConnection DatabaseConnection { get; }
         private OracleConnection Connection { get; }
-        private List<String> MezilehleTabulky { get; set; }
+        private List<string> MezilehleTabulky { get; set; }
         public DatabaseHandler()
         {
             DatabaseConnection = new DatabaseConnection();
-            Tables = new List<String>();
+            Tables = new List<string>();
             Connection = DatabaseConnection.OracleConnection;
             Connection.Open();
-            MezilehleTabulky = new List<String>();
+            MezilehleTabulky = new List<string>();
             MezilehleTabulkyInit();
         }
         public void ComboBoxHandle(ref ComboBox comboBox)
@@ -45,17 +45,19 @@ namespace Nemocnice
             }
             comboBox.SelectedIndex = 0;
         }
+
         private void MezilehleTabulkyInit()
         {
-            MezilehleTabulky.AddRange(new List<String>
+            MezilehleTabulky.AddRange(new List<string>
             {
                 "LUZKA_PACIENTI", "ZAMESTNANCI_POMUCKY", "RECEPTY_LEKY", "DIAGNOZY_PACIENTI"
             });
         }
+
         public void switchMethod(ref Label resultLabel, ref ComboBox comboBox, ref DataGrid grid)
         {
             {
-                ObservableCollection<Object> collection = new ObservableCollection<Object>();
+                ObservableCollection<object> collection = new ObservableCollection<object>();
                 resultLabel.Content = string.Empty;
                 using (var command = new OracleCommand($"SELECT * FROM {comboBox.SelectedValue}", Connection))
                 {
