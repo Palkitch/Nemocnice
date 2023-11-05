@@ -18,10 +18,11 @@ namespace Nemocnice.Database
         private List<string> MezilehleTabulky { get; set; }
         public DatabaseHandler()
         {
-            DatabaseConnection = new DatabaseConnection();
+            DatabaseConnection = DatabaseConnection.Instance;
             Tables = new List<string>();
             Connection = DatabaseConnection.OracleConnection;
-            Connection.Open();
+            Connection.Open();  // TODO: tohle by mohl byt problem když se bude volat předtim login logika, tam se bude taky 
+            // ta connection otevirat, tak hlavně zajistit aby se buď zavřela, nebo ji nechat otevřenou z loginu a tohle vymazat
             MezilehleTabulky = new List<string>();
             MezilehleTabulkyInit();
         }

@@ -13,7 +13,7 @@ namespace Nemocnice
 {
     public partial class MainWindow : Window
     {
-        private DatabaseHandler handler = null;
+        private DatabaseHandler handler;
 
         public MainWindow()
         {

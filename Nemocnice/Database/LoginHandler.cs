@@ -13,7 +13,7 @@ namespace Nemocnice.Database
 
         public LoginHandler() 
         {
-            DatabaseConnection dbConnection = new DatabaseConnection();
+            DatabaseConnection dbConnection = DatabaseConnection.Instance;
             oracleConnection = dbConnection.OracleConnection;
         }
 
