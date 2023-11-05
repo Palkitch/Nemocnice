@@ -13,14 +13,28 @@ namespace Nemocnice
 {
     public partial class MainWindow : Window
     {
-        private DatabaseHandler handler;
+        private DatabaseHandler handler = null;
 
         public MainWindow()
         {
             InitializeComponent();
+            startupInit();
+        }
+
+        private void startupInit()
+        {
+            // Login setup
             Login login = new Login();
+            login.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             login.ShowDialog();
+
+            // mainwindow center possition
+            this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
+            // handler init
             handler = new DatabaseHandler();
+
+            // mainwindow combobox init
             handler.ComboBoxHandle(ref comboBox);
         }
 
@@ -31,7 +45,10 @@ namespace Nemocnice
 
         private void menuItemShowClick(object sender, RoutedEventArgs e)
         {
-            //TODO: show uvodni okno
+            if (!this.IsActive) 
+            {
+                this.ShowDialog();
+            }
         }
 
         private void menuItemAddOrRemoveClick(object sender, RoutedEventArgs e)
