@@ -7,9 +7,20 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Height="20" Margin="34,44,0,0" VerticalAlignment="Top" Width="177"/>
-        <Label x:Name="resultLabel" HorizontalAlignment="Left" Height="370" Margin="291,29,0,0" VerticalAlignment="Top" Width="472"/>
-        <Button x:Name="printButton" Content="Print" HorizontalAlignment="Left" Height="25" Margin="62,127,0,0" VerticalAlignment="Top" Width="60" Click="printButtonOnAction"/>
-        <DataGrid x:Name="grid" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="300,0,0,0"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260*"/>
+            <ColumnDefinition Width="400*"/>
+        </Grid.ColumnDefinitions>
+        <Rectangle Stroke="Black" Fill="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Margin="0,29,0,0"/>
+        <ComboBox x:Name="comboBox" HorizontalAlignment="Center" Height="30" Margin="0,162,0,0" VerticalAlignment="Top" Width="296" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label x:Name="resultLabel" HorizontalAlignment="Left" Height="370" Margin="0,29,0,0" VerticalAlignment="Top" Width="472" Grid.Column="1" Grid.ColumnSpan="2"/>
+        <Button x:Name="printButton" Content="Zobraz" HorizontalAlignment="Center" Height="38" Margin="0,208,0,0" VerticalAlignment="Top" Width="296" Click="printButtonOnAction"/>
+        <DataGrid x:Name="grid" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,30,0,0" Grid.Column="1" BorderBrush="White"/>
+        <Menu x:Name="menu" Grid.ColumnSpan="2" Height="30" VerticalAlignment="Top" BorderBrush="Black" Background="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+            <MenuItem x:Name="menuItemShow" Header="Zobrazit" Click="menuItemShowClick" Height="30" />
+            <MenuItem x:Name="menuItemAddDelete" Header="Přidat/Odebrat" Click="menuItemAddOrRemoveClick" Height="30"/>
+            <MenuItem x:Name="menuItemEdit" Header="Upravit" Click="menuItemEditClick" Height="30"/>
+        </Menu>
+        <Label Content="Tabulka&#xD;&#xA;" HorizontalAlignment="Center" Margin="0,127,0,0" VerticalAlignment="Top" Height="30" Width="295" FontSize="16" HorizontalContentAlignment="Center"/>
     </Grid>
 </Window>

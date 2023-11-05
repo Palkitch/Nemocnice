@@ -29,6 +29,19 @@ namespace Nemocnice
         {
             handler.switchMethod(ref resultLabel, ref comboBox, ref grid);
         }
+
+        private void menuItemShowClick(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void menuItemAddOrRemoveClick(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void menuItemEditClick(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 
 }
