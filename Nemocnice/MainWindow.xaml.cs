@@ -23,6 +23,10 @@ namespace Nemocnice
 
         private void startupInit()
         {
+
+            // handler init
+            handler = new DatabaseHandler();
+
             // Login setup
             Login login = new Login();
             login.WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -31,8 +35,6 @@ namespace Nemocnice
             // mainwindow center possition
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
-            // handler init
-            handler = new DatabaseHandler();
 
             // mainwindow combobox init
             handler.ComboBoxHandle(ref comboBox);
@@ -45,7 +47,7 @@ namespace Nemocnice
 
         private void menuItemShowClick(object sender, RoutedEventArgs e)
         {
-            if (!this.IsActive) 
+            if (!this.IsActive)
             {
                 this.ShowDialog();
             }

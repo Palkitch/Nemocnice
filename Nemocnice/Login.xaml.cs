@@ -28,15 +28,15 @@ namespace Nemocnice
             loginHandler = new LoginHandler();
         }
 
-        
+
 
         private void btnLoginClick(object sender, RoutedEventArgs e)
         {
             string password = new NetworkCredential(string.Empty, pbPassword.SecurePassword).Password;
             string username = tbLogin.Text;
-            if (username.Length > 0 && password.Length > 0) 
+            if (username.Length > 0 && password.Length > 0)
             {
-                loginHandler.login(username, password);
+                loginHandler.Login(username, password);
             }
         }
 
@@ -46,7 +46,7 @@ namespace Nemocnice
             string username = tbLogin.Text;
             if (username.Length > 0 && password.Length > 0)
             {
-                loginHandler.register(username, password);
+                loginHandler.Register(username, password);
             }
         }
     }
