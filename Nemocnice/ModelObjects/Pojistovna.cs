@@ -8,14 +8,14 @@ namespace Nemocnice.ModelObjects
 {
     public class Pojistovna
     {
-        public string Name { get; set; }
+        public string Nazev { get; set; }
         public int Id { get; set; }
-        public int Code { get; set; }
-        public Pojistovna(int id, string name, int code)
+        public int Cislo { get; set; }
+        public Pojistovna(int id, string nazev, int cislo)
         {
             Id = id;
-            Name = name;
-            Code = code;
+            Nazev = nazev;
+            Cislo = cislo;
         }
     }
 }

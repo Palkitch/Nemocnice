@@ -9,16 +9,16 @@ namespace Nemocnice.ModelObjects
     public class Budova
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public int? NumberOfFloors { get; set; }
-        public int AddressId { get; set; }
+        public string Nazev { get; set; }
+        public int? PocetPater { get; set; }
+        public int IdAdresa { get; set; }
 
-        public Budova(int id, string name, int? numberOfFloors, int addressId)
+        public Budova(int id, string nazev, int? pocetPater, int idAdresa)
         {
             Id = id;
-            Name = name;
-            NumberOfFloors = numberOfFloors;
-            AddressId = addressId;
+            Nazev = nazev;
+            PocetPater = pocetPater;
+            IdAdresa = idAdresa;
         }
     }
 }

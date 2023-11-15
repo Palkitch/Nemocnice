@@ -9,23 +9,23 @@ namespace Nemocnice.ModelObjects
     public class Zamestanec
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string SurName { get; set; }
-        public int Salary { get; set; }
-        public int HospitalWardId { get; set; }
-        public int? SuperiorId { get; set; }
-        public int AddressId { get; set; }
-        public char TypeOfEmployment { get; set; }
-        public Zamestanec(int id, string name, string surName, int salary, int hospitalWardId, int? superiorId, int addressId, char typeOfEmployment)
+        public string Jmeno { get; set; }
+        public string Prijmeni { get; set; }
+        public int Plat { get; set; }
+        public int IdOddeleni { get; set; }
+        public int? IdNadrizeneho { get; set; }
+        public int IdAdresy { get; set; }
+        public char Druh { get; set; }
+        public Zamestanec(int id, string jmeno, string prijmeni, int plat, int idOddeleni, int? idNadrizeneho, int idAdresy, char druh)
         {
             Id = id;
-            Name = name;
-            SurName = surName;
-            Salary = salary;
-            HospitalWardId = hospitalWardId;
-            SuperiorId = superiorId;
-            AddressId = addressId;
-            TypeOfEmployment = typeOfEmployment;
+            Jmeno = jmeno;
+            Prijmeni = prijmeni;
+            Plat = plat;
+            IdOddeleni = idOddeleni;
+            IdNadrizeneho = idNadrizeneho;
+            IdAdresy = idAdresy;
+            Druh = druh;
         }
     }
 }

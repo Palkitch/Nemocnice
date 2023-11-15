@@ -9,15 +9,15 @@ namespace Nemocnice.ModelObjects
     public class Lek
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Category { get; set; }
-        public int Price { get; set; }
-        public Lek(int id, string name, string category, int price)
+        public string Nazev { get; set; }
+        public string Kategorie { get; set; }
+        public int Cena { get; set; }
+        public Lek(int id, string nazev, string kategorie, int cena)
         {
             Id = id;
-            Name = name;
-            Category = category;
-            Price = price;
+            Nazev = nazev;
+            Kategorie = kategorie;
+            Cena = cena;
         }
     }
 }

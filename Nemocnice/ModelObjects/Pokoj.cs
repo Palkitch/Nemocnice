@@ -9,13 +9,13 @@ namespace Nemocnice.ModelObjects
     public class Pokoj
     {
         public int Id { get; set; }
-        public int RoomNumber { get; set; }
-        public int HospitalWardId { get; set; }
-        public Pokoj(int id, int roomNumber, int hospitalWardId)
+        public int CisloPokoje { get; set; }
+        public int IdOddeleni { get; set; }
+        public Pokoj(int id, int cisloPokoje, int idOddeleni)
         {
             Id = id;
-            RoomNumber = roomNumber;
-            HospitalWardId = hospitalWardId;
+            CisloPokoje = cisloPokoje;
+            IdOddeleni = idOddeleni;
         }
     }
 }

@@ -10,25 +10,25 @@ namespace Nemocnice.ModelObjects
     public class Pacient
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Surname { get; set; }
-        public string Birthdate { get; set; }
-        public string PIN { get; set; } 
-        public string StartDate { get; set; }
-        public int DoctorId { get; set; }
-        public int AddressId { get; set; }
-        public int InsuranceCompanyId { get; set; }
-        public Pacient(int id, string name, string surname, string birthdate, string pin, string startDate, int doctorId, int addressId, int insuranceCompanyId)
+        public string Jmeno { get; set; }
+        public string Prijmeni { get; set; }
+        public string DatumNarozeni { get; set; }
+        public string RodneCislo { get; set; } 
+        public string DatumNastupu { get; set; }
+        public int IdDoktora { get; set; }
+        public int IdAdresy { get; set; }
+        public int IdPojistovny { get; set; }
+        public Pacient(int id, string jmeno, string prijmeni, string datumNarozeni, string rodneCislo, string datumNastupu, int idDoktora, int idAdresy, int idPojistovny)
         {
             Id = id;
-            Name = name;
-            Surname = surname;
-            Birthdate = birthdate;
-            PIN = pin;
-            StartDate = startDate;
-            DoctorId = doctorId;
-            AddressId = addressId;
-            InsuranceCompanyId = insuranceCompanyId;
+            Jmeno = jmeno;
+            Prijmeni = prijmeni;
+            DatumNarozeni = datumNarozeni;
+            RodneCislo = rodneCislo;
+            DatumNastupu = datumNastupu;
+            IdDoktora = idDoktora;
+            IdAdresy = idAdresy;
+            IdPojistovny = idPojistovny;
         }
     }
 }

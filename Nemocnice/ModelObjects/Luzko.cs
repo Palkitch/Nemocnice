@@ -9,16 +9,16 @@ namespace Nemocnice.ModelObjects
     public class Luzko
     {
         public int Id { get; set; }
-        public int BedNumber { get; set; }
-        public int? NurseId { get; set; }
-        public int RoomId { get; set; }
+        public int Cislo { get; set; }
+        public int? IdSestra { get; set; }
+        public int IdPokoje { get; set; }
 
-        public Luzko(int id, int bedNumber, int? nurseId, int roomId)
+        public Luzko(int id, int cislo, int? idSestra, int idPokoje)
         {
             Id = id;
-            BedNumber = bedNumber;
-            NurseId = nurseId;
-            RoomId = roomId;
+            Cislo = cislo;
+            IdSestra = idSestra;
+            IdPokoje = idPokoje;
         }
     }
 }

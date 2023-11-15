@@ -9,14 +9,14 @@ namespace Nemocnice.ModelObjects
     public class Oddeleni
     {
         public int ID { get; set; }
-        public string Name { get; set; }
-        public int BuildingId { get; set; }
+        public string Nazev { get; set; }
+        public int IdBudovy { get; set; }
 
-        public Oddeleni(int id, string name, int buildingId) 
+        public Oddeleni(int id, string nazev, int idBudovy) 
         {
             ID = id;
-            Name = name;
-            BuildingId = buildingId;
+            Nazev = nazev;
+            IdBudovy = idBudovy;
         }
     }
 }

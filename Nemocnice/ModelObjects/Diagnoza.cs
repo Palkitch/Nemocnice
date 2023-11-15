@@ -9,11 +9,11 @@ namespace Nemocnice.ModelObjects
     public class Diagnoza
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public Diagnoza(int id, string name)
+        public string Nazev { get; set; }
+        public Diagnoza(int id, string nazev)
         {
             Id = id;
-            Name = name;
+            Nazev = nazev;
         }
     }
 }

@@ -50,7 +50,7 @@ namespace Nemocnice
 
         private void printButtonOnAction(object sender, RoutedEventArgs e)
         {
-            handler.switchMethod(ref resultLabel, ref comboBox, ref grid);
+            handler.SwitchMethod(ref comboBox, ref grid);
         }
 
         private void menuItemShowClick(object sender, RoutedEventArgs e)

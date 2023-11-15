@@ -9,13 +9,13 @@ namespace Nemocnice.ModelObjects
     public class Pomucka
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public int Count { get; set; }
-        public Pomucka(int id, string name, int count)
+        public string Nazev { get; set; }
+        public int Pocet { get; set; }
+        public Pomucka(int id, string nazev, int pocet)
         {
             Id = id;
-            Name = name;
-            Count = count;
+            Nazev = nazev;
+            Pocet = pocet;
         }
     }
 }

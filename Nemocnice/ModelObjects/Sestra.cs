@@ -8,10 +8,10 @@ namespace Nemocnice.ModelObjects
 {
     public class Sestra
     {
-        public int EmployeeId { get; set; }
-        public Sestra(int employeeId)
+        public int IdZamestnance { get; set; }
+        public Sestra(int idZamestnance)
         {
-            EmployeeId = employeeId;
+            IdZamestnance = idZamestnance;
         }
     }
 }

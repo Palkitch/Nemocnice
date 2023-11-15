@@ -62,7 +62,6 @@ namespace Nemocnice.Database
 
             if (storedHashedPassword == inputHashedPassword)
             {
-                MessageBox.Show("Přihlášení úspěšné", "Přihlášení");
                 return true;
             }
             else
