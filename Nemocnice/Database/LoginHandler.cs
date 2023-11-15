@@ -32,25 +32,29 @@ namespace Nemocnice.Database
                 return builder.ToString();
             }
         }
-        public void Register(string username, string password)
+        public bool Register(string username, string password)
         {
             if (UserExists(username, oracleConnection))
             {
                 MessageBox.Show($"Uživatel s jménem {username} již existuje.", "Upozornění");
-                return;
+                return false;
             }
-            string insertQuery = "INSERT INTO Uzivatele (username, password) VALUES (:uname, :pwd)";
+            string insertQuery = "INSERT INTO Uzivatele (nazev, role, id_obrazku, heslo) VALUES (:uname, :urole, :image_id, :pwd)";
             OracleCommand cmd = new OracleCommand(insertQuery, oracleConnection);
             cmd.Parameters.Add(new OracleParameter("uname", username));
+            cmd.Parameters.Add(new OracleParameter("urole", "user"));
+            cmd.Parameters.Add(new OracleParameter("image_id", 2));
             cmd.Parameters.Add(new OracleParameter("pwd", HashPassword(password)));
             cmd.ExecuteNonQuery();
+
+            return true;
         }
-        public void Login(string username, string password)
+        public bool Login(string username, string password)
         {
             if (!UserExists(username, oracleConnection))
             {
                 MessageBox.Show($"Uživatel s jménem {username} neexistuje.", "Upozornění");
-                return;
+                return false;
             }
 
             string storedHashedPassword = GetHashedPassword(username, oracleConnection);
@@ -59,15 +63,17 @@ namespace Nemocnice.Database
             if (storedHashedPassword == inputHashedPassword)
             {
                 MessageBox.Show("Přihlášení úspěšné", "Přihlášení");
+                return true;
             }
             else
             {
                 MessageBox.Show("Nesprávné heslo", "Upozornění");
+                return false;
             }
         }
         private bool UserExists(string username, OracleConnection connection)
         {
-            string query = "SELECT COUNT(*) FROM Uzivatele WHERE username = :uname";
+            string query = "SELECT COUNT(*) FROM Uzivatele WHERE nazev = :uname";
             OracleCommand cmd = new OracleCommand(query, connection);
             cmd.Parameters.Add(new OracleParameter("uname", username));
             int count = Convert.ToInt32(cmd.ExecuteScalar());
@@ -75,7 +81,7 @@ namespace Nemocnice.Database
         }
         private string GetHashedPassword(string username, OracleConnection connection)
         {
-            string query = "SELECT password FROM Uzivatele WHERE username = :uname";
+            string query = "SELECT heslo FROM Uzivatele WHERE nazev = :uname";
             OracleCommand cmd = new OracleCommand(query, connection);
             cmd.Parameters.Add(new OracleParameter("uname", username));
             return cmd.ExecuteScalar().ToString();

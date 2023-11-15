@@ -36,7 +36,18 @@ namespace Nemocnice
             string username = tbLogin.Text;
             if (username.Length > 0 && password.Length > 0)
             {
-                loginHandler.Login(username, password);
+                bool loginResult = loginHandler.Login(username, password);
+
+                if (loginResult)
+                {
+                    // Nastavte DialogResult na true a uzavřete okno
+                    DialogResult = true;
+                }
+                else
+                {
+                    // Zde můžete obsloužit případ neúspěšného přihlášení
+                    MessageBox.Show("Neplatné přihlašovací údaje.");
+                }
             }
         }
 
@@ -46,7 +57,14 @@ namespace Nemocnice
             string username = tbLogin.Text;
             if (username.Length > 0 && password.Length > 0)
             {
-                loginHandler.Register(username, password);
+                bool registerResult = loginHandler.Register(username, password);
+
+                if (registerResult)
+                {
+                    // Nastavte DialogResult na true a uzavřete okno
+                    DialogResult = true;
+                }
+                
             }
         }
     }

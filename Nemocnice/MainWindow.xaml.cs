@@ -30,11 +30,14 @@ namespace Nemocnice
             // Login setup
             Login login = new Login();
             login.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            if (login.ShowDialog() != true)
+            login.ShowDialog();
+            if (login.DialogResult == true)
             {
                 // Uživatel zavřel dialogové okno - ukončí aplikaci
+                login.Close();
+            } else
+            {
                 Application.Current.Shutdown();
-                return;
             }
 
             // mainwindow center possition
