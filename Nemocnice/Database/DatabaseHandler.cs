@@ -1,8 +1,10 @@
 ﻿using Nemocnice.ModelObjects;
 using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,44 +17,47 @@ namespace Nemocnice.Database
         private List<string> Tables { get; set; }
         private DatabaseConnection DatabaseConnection { get; }
         private OracleConnection Connection { get; }
-        private List<string> MezilehleTabulky { get; set; }
+
         public DatabaseHandler()
         {
             DatabaseConnection = DatabaseConnection.Instance;
             Tables = new List<string>();
             Connection = DatabaseConnection.OracleConnection;
-            Connection.Open();  // TODO: tohle by mohl byt problem když se bude volat předtim login logika, tam se bude taky 
-            // ta connection otevirat, tak hlavně zajistit aby se buď zavřela, nebo ji nechat otevřenou z loginu a tohle vymazat
-            MezilehleTabulky = new List<string>();
-            MezilehleTabulkyInit();
+            Connection.Open();
         }
         public void ComboBoxHandle(ref ComboBox comboBox)
         {
-            using (var command = new OracleCommand($"SELECT * FROM user_tables", Connection))
+
             {
-                using (var reader = command.ExecuteReader())
+                using (OracleCommand command = new OracleCommand("ZobrazeniTabulek", Connection))
                 {
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+
+                    // Output parameter for the cursor
+                    command.Parameters.Add("result_cursor", OracleDbType.RefCursor, ParameterDirection.Output);
+
+
+                    // Execute the procedure
+                    command.ExecuteNonQuery();
+
+                    // Retrieve the cursor
+                    OracleDataReader reader = ((OracleRefCursor)command.Parameters["result_cursor"].Value).GetDataReader();
+
+                    // Process the result set
                     while (reader.Read())
                     {
-                        string name = reader.GetString(0);
-                        Tables.Add(name);
+                        string tableName = reader["alias_table_name"].ToString();
+                        Tables.Add(tableName);
+                        // Here you can do whatever you need with the table names
                     }
                 }
-            }
-            Tables.RemoveAll(name => MezilehleTabulky.Contains(name));
-            foreach (string name in Tables)
-            {
-                comboBox.Items.Add(name);
-            }
-            comboBox.SelectedIndex = 0;
-        }
 
-        private void MezilehleTabulkyInit()
-        {
-            MezilehleTabulky.AddRange(new List<string>
-            {
-                "LUZKA_PACIENTI", "ZAMESTNANCI_POMUCKY", "RECEPTY_LEKY", "DIAGNOZY_PACIENTI"
-            });
+                foreach (string name in Tables)
+                {
+                    comboBox.Items.Add(name);
+                }
+                comboBox.SelectedIndex = 0;
+            }
         }
 
         public void switchMethod(ref Label resultLabel, ref ComboBox comboBox, ref DataGrid grid)
