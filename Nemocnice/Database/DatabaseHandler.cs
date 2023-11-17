@@ -27,7 +27,7 @@ namespace Nemocnice.Database
         private Dictionary<string, string> TableAliasMapping { get; set; }
         private DatabaseConnection DatabaseConnection { get; }
         private OracleConnection Connection { get; }
-        public Uzivatel? Uzivatel { get; set; }
+        //public Uzivatel? Uzivatel { get; set; }
         private static DatabaseHandler? instance;
 
         public DatabaseHandler()
@@ -79,14 +79,16 @@ namespace Nemocnice.Database
 
         public void SwitchMethod(ref ComboBox comboBox, ref DataGrid grid)
         {
+
             ObservableCollection<object> collection = new ObservableCollection<object>();
+
+            string? selectedTableAlias = comboBox.SelectedItem.ToString();
+            string? dictValue = TableAliasMapping.FirstOrDefault(x => x.Value == selectedTableAlias).Key;
 
 
             using (var command = new OracleCommand("ZiskaniDat", Connection))
             {
                 command.CommandType = CommandType.StoredProcedure;
-                string? selectedTableAlias = comboBox.SelectedItem.ToString();
-                string? dictValue = TableAliasMapping.FirstOrDefault(x => x.Value == selectedTableAlias).Key;
 
                 // Převedení názvu tabulky na velká písmena
                 string? tableName = dictValue.ToUpper();
@@ -101,196 +103,212 @@ namespace Nemocnice.Database
                 command.ExecuteNonQuery();
                 OracleRefCursor refCursor = (OracleRefCursor)command.Parameters["result_cursor"].Value;
 
-
-                using (OracleDataReader reader = refCursor.GetDataReader())
+                if (dictValue == "DOKTORI")
                 {
-                    while (reader.Read())
+                    string? sql = "SELECT z.* FROM ZAMESTNANCI z JOIN DOKTORI d ON z.id_zamestnanec = d.id_zamestnanec";
+                    using (var cmd = new OracleCommand(sql, Connection))
                     {
-
-                        switch (dictValue)
+                        using (var cmdReader = cmd.ExecuteReader())
                         {
-                            case "ADRESY":
-                                {
-                                    int id = int.Parse(ReadString(reader, 0));
-                                    int postNum = int.Parse(ReadString(reader, 1));
-                                    string? street = ReadString(reader, 2);
-                                    string? city = ReadString(reader, 3);
-                                    int postCode = int.Parse(ReadString(reader, 4));
-                                    string? country = ReadString(reader, 5);
-                                    Adresa address = new Adresa(id, postNum, street, city, country, postCode);
-                                    collection.Add(address);
-                                }
-                                break;
+                            while (cmdReader.Read())
+                            {
+                                int id = int.Parse(ReadString(cmdReader, 0));
+                                string? name = ReadString(cmdReader, 1);
+                                string? surName = ReadString(cmdReader, 2);
+                                int salary = int.Parse(ReadString(cmdReader, 3));
+                                int hospWardId = int.Parse(ReadString(cmdReader, 4));
+                                int? superiorId = ParseNullableInt(ReadString(cmdReader, 5));
+                                int addressId = int.Parse(ReadString(cmdReader, 6));
+                                char type = ReadString(cmdReader, 7)[0];
+                                Zamestanec employee = new Zamestanec(id, name, surName, salary, hospWardId, superiorId, addressId, type);
+                                collection.Add(employee);
+                            }
+                            cmdReader.Close();
+                        }
+                    }
+                }
+                else if (dictValue == "SESTRY")
+                {
+                    string? sql = "SELECT z.* FROM ZAMESTNANCI z JOIN SESTRY s ON z.id_zamestnanec = s.id_zamestnanec";
+                    using (var cmd = new OracleCommand(sql, Connection))
+                    {
+                        using (var cmdReader = cmd.ExecuteReader())
+                        {
+                            while (cmdReader.Read())
+                            {
+                                int id = int.Parse(ReadString(cmdReader, 0));
+                                string? name = ReadString(cmdReader, 1);
+                                string? surName = ReadString(cmdReader, 2);
+                                int salary = int.Parse(ReadString(cmdReader, 3));
+                                int hospWardId = int.Parse(ReadString(cmdReader, 4));
+                                int? superiorId = ParseNullableInt(ReadString(cmdReader, 5));
+                                int addressId = int.Parse(ReadString(cmdReader, 6));
+                                char type = ReadString(cmdReader, 7)[0];
+                                Zamestanec employee = new Zamestanec(id, name, surName, salary, hospWardId, superiorId, addressId, type);
+                                collection.Add(employee);
+                            }
+                            cmdReader.Close();
+                        }
+                    }
+                }
+                else
+                {
+                    using (OracleDataReader reader = refCursor.GetDataReader())
+                    {
+                        while (reader.Read())
+                        {
 
-
-                            case "BUDOVY":
-                                {
-                                    int id = int.Parse(ReadString(reader, 0));
-                                    string? name = ReadString(reader, 1);
-                                    int? floors = ParseNullableInt(ReadString(reader, 2));
-                                    int addressId = int.Parse(ReadString(reader, 3));
-                                    Budova building = new Budova(id, name, floors, addressId);
-                                    collection.Add(building);
-                                    break;
-                                }
-
-
-
-                            case "DIAGNOZY_CISELNIK":
-                                {
-                                    int id = int.Parse(ReadString(reader, 0));
-                                    string? name = ReadString(reader, 1);
-                                    Diagnoza diagnosis = new Diagnoza(id, name);
-                                    collection.Add(diagnosis);
-                                    break;
-                                }
-
-
-                            case "DOKTORI":
-                                {
-                                    string? sql = "SELECT z.* FROM ZAMESTNANCI z JOIN DOKTORI d ON z.id_zamestnanec = d.id_zamestnanec";
-                                    using (var cmd = new OracleCommand(sql, Connection))
+                            switch (dictValue)
+                            {
+                                case "ADRESY":
                                     {
-                                        using (var cmdReader = cmd.ExecuteReader())
-                                        {
-                                            while (cmdReader.Read())
-                                            {
-                                                int id = int.Parse(ReadString(cmdReader, 0));
-                                                string? name = ReadString(cmdReader, 1);
-                                                string? surName = ReadString(cmdReader, 2);
-                                                int salary = int.Parse(ReadString(cmdReader, 3));
-                                                int hospWardId = int.Parse(ReadString(cmdReader, 4));
-                                                int? superiorId = ParseNullableInt(ReadString(cmdReader, 5));
-                                                int addressId = int.Parse(ReadString(cmdReader, 6));
-                                                char type = ReadString(cmdReader, 7)[0];
-                                                Zamestanec employee = new Zamestanec(id, name, surName, salary, hospWardId, superiorId, addressId, type);
-                                                collection.Add(employee);
-                                            }
-                                            reader.Close();
-                                        }
+                                        int id = int.Parse(ReadString(reader, 0));
+                                        int postNum = int.Parse(ReadString(reader, 1));
+                                        string? street = ReadString(reader, 2);
+                                        string? city = ReadString(reader, 3);
+                                        int postCode = int.Parse(ReadString(reader, 4));
+                                        string? country = ReadString(reader, 5);
+                                        Adresa address = new Adresa(id, postNum, street, city, country, postCode);
+                                        collection.Add(address);
                                     }
                                     break;
-                                }
+
+
+                                case "BUDOVY":
+                                    {
+                                        int id = int.Parse(ReadString(reader, 0));
+                                        string? name = ReadString(reader, 1);
+                                        int? floors = ParseNullableInt(ReadString(reader, 2));
+                                        int addressId = int.Parse(ReadString(reader, 3));
+                                        Budova building = new Budova(id, name, floors, addressId);
+                                        collection.Add(building);
+                                        break;
+                                    }
 
 
 
-                            case "LEKY":
-                                {
-                                    int id = int.Parse(ReadString(reader, 0));
-                                    string? name = ReadString(reader, 1);
-                                    string? category = ReadString(reader, 2);
-                                    int price = int.Parse(ReadString(reader, 3));
-                                    Lek medicament = new Lek(id, name, category, price);
-                                    collection.Add(medicament);
-                                    break;
-                                }
+                                case "DIAGNOZY_CISELNIK":
+                                    {
+                                        int id = int.Parse(ReadString(reader, 0));
+                                        string? name = ReadString(reader, 1);
+                                        Diagnoza diagnosis = new Diagnoza(id, name);
+                                        collection.Add(diagnosis);
+                                        break;
+                                    }
+                                case "LEKY":
+                                    {
+                                        int id = int.Parse(ReadString(reader, 0));
+                                        string? name = ReadString(reader, 1);
+                                        string? category = ReadString(reader, 2);
+                                        int price = int.Parse(ReadString(reader, 3));
+                                        Lek medicament = new Lek(id, name, category, price);
+                                        collection.Add(medicament);
+                                        break;
+                                    }
 
+                                case "LUZKA":
+                                    {
+                                        // TODO: mby tohle nějak rozšiřit, že by se vypisovaly misto sestra_id_zamestanec informace o tom zaměstnanci
+                                        // pro admina bych nechal tyhle data, pro usera bych to nějakým způsobem rozšířil
+                                        int id = int.Parse(ReadString(reader, 0));
+                                        int bedNumber = int.Parse(ReadString(reader, 1));
+                                        int? nurseId = ParseNullableInt(ReadString(reader, 2));
+                                        int roomId = int.Parse(ReadString(reader, 3));
+                                        Luzko bed = new Luzko(id, bedNumber, nurseId, roomId);
+                                        collection.Add(bed);
+                                        break;
+                                    }
 
-                            case "LUZKA":
-                                {
-                                    // TODO: mby tohle nějak rozšiřit, že by se vypisovaly misto sestra_id_zamestanec informace o tom zaměstnanci
-                                    int id = int.Parse(ReadString(reader, 0));
-                                    int bedNumber = int.Parse(ReadString(reader, 1));
-                                    int? nurseId = ParseNullableInt(ReadString(reader, 2));
-                                    int roomId = int.Parse(ReadString(reader, 3));
-                                    Luzko bed = new Luzko(id, bedNumber, nurseId, roomId);
-                                    collection.Add(bed);
-                                    break;
-                                }
+                                case "ODDELENI":
+                                    {
+                                        int id = int.Parse(ReadString(reader, 0));
+                                        string? name = ReadString(reader, 1);
+                                        int buildingId = int.Parse(ReadString(reader, 2));
+                                        Oddeleni oddeleni = new Oddeleni(id, name, buildingId);
+                                        collection.Add(oddeleni);
+                                        break;
+                                    }
 
-                            case "ODDELENI":
-                                {
-                                    int id = int.Parse(ReadString(reader, 0));
-                                    string? name = ReadString(reader, 1);
-                                    int buildingId = int.Parse(ReadString(reader, 2));
-                                    Oddeleni oddeleni = new Oddeleni(id, name, buildingId);
-                                    collection.Add(oddeleni);
-                                    break;
-                                }
+                                case "PACIENTI":
+                                    {
+                                        int id = int.Parse(ReadString(reader, 0));
+                                        string? name = ReadString(reader, 1);
+                                        string? surName = ReadString(reader, 2);
+                                        DateTime birthDate = DateTime.Parse(ReadString(reader, 3));
+                                        string? formattedBirthDate = birthDate.ToString("yyyy-MM-dd");
+                                        string? pin = ReadString(reader, 4);
+                                        DateTime startDate = DateTime.Parse(ReadString(reader, 5));
+                                        string? formattedStartDate = startDate.ToString("yyyy-MM-dd");
+                                        int doctorId = int.Parse(ReadString(reader, 6));
+                                        int addressId = int.Parse(ReadString(reader, 7));
+                                        int insuranceId = int.Parse(ReadString(reader, 8));
+                                        Pacient pacient = new Pacient(id, name, surName, formattedBirthDate, pin, formattedStartDate, doctorId, addressId, insuranceId);
+                                        collection.Add(pacient);
+                                        break;
+                                    }
 
-                            case "PACIENTI":
-                                {
-                                    int id = int.Parse(ReadString(reader, 0));
-                                    string? name = ReadString(reader, 1);
-                                    string? surName = ReadString(reader, 2);
-                                    DateTime birthDate = DateTime.Parse(ReadString(reader, 3));
-                                    string? formattedBirthDate = birthDate.ToString("yyyy-MM-dd");
-                                    string? pin = ReadString(reader, 4);
-                                    DateTime startDate = DateTime.Parse(ReadString(reader, 5));
-                                    string? formattedStartDate = startDate.ToString("yyyy-MM-dd");
-                                    int doctorId = int.Parse(ReadString(reader, 6));
-                                    int addressId = int.Parse(ReadString(reader, 7));
-                                    int insuranceId = int.Parse(ReadString(reader, 8));
-                                    Pacient pacient = new Pacient(id, name, surName, formattedBirthDate, pin, formattedStartDate, doctorId, addressId, insuranceId);
-                                    collection.Add(pacient);
-                                    break;
-                                }
+                                case "POJISTOVNY":
+                                    {
+                                        int id = int.Parse(ReadString(reader, 0));
+                                        string? name = ReadString(reader, 1);
+                                        int code = int.Parse(ReadString(reader, 2));
+                                        Pojistovna pojistovna = new Pojistovna(id, name, code);
+                                        collection.Add(pojistovna);
+                                        break;
+                                    }
 
-                            case "POJISTOVNY":
-                                {
-                                    int id = int.Parse(ReadString(reader, 0));
-                                    string? name = ReadString(reader, 1);
-                                    int code = int.Parse(ReadString(reader, 2));
-                                    Pojistovna pojistovna = new Pojistovna(id, name, code);
-                                    collection.Add(pojistovna);
-                                    break;
-                                }
+                                case "POKOJE":
+                                    {
+                                        int id = int.Parse(ReadString(reader, 0));
+                                        int roomNum = int.Parse(ReadString(reader, 1));
+                                        int hospWard = int.Parse(ReadString(reader, 2));
+                                        Pokoj pokoj = new Pokoj(id, roomNum, hospWard);
+                                        collection.Add(pokoj);
+                                        break;
+                                    }
 
-                            case "POKOJE":
-                                {
-                                    int id = int.Parse(ReadString(reader, 0));
-                                    int roomNum = int.Parse(ReadString(reader, 1));
-                                    int hospWard = int.Parse(ReadString(reader, 2));
-                                    Pokoj pokoj = new Pokoj(id, roomNum, hospWard);
-                                    collection.Add(pokoj);
-                                    break;
-                                }
+                                case "POMUCKY":
+                                    {
+                                        int id = int.Parse(ReadString(reader, 0));
+                                        string? name = ReadString(reader, 1);
+                                        int count = int.Parse(ReadString(reader, 2));
+                                        Pomucka pomucka = new Pomucka(id, name, count);
+                                        collection.Add(pomucka);
+                                        break;
+                                    }
 
-                            case "POMUCKY":
-                                {
-                                    int id = int.Parse(ReadString(reader, 0));
-                                    string? name = ReadString(reader, 1);
-                                    int count = int.Parse(ReadString(reader, 2));
-                                    Pomucka pomucka = new Pomucka(id, name, count);
-                                    collection.Add(pomucka);
-                                    break;
-                                }
-
-                            case "RECEPTY":
-                                {
-                                    int id = int.Parse(ReadString(reader, 0));
-                                    int docId = int.Parse(ReadString(reader, 1));
-                                    int patId = int.Parse(ReadString(reader, 2));
-                                    DateTime date = DateTime.Parse(ReadString(reader, 3));
-                                    string? formattedDate = date.ToString("yyyy-MM-dd");
-                                    Recept prescription = new Recept(id, docId, patId, formattedDate);
-                                    collection.Add(prescription);
-                                    break;
-                                }
-
-                            case "SESTRY":
-                                // TODO: vyřešit sestry
-                                break;
-
-                            case "ZAMESTNANCI":
-                                {
-                                    int id = int.Parse(ReadString(reader, 0));
-                                    string? name = ReadString(reader, 1);
-                                    string? surname = ReadString(reader, 2);
-                                    int salary = int.Parse(ReadString(reader, 3));
-                                    int wardId = int.Parse(ReadString(reader, 4));
-                                    int? superiorId = ParseNullableInt(ReadString(reader, 5));
-                                    int addressId = int.Parse(ReadString(reader, 6));
-                                    char type = char.Parse(ReadString(reader, 7));
-                                    Zamestanec employee = new Zamestanec(id, name, surname, salary, wardId, superiorId, addressId, type);
-                                    collection.Add(employee);
-                                    break;
-                                }
+                                case "RECEPTY":
+                                    {
+                                        int id = int.Parse(ReadString(reader, 0));
+                                        int docId = int.Parse(ReadString(reader, 1));
+                                        int patId = int.Parse(ReadString(reader, 2));
+                                        DateTime date = DateTime.Parse(ReadString(reader, 3));
+                                        string? formattedDate = date.ToString("yyyy-MM-dd");
+                                        Recept prescription = new Recept(id, docId, patId, formattedDate);
+                                        collection.Add(prescription);
+                                        break;
+                                    }
+                                case "ZAMESTNANCI":
+                                    {
+                                        int id = int.Parse(ReadString(reader, 0));
+                                        string? name = ReadString(reader, 1);
+                                        string? surname = ReadString(reader, 2);
+                                        int salary = int.Parse(ReadString(reader, 3));
+                                        int wardId = int.Parse(ReadString(reader, 4));
+                                        int? superiorId = ParseNullableInt(ReadString(reader, 5));
+                                        int addressId = int.Parse(ReadString(reader, 6));
+                                        char type = char.Parse(ReadString(reader, 7));
+                                        Zamestanec employee = new Zamestanec(id, name, surname, salary, wardId, superiorId, addressId, type);
+                                        collection.Add(employee);
+                                        break;
+                                    }
+                            }
                         }
                     }
                 }
             }
             grid.ItemsSource = collection;
+            grid.Columns[0].Visibility = Visibility.Hidden; // TODO: Ne moc dobrý řešení toho, jestli je vidět id nebo není. Mohlo by se to lišit podle role. Jestli tě napadá lepší řešení tak řekni
         }
 
         public int saveImageToDatabase(string filePath)
@@ -376,7 +394,7 @@ namespace Nemocnice.Database
             return cmd.ExecuteScalar().ToString();
         }
 
-        public BitmapImage loadImageFromDatabase(int idImage) 
+        public BitmapImage loadImageFromDatabase(int idImage)
         {
             try
             {
@@ -422,7 +440,7 @@ namespace Nemocnice.Database
             return imageBytes;
         }
 
-        public void loadLoggedUser(TextBox tb, ComboBox cb, Image img) 
+        public void loadLoggedUser(TextBox tb, ComboBox cb, Image img)
         {
             Uzivatel uzivatel = null;
             BitmapImage bitMapImage = null;
@@ -443,7 +461,7 @@ namespace Nemocnice.Database
                     bitMapImage = loadImageFromDatabase(imgId);
                 }
             }
-            if (uzivatel != null) 
+            if (uzivatel != null)
             {
                 tb.Text = uzivatel.Jmeno;
                 tb.IsReadOnly = true;
