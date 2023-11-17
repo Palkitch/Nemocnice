@@ -23,7 +23,6 @@ namespace Nemocnice
 
         private void startupInit()
         {
-
             // handler init
             handler = new DatabaseHandler();
 
@@ -31,11 +30,11 @@ namespace Nemocnice
             Login login = new Login();
             login.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             login.ShowDialog();
-            if (login.DialogResult == true)
+            if (login.DialogResult == true) // úspěšný login/register
             {
-                // Uživatel zavřel dialogové okno - ukončí aplikaci
                 login.Close();
-            } else
+            }
+            else  // Uživatel zavřel dialogové okno - ukončí aplikaci
             {
                 Application.Current.Shutdown();
             }
@@ -52,24 +51,5 @@ namespace Nemocnice
         {
             handler.SwitchMethod(ref comboBox, ref grid);
         }
-
-        private void menuItemShowClick(object sender, RoutedEventArgs e)
-        {
-            if (!this.IsActive)
-            {
-                this.ShowDialog();
-            }
-        }
-
-        private void menuItemAddOrRemoveClick(object sender, RoutedEventArgs e)
-        {
-            //TODO: show add/edit dialog kde se budou měnit textfields s parametry pro přidání dle tabulky
-        }
-
-        private void menuItemEditClick(object sender, RoutedEventArgs e)
-        {
-            //TODO: vzit selected index a ten upravit v dialogu
-        }
     }
-
 }

@@ -32,6 +32,7 @@ namespace Nemocnice.Database
                 return builder.ToString();
             }
         }
+
         public bool Register(string username, string password)
         {
             if (UserExists(username, oracleConnection))
@@ -49,6 +50,7 @@ namespace Nemocnice.Database
 
             return true;
         }
+
         public bool Login(string username, string password)
         {
             if (!UserExists(username, oracleConnection))
@@ -70,6 +72,7 @@ namespace Nemocnice.Database
                 return false;
             }
         }
+
         private bool UserExists(string username, OracleConnection connection)
         {
             string query = "SELECT COUNT(*) FROM Uzivatele WHERE nazev = :uname";
@@ -78,6 +81,7 @@ namespace Nemocnice.Database
             int count = Convert.ToInt32(cmd.ExecuteScalar());
             return count > 0;
         }
+
         private string GetHashedPassword(string username, OracleConnection connection)
         {
             string query = "SELECT heslo FROM Uzivatele WHERE nazev = :uname";

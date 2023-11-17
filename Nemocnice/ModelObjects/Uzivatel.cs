@@ -11,6 +11,7 @@ namespace Nemocnice.ModelObjects
         Admin,
         User
     }
+
     internal class Uzivatel
     {
         public string Jmeno { get; set; }

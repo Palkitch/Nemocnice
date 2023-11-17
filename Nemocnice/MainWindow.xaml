@@ -6,34 +6,31 @@
         xmlns:local="clr-namespace:Nemocnice"
         mc:Ignorable="d"
         Title="Nemocnice" Height="450" Width="800">
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="#FF908E8D" Offset="1"/>
-                <GradientStop Color="#FFC6D6D5" Offset="0.012"/>
-            </LinearGradientBrush>
-        </Grid.Background>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150
-                              *"/>
-            <ColumnDefinition Width="400*"/>
-        </Grid.ColumnDefinitions>
-        <ComboBox x:Name="comboBox" Height="30" Margin="10,212,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-        <Label x:Name="resultLabel" HorizontalAlignment="Left" Height="370" Margin="0,29,0,0" VerticalAlignment="Top" Width="472" Grid.Column="1" Grid.ColumnSpan="2"/>
-        <Button x:Name="printButton" Content="Zobraz" Margin="56,0,56,10" Click="printButtonOnAction" Height="40" VerticalAlignment="Bottom"/>
-        <DataGrid x:Name="grid" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,30,0,0" Grid.Column="1" BorderBrush="White"/>
-        <Menu x:Name="menu" Grid.ColumnSpan="2" Height="30" VerticalAlignment="Top" BorderBrush="Black">
-            <Menu.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FFC6D6D5" Offset="0.012"/>
-                    <GradientStop Color="#FF908E8D" Offset="1"/>
-                </LinearGradientBrush>
-            </Menu.Background>
-            <MenuItem x:Name="menuItemShow" Header="Zobrazit" Click="menuItemShowClick" Height="30" />
-            <MenuItem x:Name="menuItemAddDelete" Header="Přidat/Odebrat" Click="menuItemAddOrRemoveClick" Height="30"/>
-            <MenuItem x:Name="menuItemEdit" Header="Upravit" Click="menuItemEditClick" Height="30"/>
-        </Menu>
-        <Label Content="Tabulka" Margin="10,177,10,0" VerticalAlignment="Top" Height="30" FontSize="16"/>
-        <Label Content="Menu" Margin="10,35,10,0" VerticalAlignment="Top" Height="30" FontSize="16" HorizontalContentAlignment="Center"/>
-    </Grid>
+    <TabControl>
+        <TabItem Header="Admin">
+            <Grid>
+                <Grid.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF908E8D" Offset="1"/>
+                        <GradientStop Color="#FFC6D6D5" Offset="0.012"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250*"/>
+                    <ColumnDefinition Width="544*"/>
+                </Grid.ColumnDefinitions>
+                <DataGrid x:Name="grid" d:ItemsSource="{d:SampleData ItemCount=5}" Grid.Column="1" BorderBrush="White"/>
+                <Button x:Name="printButton" Grid.Column="0" Content="Zobraz" Click="printButtonOnAction" Margin="10,173,10,0" Height="35" VerticalAlignment="Top"/>
+                <Label Content="Menu" Grid.Column="0" FontSize="16" HorizontalContentAlignment="Center" Margin="0,10,0,0" Height="30" VerticalAlignment="Top"/>
+                <Label Content="Tabulka" Grid.Column="0" Height="30" FontSize="16" Margin="10,103,10,0" VerticalAlignment="Top"/>
+                <ComboBox x:Name="comboBox" Grid.Column="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="10,138,10,0" Height="30" VerticalAlignment="Top"/>
+                <Label Content="Logy" Grid.Column="0" Height="30" FontSize="16" Margin="10,221,10,0" VerticalAlignment="Top"/>
+                <Button x:Name="printButton_Kopírovat" Grid.Column="0" Content="Zobraz" Click="printButtonOnAction" Margin="10,251,10,0" Height="35" VerticalAlignment="Top"/>
+            </Grid>
+        </TabItem>
+        <TabItem Header="TabItem">
+            <Grid Background="#FFE5E5E5"/>
+        </TabItem>
+    </TabControl>
+
 </Window>

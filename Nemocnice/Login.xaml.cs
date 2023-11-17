@@ -67,5 +67,11 @@ namespace Nemocnice
                 
             }
         }
+
+        private void btnSkip_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+            // TODO: Disable ruznejch items bo je to guest
+        }
     }
 }
