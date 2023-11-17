@@ -8,11 +8,11 @@ namespace Nemocnice.ModelObjects
 {
     public enum Role
     {
-        Admin,
-        User
+        ADMIN,
+        USER
     }
 
-    internal class Uzivatel
+    public class Uzivatel
     {
         public string Jmeno { get; set; }
         public Role Role { get; set; }

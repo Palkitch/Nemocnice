@@ -20,15 +20,14 @@ namespace Nemocnice
     public partial class Login : Window
     {
 
-        LoginHandler loginHandler;
+        private readonly LoginHandler loginHandler;
+        public static bool Guest { get; set; }
 
         public Login()
         {
             InitializeComponent();
             loginHandler = new LoginHandler();
         }
-
-
 
         private void btnLoginClick(object sender, RoutedEventArgs e)
         {
@@ -61,6 +60,7 @@ namespace Nemocnice
 
                 if (registerResult)
                 {
+                    MessageBox.Show("Úspěšně jste se registrovali!", "info");
                     // Nastavte DialogResult na true a uzavřete okno
                     DialogResult = true;
                 }
@@ -71,6 +71,7 @@ namespace Nemocnice
         private void btnSkip_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
+            Guest = true;
             // TODO: Disable ruznejch items bo je to guest
         }
     }

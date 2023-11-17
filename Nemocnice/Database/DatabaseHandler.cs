@@ -1,4 +1,6 @@
-﻿using Nemocnice.ModelObjects;
+﻿using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.ApplicationServices;
+using Nemocnice.ModelObjects;
 using Oracle.ManagedDataAccess.Client;
 using Oracle.ManagedDataAccess.Types;
 using System;
@@ -7,20 +9,26 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+using ComboBox = System.Windows.Controls.ComboBox;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace Nemocnice.Database
 {
-    internal class DatabaseHandler
+    public class DatabaseHandler
     {
         private Dictionary<string, string> TableAliasMapping { get; set; }
         private DatabaseConnection DatabaseConnection { get; }
         private OracleConnection Connection { get; }
-        public Uzivatel Uzivatel { get; set; }
+        public Uzivatel? Uzivatel { get; set; }
+        private static DatabaseHandler? instance;
 
         public DatabaseHandler()
         {
@@ -30,7 +38,16 @@ namespace Nemocnice.Database
             Connection.Open();
         }
 
-        public void ComboBoxHandle(ref ComboBox comboBox)
+        public static DatabaseHandler Instance  // singletone kvuli otevirani connection v konstruktoru
+        {
+            get
+            {
+                instance ??= new DatabaseHandler();
+                return instance;
+            }
+        }
+
+        public void adminComboBoxHandle(ref ComboBox comboBox)   // TODO: asi rename, takhle se to stejně řešit nebude, leda pro admina
         {
             {
                 using (OracleCommand command = new OracleCommand("ZobrazeniTabulek", Connection))
@@ -276,39 +293,98 @@ namespace Nemocnice.Database
             grid.ItemsSource = collection;
         }
 
-        public void saveImageToDatabase(string filePath)
+        public int saveImageToDatabase(string filePath)
         {
             try
             {
                 byte[] imageBytes = LoadImageBytes(filePath);
                 string? imageName = getImageNameFromFilePath(filePath);
-
+                int newId;
                 using (OracleCommand cmd = new OracleCommand())
                 {
+                    // Uložení obrazku do ikon
                     cmd.Connection = Connection;
-                    cmd.CommandText = "INSERT INTO Ikony (nazev, obsah) VALUES (:imageName, :image)";
+                    cmd.CommandText = "INSERT INTO Ikony (nazev, obsah) VALUES (:imageName, :image) RETURNING id INTO :newId";
                     cmd.Parameters.Add("imageName", OracleDbType.Varchar2).Value = imageName;
                     cmd.Parameters.Add("image", OracleDbType.Blob).Value = imageBytes;
+                    OracleParameter newIdParam = new OracleParameter(":newId", OracleDbType.Int32);
+                    newIdParam.Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(newIdParam);
+                    cmd.ExecuteNonQuery();
 
+                    // update obrázku aktuálně přihlášeného uživatele
+                    newId = Convert.ToInt32(newIdParam.Value);
+                    cmd.CommandText = "UPDATE uzivatele SET id_obrazku = :newId WHERE id_uzivatel = (SELECT * FROM prihlaseny_uzivatel)";
+                    cmd.Parameters.Add("newId", OracleDbType.Int32).Value = newId;
                     cmd.ExecuteNonQuery();
                 }
 
                 MessageBox.Show("Obrázek byl úspěšně uložen do databáze.", "Info");
+                return newId;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Chyba při ukládání obrázku: " + ex.Message, "Chyba");
             }
+            return 0;
         }
 
-        public BitmapImage loadImageFromDatabase() 
+        public string? Login(string username, string password)
+        {
+            if (!UserExists(username))
+            {
+                MessageBox.Show($"Uživatel s jménem {username} neexistuje.", "Upozornění");
+                return null;
+            }
+
+            string storedHashedPassword = GetHashedPassword(username);
+            return storedHashedPassword == password ? storedHashedPassword : null;
+        }
+
+        public bool Register(string username, string password)
+        {
+            if (UserExists(username))
+            {
+                MessageBox.Show($"Uživatel s jménem {username} již existuje.", "Upozornění");
+                return false;
+            }
+            string insertQuery = "INSERT INTO Uzivatele (nazev, role, id_obrazku, heslo) VALUES (:uname, :urole, :image_id, :pwd)";
+            OracleCommand cmd = new OracleCommand(insertQuery, Connection);
+            cmd.Parameters.Add(new OracleParameter("uname", username));
+            cmd.Parameters.Add(new OracleParameter("urole", "user"));
+            cmd.Parameters.Add(new OracleParameter("image_id", 2));
+            cmd.Parameters.Add(new OracleParameter("pwd", password));
+            cmd.ExecuteNonQuery();
+
+            return true;
+        }
+
+        private bool UserExists(string username)
+        {
+            string query = "SELECT COUNT(*) FROM Uzivatele WHERE nazev = :uname";
+            OracleCommand cmd = new OracleCommand(query, Connection);
+            cmd.Parameters.Add(new OracleParameter("uname", username));
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
+            return count > 0;
+        }
+
+        private string GetHashedPassword(string username)
+        {
+            string query = "SELECT heslo FROM Uzivatele WHERE nazev = :uname";
+            OracleCommand cmd = new OracleCommand(query, Connection);
+            cmd.Parameters.Add(new OracleParameter("uname", username));
+            return cmd.ExecuteScalar().ToString();
+        }
+
+        public BitmapImage loadImageFromDatabase(int idImage) 
         {
             try
             {
                 using (OracleCommand cmd = new OracleCommand())
                 {
                     cmd.Connection = Connection;
-                    cmd.CommandText = "SELECT obsah FROM Ikony WHERE id_obrazek = 3";
+                    cmd.CommandText = "SELECT obsah FROM Ikony WHERE id_obrazek = :idImage";
+                    cmd.Parameters.Add(new OracleParameter("idImage", idImage));
                     OracleDataReader reader = cmd.ExecuteReader();
 
                     if (reader.Read())
@@ -346,6 +422,39 @@ namespace Nemocnice.Database
             return imageBytes;
         }
 
+        public void loadLoggedUser(TextBox tb, ComboBox cb, Image img) 
+        {
+            Uzivatel uzivatel = null;
+            BitmapImage bitMapImage = null;
+
+            string query = "SELECT prihlaseny_nazev, obrazek_id, prihlaseny_role FROM uzivatele_s_obrazky";
+            OracleCommand cmd = new OracleCommand(query, Connection);
+            using (var cmdReader = cmd.ExecuteReader())
+            {
+                while (cmdReader.Read())
+                {
+                    string? name = ReadString(cmdReader, 0);
+                    int imgId = int.Parse(ReadString(cmdReader, 1));
+                    string? roleString = ReadString(cmdReader, 2).ToUpper();
+                    if (Enum.TryParse<Role>(roleString, out Role role))
+                    {
+                        uzivatel = new Uzivatel(name, role);
+                    }
+                    bitMapImage = loadImageFromDatabase(imgId);
+                }
+            }
+            if (uzivatel != null) 
+            {
+                tb.Text = uzivatel.Jmeno;
+                tb.IsReadOnly = true;
+                cb.Items.Add(uzivatel.Role.ToString().ToLower());
+                cb.IsReadOnly = true;
+                cb.SelectedIndex = 0;
+                img.Source = bitMapImage;
+            }
+
+
+        }
 
         private static string ReadString(OracleDataReader reader, int columnIndex)
         {

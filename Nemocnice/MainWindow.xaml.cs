@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.IO;
+using MessageBox = System.Windows.MessageBox;
 
 namespace Nemocnice
 {
@@ -26,8 +27,7 @@ namespace Nemocnice
 
         private void startupInit()
         {
-            // handler init
-            handler = new DatabaseHandler();
+            handler = DatabaseHandler.Instance;
 
             // Login setup
             Login login = new Login();
@@ -42,12 +42,15 @@ namespace Nemocnice
                 System.Windows.Application.Current.Shutdown();
             }
 
-            // mainwindow center possition
+            // main okno appky bude zobrazeno vycentrované na obrazovce
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
-
-            // mainwindow combobox init
-            handler.ComboBoxHandle(ref comboBox);
+            // naplnění comboboxu pro admina aby si mohl zobrazit každou tabulku
+            handler.adminComboBoxHandle(ref comboBox);
+            if (Login.Guest == false) 
+            {
+                handler.loadLoggedUser(profileUserTb, profileRolesCb, profileImg);
+            }
         }
 
         private void printButtonOnAction(object sender, RoutedEventArgs e)
@@ -60,22 +63,20 @@ namespace Nemocnice
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Filter = "Obrázky|*.jpg;*.jpeg;*.png|Všechny soubory|*.*";
-
-                // Nastavíme počáteční adresář pro prohlížeč souborů (volitelné)
-                openFileDialog.InitialDirectory = "C:\\";
-
-                // Zobrazíme dialog pro výběr souboru
                 DialogResult result = openFileDialog.ShowDialog();
 
-                // Pokud uživatel vybere soubor a potvrdí dialog, zpracujeme vybraný soubor
+                // Po vybrání správného souboru se zpracuje, uloží do databáze a z ní načte do GUI
+                // tím je ověřena funkčnost a správnost ukládání binárních dat
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     string selectedFilePath = openFileDialog.FileName;
-                    System.Windows.MessageBox.Show("Načteno: " + selectedFilePath);
-
-                    handler.saveImageToDatabase(selectedFilePath);
-
-                    profileImg.Source = handler.loadImageFromDatabase();
+                    int lastId = handler.saveImageToDatabase(selectedFilePath);
+                    BitmapImage bitmap = handler.loadImageFromDatabase(lastId);
+                    if (bitmap != null) 
+                    {
+                        profileImg.Source = bitmap;
+                        profileInsertPictureButton.Content = "Změňte obrázek";
+                    }
                 }
             }
         }
