@@ -28,7 +28,25 @@
                 <Button x:Name="printButton_Kopírovat" Grid.Column="0" Content="Zobraz" Click="printButtonOnAction" Margin="10,251,10,0" Height="35" VerticalAlignment="Top"/>
             </Grid>
         </TabItem>
-        <TabItem Header="TabItem">
+        <TabItem Header="Profil">
+            <Grid Background="#FFE5E5E5">
+                <Label HorizontalAlignment="Left" Margin="32,31,0,348" Width="48"/>
+                <ComboBox x:Name="profileRolesCb" Width="120" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" VerticalAlignment="Top" Height="22" Margin="80,31,0,0"/>
+                <Image x:Name="profileImg" HorizontalAlignment="Left" Height="135" Margin="214,10,0,0" VerticalAlignment="Top" Width="120"/>
+                <TextBox x:Name="profileUserTb" HorizontalAlignment="Left" Margin="80,60,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Height="26" VerticalContentAlignment="Center"/>
+                <Label Content="Role" HorizontalAlignment="Left" Margin="32,29,0,0" VerticalAlignment="Top"/>
+                <Label Content="User" HorizontalAlignment="Left" Margin="32,60,0,0" VerticalAlignment="Top"/>
+                <Button x:Name="profileInsertPictureButton" Content="Vyberte obrázek" HorizontalAlignment="Left" Margin="38,91,0,0" VerticalAlignment="Top" Height="30" Width="162" Click="profileInsertPictureButton_Click"/>
+                <Label x:Name="profileLoadedLbl" Content="" HorizontalAlignment="Left" Margin="38,126,0,0" VerticalAlignment="Top" Width="162" Height="30"/>
+            </Grid>
+        </TabItem>
+        <TabItem HorizontalAlignment="Center" Height="20" Header="TabItem" VerticalAlignment="Center" Width="54">
+            <Grid Background="#FFE5E5E5"/>
+        </TabItem>
+        <TabItem HorizontalAlignment="Center" Height="20" Header="TabItem" VerticalAlignment="Center" Width="54">
+            <Grid Background="#FFE5E5E5"/>
+        </TabItem>
+        <TabItem HorizontalAlignment="Center" Height="20" Header="TabItem" VerticalAlignment="Center" Width="54">
             <Grid Background="#FFE5E5E5"/>
         </TabItem>
     </TabControl>
