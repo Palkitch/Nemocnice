@@ -30,7 +30,7 @@ namespace Nemocnice.Database
         private Dictionary<string, string> TableAliasMapping { get; set; }
         private DatabaseConnection DatabaseConnection { get; }
         private OracleConnection Connection { get; }
-        public Uzivatel Uzivatel { get; set; }
+        public Uzivatel? Uzivatel { get; set; }
         private static DatabaseHandler? instance;
 
         public DatabaseHandler()
@@ -50,7 +50,7 @@ namespace Nemocnice.Database
             }
         }
 
-        public void AdminComboBoxHandle(ref ComboBox comboBox)   // TODO: asi rename, takhle se to stejně řešit nebude, leda pro admina
+        public void AdminComboBoxHandle(ref ComboBox comboBox)
         {
             {
                 using (OracleCommand command = new OracleCommand("ZobrazeniTabulek", Connection))
@@ -62,13 +62,12 @@ namespace Nemocnice.Database
                     command.ExecuteNonQuery();
 
                     OracleDataReader reader = ((OracleRefCursor)command.Parameters["result_cursor"].Value).GetDataReader();
-                    StringBuilder sb = new StringBuilder();
                     while (reader.Read())
                     {
                         string? aliasTableName = reader["alias_table_name"].ToString();
                         string? tableName = reader["table_name"].ToString();
-                        sb.AppendLine(tableName + " (" + aliasTableName + ")");
-                        TableAliasMapping.Add(tableName, aliasTableName);
+                        if (aliasTableName != null && tableName != null) 
+                            TableAliasMapping.Add(tableName, aliasTableName);
                     }
                 }
                 foreach (string value in TableAliasMapping.Values)
@@ -80,7 +79,7 @@ namespace Nemocnice.Database
         }
 
 
-        public void SwitchMethod(ref ComboBox comboBox, ref DataGrid grid)
+        public void LoadDataFromTable(ref ComboBox comboBox, ref DataGrid grid)
         {
 
             ObservableCollection<object> collection = new ObservableCollection<object>();
@@ -106,6 +105,7 @@ namespace Nemocnice.Database
                 command.ExecuteNonQuery();
                 OracleRefCursor refCursor = (OracleRefCursor)command.Parameters["result_cursor"].Value;
 
+                // TODO: mby předělat reader aby četl podle nazvu sloupců (cmdReader["nazev"]) a oddělat vyčitání IDs
                 if (dictValue == "DOKTORI")
                 {
                     string? sql = "SELECT z.* FROM ZAMESTNANCI z JOIN DOKTORI d ON z.id_zamestnanec = d.id_zamestnanec";

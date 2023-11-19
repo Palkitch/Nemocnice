@@ -52,7 +52,7 @@ namespace Nemocnice
 
         private void printButtonOnAction(object sender, RoutedEventArgs e)
         {
-            handler.SwitchMethod(ref comboBox, ref grid);
+            handler.LoadDataFromTable(ref comboBox, ref grid);
         }
 
         private void profileInsertPictureButton_Click(object sender, RoutedEventArgs e)
