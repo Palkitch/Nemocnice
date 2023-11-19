@@ -46,11 +46,8 @@ namespace Nemocnice
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
             // naplnění comboboxu pro admina aby si mohl zobrazit každou tabulku
-            handler.adminComboBoxHandle(ref comboBox);
-            if (Login.Guest == false) 
-            {
-                handler.loadLoggedUser(profileUserTb, profileRolesCb, profileImg);
-            }
+            handler.AdminComboBoxHandle(ref comboBox);
+            handler.LoadLoggedUser(profileUserTb, profileRolesCb, profileImg, profileInsertPictureButton, Login.Guest);
         }
 
         private void printButtonOnAction(object sender, RoutedEventArgs e)
@@ -70,8 +67,8 @@ namespace Nemocnice
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     string selectedFilePath = openFileDialog.FileName;
-                    int lastId = handler.saveImageToDatabase(selectedFilePath);
-                    BitmapImage bitmap = handler.loadImageFromDatabase(lastId);
+                    int lastId = handler.SaveImageToDatabase(selectedFilePath);
+                    BitmapImage? bitmap = handler.LoadImageFromDatabase(lastId);
                     if (bitmap != null) 
                     {
                         profileImg.Source = bitmap;

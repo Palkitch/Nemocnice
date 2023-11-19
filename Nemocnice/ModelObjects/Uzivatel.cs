@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,8 +11,12 @@ namespace Nemocnice.ModelObjects
 {
     public enum Role
     {
-        ADMIN,
-        USER
+        [Description("primar")]
+        PRIMAR, // admin
+        [Description("doktor")]
+        DOKTOR, // user
+        [Description("sestra")]
+        SESTRA  // user
     }
 
     public class Uzivatel
