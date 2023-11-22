@@ -35,16 +35,20 @@ namespace Nemocnice.Database
         private OracleConnection Connection { get; }
         public Uzivatel? Uzivatel { get; set; }
         private static DatabaseHandler? instance;
+        public List<Diagnoza> Diagnozy { get; set; }
+        public List<KrevniSkupina> KrevniSkupiny { get; set; }
 
         public DatabaseHandler()
         {
             DatabaseConnection = DatabaseConnection.Instance;
+            Diagnozy = new List<Diagnoza>();
+            KrevniSkupiny = new List<KrevniSkupina>();
             TableAliasMapping = new Dictionary<string, string>();
             Connection = DatabaseConnection.OracleConnection;
             Connection.Open();
         }
 
-        public static DatabaseHandler Instance  // singletone kvuli otevirani connection v konstruktoru
+        public static DatabaseHandler Instance  // singleton kvuli otevirani connection v konstruktoru
         {
             get
             {
@@ -81,7 +85,6 @@ namespace Nemocnice.Database
             }
         }
 
-
         public void LoadDataFromTable(ref ComboBox comboBox, ref DataGrid grid)
         {
 
@@ -98,7 +101,6 @@ namespace Nemocnice.Database
                 // Převedení názvu tabulky na velká písmena
                 string? tableName = dictValue.ToUpper();
 
-                command.CommandType = CommandType.StoredProcedure;
 
                 // Přidání parametrů pro volání procedury
                 command.Parameters.Add("p_table_name", OracleDbType.Varchar2).Value = dictValue;
@@ -477,11 +479,11 @@ namespace Nemocnice.Database
                     cmd.CommandText = "DELETE FROM Ikony WHERE id_obrazek = :imgId";
                     cmd.Parameters.Add(new OracleParameter("imgId", userImgId));
                     int rowsAffected = cmd.ExecuteNonQuery();
-                    if (rowsAffected > 0) 
+                    if (rowsAffected > 0)
                     {
                         MessageBox.Show("Obrázek byl úspěšně smazán", "Info");
                         return true;
-                    } 
+                    }
                     else
                     {
                         MessageBox.Show("Obrázek se nepovedlo smazat", "Warn");
@@ -492,8 +494,6 @@ namespace Nemocnice.Database
             }
             return false;
         }
-
-
         public string? Login(string username, string password)
         {
             if (!UserExists(username))
@@ -615,6 +615,144 @@ namespace Nemocnice.Database
             else
             {
                 deletImgBtn.IsEnabled = false;
+            }
+        }
+        public void VypisZaznamu()
+        {
+            using (var command = new OracleCommand("ZiskaniDat", Connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.Add("p_table_name", OracleDbType.Varchar2).Value = "ZAZNAMY";
+                command.Parameters.Add("result_cursor", OracleDbType.RefCursor, ParameterDirection.Output); // Explicitní kurzor? 
+                command.ExecuteNonQuery();
+                OracleRefCursor refCursor = (OracleRefCursor)command.Parameters["result_cursor"].Value;
+                using (OracleDataReader reader = refCursor.GetDataReader())
+                {
+                    ZaznamyDialog d = new ZaznamyDialog(reader);
+                    d.Show();
+                }
+            }
+        }
+        public void PacientiComboBoxyHandle(ref ComboBox skupiny, ref ComboBox diagnozy)
+        {
+            // Nastavení příkazů pro funkce
+            string skupinyCmd = "BEGIN :result := GetKrevniSkupiny; END;";
+            string diagnozyCmd = "BEGIN :result := GetDiagnozy; END;";
+
+            // Vytvoření transakce
+            using (OracleTransaction transaction = Connection.BeginTransaction())
+            {
+                try
+                {
+                    // Volání první funkce
+                    using (OracleCommand command1 = new OracleCommand(skupinyCmd, Connection))
+                    {
+                        command1.CommandType = System.Data.CommandType.Text;
+                        command1.Parameters.Add("result", OracleDbType.RefCursor, System.Data.ParameterDirection.ReturnValue);
+                        command1.Transaction = transaction;
+
+                        using (OracleDataReader reader1 = command1.ExecuteReader())
+                        {
+                            skupiny.Items.Clear();
+
+                            while (reader1.Read())
+                            {
+                                string typ = reader1["TYP"].ToString();
+                                string id = reader1["ID_SKUPINA"].ToString();
+                                KrevniSkupina ks = new KrevniSkupina(int.Parse(id), typ);
+                                KrevniSkupiny.Add(ks);
+                                skupiny.Items.Add(ks);
+                            }
+                        }
+                    }
+
+                    // Volání druhé funkce
+                    using (OracleCommand command2 = new OracleCommand(diagnozyCmd, Connection))
+                    {
+                        command2.CommandType = System.Data.CommandType.Text;
+                        command2.Parameters.Add("result", OracleDbType.RefCursor, System.Data.ParameterDirection.ReturnValue);
+                        command2.Transaction = transaction;
+
+                        using (OracleDataReader reader2 = command2.ExecuteReader())
+                        {
+                            // Vyčištění ComboBoxu před přidáním nových dat
+                            diagnozy.Items.Clear();
+
+                            // Zpracování výsledků druhé funkce a naplnění ComboBoxu
+                            while (reader2.Read())
+                            {
+                                string nazev = reader2["NAZEV"].ToString();
+                                string id = reader2["ID"].ToString();
+                                Diagnoza d = new Diagnoza(int.Parse(id), nazev);
+                                diagnozy.Items.Add(d);
+                                Diagnozy.Add(d);
+                            }
+                        }
+                    }
+
+                    // Commit transakce
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Chyba: " + ex.Message);
+
+                    transaction.Rollback();
+                }
+            }
+            skupiny.SelectedIndex = 0;
+            diagnozy.SelectedIndex = 0;
+        }
+
+        public void VypisPacientu(ref DataGrid dataGrid, ref ComboBox comboBox, Ciselnik druhCiselniku)
+        {
+            switch (druhCiselniku)
+            {
+                case Ciselnik.DIAGNOZY:
+                    {
+                        using (OracleCommand command = new OracleCommand("BEGIN :result := GetPacientiByDiagnoza(:id_param); END;", Connection))
+                        {
+                            command.CommandType = CommandType.Text;
+                            Diagnoza selectedDiagnoza = comboBox.SelectedValue as Diagnoza;
+                            int id = selectedDiagnoza.Id;
+
+                            command.Parameters.Add("result", OracleDbType.RefCursor).Direction = ParameterDirection.ReturnValue;
+                            command.Parameters.Add("id_param", OracleDbType.Int32).Value = id;
+                            command.ExecuteNonQuery();
+
+                            using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
+                            {
+                                DataTable dataTable = new DataTable();
+                                dataTable.Load(reader);
+
+                                dataGrid.ItemsSource = dataTable.DefaultView;
+                            }
+                        }
+
+                        break;
+                    }
+                case Ciselnik.SKUPINY:
+                    {
+                        using (OracleCommand command = new OracleCommand("BEGIN :result := GetPacientiBySkupina(:id_param); END;", Connection))
+                        {
+                            command.CommandType = CommandType.Text;
+                            KrevniSkupina selectedSkupina = comboBox.SelectedValue as KrevniSkupina;
+                            int id = selectedSkupina.Id;
+
+                            command.Parameters.Add("result", OracleDbType.RefCursor).Direction = ParameterDirection.ReturnValue;
+                            command.Parameters.Add("id_param", OracleDbType.Int32).Value = id;
+                            command.ExecuteNonQuery();
+
+                            using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
+                            {
+                                DataTable dataTable = new DataTable();
+                                dataTable.Load(reader);
+
+                                dataGrid.ItemsSource = dataTable.DefaultView;
+                            }
+                        }
+                        break;
+                    }
             }
         }
     }

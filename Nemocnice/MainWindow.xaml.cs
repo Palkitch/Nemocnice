@@ -47,15 +47,25 @@ namespace Nemocnice
 
             // naplnění comboboxu pro admina aby si mohl zobrazit každou tabulku
             handler.AdminComboBoxHandle(ref comboBox);
-            handler.LoadLoggedUser(profileUserTb, profileRolesCb, profileImg, 
-                profInsertPictureBtn, profDeletePictureBtn, Login.Guest);
+            handler.PacientiComboBoxyHandle(ref skupinyComboBox, ref diagnozyComboBox);
+            handler.LoadLoggedUser(profileUserTb, profileRolesCb, profileImg,
+            profInsertPictureBtn, profDeletePictureBtn, Login.Guest);
+            diagnozyRadio.Checked += (sender, e) =>
+            {
+                diagnozyComboBox.IsEnabled = true;
+                skupinyComboBox.IsEnabled = false;
+            };
+            skupinyRadio.Checked += (sender, e) =>
+            {
+                diagnozyComboBox.IsEnabled = false;
+                skupinyComboBox.IsEnabled = true;
+            };
         }
 
         private void printButtonOnAction(object sender, RoutedEventArgs e)
         {
             handler.LoadDataFromTable(ref comboBox, ref grid);
         }
-
 
         private void ProfInsertPicture_Click(object sender, RoutedEventArgs e)
         {
@@ -74,23 +84,23 @@ namespace Nemocnice
                         int savedImgId = handler.SaveImageToDatabase(selectedFilePath);
                         InitImage(savedImgId);
                     }
-                    else 
+                    else
                     {
                         int updatedImgId = handler.UpdateImageInDatabase(selectedFilePath);
                         InitImage(updatedImgId);
                     }
-      
+
                 }
             }
         }
 
-        private void InitImage(int id) 
+        private void InitImage(int id)
         {
             BitmapImage? bitmap = handler.LoadImageContentFromDatabase(id);
             if (bitmap != null)
             {
                 profileImg.Source = bitmap;
-                if (!profDeletePictureBtn.IsEnabled) 
+                if (!profDeletePictureBtn.IsEnabled)
                     profDeletePictureBtn.IsEnabled = true;
                 profInsertPictureBtn.Content = "Změnit obrázek";
             }
@@ -98,11 +108,29 @@ namespace Nemocnice
 
         private void ProfDeletePicture_Click(object sender, RoutedEventArgs e)
         {
-            if (handler.DeleteCurrentUserImageFromDatabase()) 
+            if (handler.DeleteCurrentUserImageFromDatabase())
             {
                 profileImg.Source = null;
                 profDeletePictureBtn.IsEnabled = false;
             }
         }
+
+        private void ZaznamButtonOnAction(object sender, RoutedEventArgs e)
+        {
+            handler.VypisZaznamu();
+        }
+
+        private void ZobrazitCiselnikOnAction(object sender, RoutedEventArgs e)
+        {
+            if (skupinyRadio.IsChecked == true)
+            {
+                handler.VypisPacientu(ref pacientiGrid, ref skupinyComboBox, Ciselnik.SKUPINY);
+            }
+            else if (diagnozyRadio.IsChecked == true)
+            {
+                handler.VypisPacientu(ref pacientiGrid, ref diagnozyComboBox, Ciselnik.DIAGNOZY);
+            }
+        }
+
     }
 }

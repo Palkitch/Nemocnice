@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 
 namespace Nemocnice.ModelObjects
 {
-    public class Diagnoza
+    public class KrevniSkupina
     {
         public int Id { get; set; }
-        public string Nazev { get; set; }
-        public Diagnoza(int id, string nazev)
+        public string Typ { get; set; }
+        public KrevniSkupina(int id, string typ)
         {
-            Id = id;
-            Nazev = nazev;
+            this.Id = id;
+            this.Typ = typ;
         }
 
         public override string? ToString()
         {
-            return Nazev;
+            return Typ;
         }
     }
 }
