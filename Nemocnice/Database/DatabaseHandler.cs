@@ -7,13 +7,16 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Reflection.PortableExecutable;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Xml.Linq;
@@ -66,7 +69,7 @@ namespace Nemocnice.Database
                     {
                         string? aliasTableName = reader["alias_table_name"].ToString();
                         string? tableName = reader["table_name"].ToString();
-                        if (aliasTableName != null && tableName != null) 
+                        if (aliasTableName != null && tableName != null)
                             TableAliasMapping.Add(tableName, aliasTableName);
                     }
                 }
@@ -311,7 +314,7 @@ namespace Nemocnice.Database
                 }
             }
             grid.ItemsSource = collection;
-            grid.Columns[0].Visibility = Visibility.Hidden; 
+            grid.Columns[0].Visibility = Visibility.Hidden;
             // TODO: Ne moc dobrý řešení toho, jestli je vidět id nebo není. Mohlo by se to lišit podle role. Jestli tě napadá lepší řešení tak řekni
         }
 
@@ -319,28 +322,24 @@ namespace Nemocnice.Database
         {
             try
             {
-                byte[] imageBytes = LoadImageBytes(filePath);
-                string? imageName = GetImageNameFromFilePath(filePath);
                 int newId;
                 using (OracleCommand cmd = new OracleCommand())
                 {
                     // Uložení obrazku do ikon
+                    cmd.CommandText = "INSERT INTO Ikony (nazev, pripona, obsah) VALUES (:imageName, :imageType, :image) " +
+                        "RETURNING id_obrazek INTO :newId";
                     cmd.Connection = Connection;
-                    cmd.CommandText = "INSERT INTO Ikony (nazev, obsah) VALUES (:imageName, :image) RETURNING id_obrazek INTO :newId";
-                    cmd.Parameters.Add(new OracleParameter("imageName", imageName));
-                    cmd.Parameters.Add(new OracleParameter("image", imageBytes));
+                    cmd.Parameters.Add(new OracleParameter("imageName", GetImageNameFromFilePath(filePath)));
+                    cmd.Parameters.Add(new OracleParameter("imageType", GetImageTypeFromFilePath(filePath)));
+                    cmd.Parameters.Add(new OracleParameter("image", LoadImageBytes(filePath)));
                     OracleParameter newIdParam = new OracleParameter(":newId", OracleDbType.Int32);
                     newIdParam.Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(newIdParam);
                     cmd.ExecuteNonQuery();
-
-                    // update obrázku aktuálně přihlášeného uživatele
                     newId = ((OracleDecimal)newIdParam.Value).ToInt32();
-                    cmd.CommandText = "UPDATE uzivatele SET id_obrazku = :newId WHERE id_uzivatel = (SELECT id_uzivatel FROM uzivatele WHERE nazev LIKE :userName)";
-                    cmd.Parameters.Clear();
-                    cmd.Parameters.Add(new OracleParameter("newId", newId));
-                    cmd.Parameters.Add(new OracleParameter("userName", Uzivatel.Jmeno));
-                    cmd.ExecuteNonQuery();
+
+                    // update vazby obrazku u uzivatele
+                    UpdateUserImage(newId);
                 }
 
                 MessageBox.Show("Obrázek byl úspěšně uložen do databáze.", "Info");
@@ -352,6 +351,148 @@ namespace Nemocnice.Database
             }
             return 0;
         }
+
+        private int GetUzivatelskeIdObrazku()
+        {
+            using (OracleCommand cmd = new OracleCommand("SELECT id_obrazek FROM uzivatele_s_ikony WHERE uzivatel_nazev LIKE :userName", Connection))
+            {
+                // Vytahnout id obrazku pro update z uzivatele_s_ikony view
+                cmd.Parameters.Add(new OracleParameter("userName", Uzivatel.Jmeno));
+                object obj = cmd.ExecuteScalar();
+                if (obj != null)
+                    if (int.TryParse(obj.ToString(), out int imageId))
+                        return imageId;
+            }
+            return 0;
+        }
+
+        public int UpdateImageInDatabase(string filePath)
+        {
+            using (OracleCommand cmd = new OracleCommand())
+            {
+                int userImgId = GetUzivatelskeIdObrazku();
+                if (userImgId != 0)
+                {
+                    // update obsahu daneho id v tabulce ikony
+                    cmd.CommandText = "update_ikony";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add("p_id", OracleDbType.Int32).Value = userImgId;
+                    cmd.Parameters.Add("p_nazev", OracleDbType.Varchar2).Value = GetImageNameFromFilePath(filePath);
+                    cmd.Parameters.Add("p_obsah", OracleDbType.Blob).Value = LoadImageBytes(filePath);
+                    cmd.Parameters.Add("p_pripona", OracleDbType.Varchar2).Value = GetImageTypeFromFilePath(filePath);
+                    cmd.ExecuteNonQuery();
+
+                    // update vazby obrazku u uzivatele
+                    UpdateUserImage(userImgId);
+                    return userImgId;
+                }
+                else
+                {
+                    MessageBox.Show("Chyba při update obrazku v databazi", "Error");
+                }
+                return 0;
+            }
+        }
+
+        public BitmapImage? LoadImageContentFromDatabase(int? idImage)
+        {
+            if (idImage == null)
+                return null;
+            try
+            {
+                using (OracleCommand cmd = new OracleCommand("SELECT obsah FROM Ikony WHERE id_obrazek = :idImage", Connection))
+                {
+                    cmd.Parameters.Add(new OracleParameter("idImage", idImage));
+                    OracleDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        // Načítání bytů z databáze
+                        byte[] imageBytes = (byte[])reader["obsah"];
+
+                        // Vytvoření BitmapImage z načtených bytů
+                        BitmapImage bitmap = new BitmapImage();
+                        bitmap.BeginInit();
+                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                        bitmap.StreamSource = new MemoryStream(imageBytes);
+                        bitmap.EndInit();
+                        return bitmap;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Chyba při načítání obrázku: " + ex.Message, "Chyba");
+            }
+            return null;
+        }
+
+        private byte[] LoadImageBytes(string filePath)
+        {
+            byte[] imageBytes = File.ReadAllBytes(filePath);
+            return imageBytes;
+        }
+
+        private string? GetImageTypeFromFilePath(string filePath)
+        {
+            string[] parts = filePath.Split('\\', '/');
+            string fileName = parts[parts.Length - 1];
+            fileName = fileName.Substring(fileName.IndexOf("."));
+            return fileName;
+        }
+
+        private string? GetImageNameFromFilePath(string filePath)
+        {
+            string[] parts = filePath.Split('\\', '/');
+            string fileName = parts[parts.Length - 1];
+            fileName = fileName.Substring(0, fileName.IndexOf("."));
+            return fileName;
+        }
+
+        private void UpdateUserImage(int imgId)
+        {
+            using (OracleCommand cmd = new OracleCommand("update_uzivatelsky_obrazek", Connection))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new OracleParameter("p_nazev", Uzivatel.Jmeno));
+                cmd.Parameters.Add(new OracleParameter("p_id_obrazku", imgId));
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public bool DeleteCurrentUserImageFromDatabase()
+        {
+            int userImgId = GetUzivatelskeIdObrazku();
+            if (userImgId != 0)
+            {
+                using (OracleCommand cmd = new OracleCommand("UPDATE uzivatele SET id_obrazku = NULL WHERE id_obrazku = :imgId", Connection))
+                {
+                    // smazání vazby v tabulce uzivatele
+                    cmd.Parameters.Add(new OracleParameter("imgId", userImgId));
+                    cmd.ExecuteNonQuery();
+
+                    // smazání daného obrázku z databáze
+                    cmd.Parameters.Clear();
+                    cmd.CommandText = "DELETE FROM Ikony WHERE id_obrazek = :imgId";
+                    cmd.Parameters.Add(new OracleParameter("imgId", userImgId));
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    if (rowsAffected > 0) 
+                    {
+                        MessageBox.Show("Obrázek byl úspěšně smazán", "Info");
+                        return true;
+                    } 
+                    else
+                    {
+                        MessageBox.Show("Obrázek se nepovedlo smazat", "Warn");
+                        return false;
+                    }
+
+                }
+            }
+            return false;
+        }
+
 
         public string? Login(string username, string password)
         {
@@ -415,57 +556,9 @@ namespace Nemocnice.Database
             }
         }
 
-        public BitmapImage? LoadImageFromDatabase(int? idImage)
+        public void LoadLoggedUser(TextBox tb, ComboBox cb, Image img, Button insertImgBtn, Button deleteImgBtn, bool guest)
         {
-            if (idImage == null)
-                return null;
-            try
-            {
-                using (OracleCommand cmd = new OracleCommand())
-                {
-                    cmd.Connection = Connection;
-                    cmd.CommandText = "SELECT obsah FROM Ikony WHERE id_obrazek = :idImage";
-                    cmd.Parameters.Add(new OracleParameter("idImage", idImage));
-                    OracleDataReader reader = cmd.ExecuteReader();
-
-                    if (reader.Read())
-                    {
-                        // Načítání bytů z databáze
-                        byte[] imageBytes = (byte[])reader["obsah"];
-
-                        // Vytvoření BitmapImage z načtených bytů
-                        BitmapImage bitmap = new BitmapImage();
-                        bitmap.BeginInit();
-                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                        bitmap.StreamSource = new MemoryStream(imageBytes);
-                        bitmap.EndInit();
-                        return bitmap;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Chyba při načítání obrázku: " + ex.Message, "Chyba");
-            }
-            return null;
-        }
-
-        private string? GetImageNameFromFilePath(string filePath)
-        {
-            string[] parts = filePath.Split('\\', '/');
-            string fileName = parts[parts.Length - 1];
-            return fileName;
-        }
-
-        private byte[] LoadImageBytes(string filePath)
-        {
-            byte[] imageBytes = File.ReadAllBytes(filePath);
-            return imageBytes;
-        }
-
-        public void LoadLoggedUser(TextBox tb, ComboBox cb, Image img, Button insertImgButton, bool guest)
-        {
-            if (!guest) 
+            if (!guest)
             {
                 BitmapImage? bitMapImage = null;
                 string query = "SELECT id_obrazek FROM uzivatele_s_ikony WHERE uzivatel_nazev LIKE :userName";
@@ -475,15 +568,15 @@ namespace Nemocnice.Database
                 if (imgIdObject != null)    // našel se odpovidajici zaznam v pohledu uzivatele_s_ikony
                 {
                     int imgId = Decimal.ToInt32((decimal)imgIdObject);
-                    bitMapImage = LoadImageFromDatabase(imgId);
+                    bitMapImage = LoadImageContentFromDatabase(imgId);
                 }
                 // Nastavení hodnot uzivatele do tabu profil
-                handleProfileData(tb, cb, img, bitMapImage, insertImgButton,
+                handleProfileData(tb, cb, img, bitMapImage, insertImgBtn, deleteImgBtn,
                     Uzivatel.Jmeno, Uzivatel.Role.ToString(), true);
-            } 
-            else 
+            }
+            else
             {
-                handleProfileData(tb, cb, img, null, insertImgButton, "Nepřihlášený", "Guest", false);
+                handleProfileData(tb, cb, img, null, insertImgBtn, deleteImgBtn, "Nepřihlášený", "Guest", false);
             }
         }
 
@@ -505,16 +598,24 @@ namespace Nemocnice.Database
         }
 
         private void handleProfileData(TextBox tb, ComboBox cb, Image img, BitmapImage? bitMapImage,
-            Button insertImageButton, string tbText, string cbRole, bool isInsertImgButtonEnabled) 
+            Button insertImgBtn, Button deletImgBtn, string tbText, string cbRole, bool areBtnsEnabled)
         {
             tb.Text = tbText;
             cb.Items.Add(cbRole);
             cb.SelectedIndex = 0;
             tb.IsReadOnly = true;
             cb.IsReadOnly = true;
-            insertImageButton.IsEnabled = isInsertImgButtonEnabled;
+            insertImgBtn.IsEnabled = areBtnsEnabled;
+            deletImgBtn.IsEnabled = areBtnsEnabled;
             if (bitMapImage != null)    // Uživatel nemusí mít nastavený obrázek
+            {
                 img.Source = bitMapImage;
+                insertImgBtn.Content = "Upravit obrázek";
+            }
+            else
+            {
+                deletImgBtn.IsEnabled = false;
+            }
         }
     }
 }

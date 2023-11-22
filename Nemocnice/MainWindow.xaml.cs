@@ -22,10 +22,10 @@ namespace Nemocnice
         public MainWindow()
         {
             InitializeComponent();
-            startupInit();
+            StartupInit();
         }
 
-        private void startupInit()
+        private void StartupInit()
         {
             handler = DatabaseHandler.Instance;
 
@@ -47,7 +47,8 @@ namespace Nemocnice
 
             // naplnění comboboxu pro admina aby si mohl zobrazit každou tabulku
             handler.AdminComboBoxHandle(ref comboBox);
-            handler.LoadLoggedUser(profileUserTb, profileRolesCb, profileImg, profileInsertPictureButton, Login.Guest);
+            handler.LoadLoggedUser(profileUserTb, profileRolesCb, profileImg, 
+                profInsertPictureBtn, profDeletePictureBtn, Login.Guest);
         }
 
         private void printButtonOnAction(object sender, RoutedEventArgs e)
@@ -55,26 +56,52 @@ namespace Nemocnice
             handler.LoadDataFromTable(ref comboBox, ref grid);
         }
 
-        private void profileInsertPictureButton_Click(object sender, RoutedEventArgs e)
+
+        private void ProfInsertPicture_Click(object sender, RoutedEventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.Filter = "Obrázky|*.jpg;*.jpeg;*.png|Všechny soubory|*.*";
+                openFileDialog.Filter = "Obrázky|*.jpg;*.jpeg;*.png";
                 DialogResult result = openFileDialog.ShowDialog();
-
+                string selectedFilePath;
                 // Po vybrání správného souboru se zpracuje, uloží do databáze a z ní načte do GUI
                 // tím je ověřena funkčnost a správnost ukládání binárních dat
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
-                    string selectedFilePath = openFileDialog.FileName;
-                    int lastId = handler.SaveImageToDatabase(selectedFilePath);
-                    BitmapImage? bitmap = handler.LoadImageFromDatabase(lastId);
-                    if (bitmap != null) 
+                    selectedFilePath = openFileDialog.FileName;
+                    if (profileImg.Source == null)
                     {
-                        profileImg.Source = bitmap;
-                        profileInsertPictureButton.Content = "Změňte obrázek";
+                        int savedImgId = handler.SaveImageToDatabase(selectedFilePath);
+                        InitImage(savedImgId);
                     }
+                    else 
+                    {
+                        int updatedImgId = handler.UpdateImageInDatabase(selectedFilePath);
+                        InitImage(updatedImgId);
+                    }
+      
                 }
+            }
+        }
+
+        private void InitImage(int id) 
+        {
+            BitmapImage? bitmap = handler.LoadImageContentFromDatabase(id);
+            if (bitmap != null)
+            {
+                profileImg.Source = bitmap;
+                if (!profDeletePictureBtn.IsEnabled) 
+                    profDeletePictureBtn.IsEnabled = true;
+                profInsertPictureBtn.Content = "Změnit obrázek";
+            }
+        }
+
+        private void ProfDeletePicture_Click(object sender, RoutedEventArgs e)
+        {
+            if (handler.DeleteCurrentUserImageFromDatabase()) 
+            {
+                profileImg.Source = null;
+                profDeletePictureBtn.IsEnabled = false;
             }
         }
     }
