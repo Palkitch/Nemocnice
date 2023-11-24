@@ -4,18 +4,21 @@ using Nemocnice.ModelObjects;
 using Oracle.ManagedDataAccess.Client;
 using Oracle.ManagedDataAccess.Types;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
+using System.Printing;
 using System.Reflection.PortableExecutable;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -24,6 +27,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using Button = System.Windows.Controls.Button;
 using ComboBox = System.Windows.Controls.ComboBox;
+using MessageBox = System.Windows.MessageBox;
 using TextBox = System.Windows.Controls.TextBox;
 
 namespace Nemocnice.Database
@@ -45,7 +49,8 @@ namespace Nemocnice.Database
             KrevniSkupiny = new List<KrevniSkupina>();
             TableAliasMapping = new Dictionary<string, string>();
             Connection = DatabaseConnection.OracleConnection;
-            Connection.Open();
+            try { Connection.Open(); }
+            catch(Exception ex) { Console.WriteLine("ZAPNI SI VPN :)"); }
         }
 
         public static DatabaseHandler Instance  // singleton kvuli otevirani connection v konstruktoru
@@ -571,18 +576,24 @@ namespace Nemocnice.Database
                     bitMapImage = LoadImageContentFromDatabase(imgId);
                 }
                 // Nastavení hodnot uzivatele do tabu profil
-                handleProfileData(tb, cb, img, bitMapImage, insertImgBtn, deleteImgBtn,
+                HandleProfileData(tb, cb, img, bitMapImage, insertImgBtn, deleteImgBtn,
                     Uzivatel.Jmeno, Uzivatel.Role.ToString(), true);
             }
             else
             {
-                handleProfileData(tb, cb, img, null, insertImgBtn, deleteImgBtn, "Nepřihlášený", "Guest", false);
+                HandleProfileData(tb, cb, img, null, insertImgBtn, deleteImgBtn, "Nepřihlášený", "Guest", false);
             }
         }
 
         private static string ReadString(OracleDataReader reader, int columnIndex)
         {
             return reader.IsDBNull(columnIndex) ? "..." : reader.GetString(columnIndex);
+        }
+
+        private static string ReadString(OracleDataReader reader, string columnName)
+        {
+            int columnIndex = reader.GetOrdinal(columnName);
+            return ReadString(reader, columnIndex);
         }
 
         private static int? ParseNullableInt(string input)
@@ -597,7 +608,7 @@ namespace Nemocnice.Database
             }
         }
 
-        private void handleProfileData(TextBox tb, ComboBox cb, Image img, BitmapImage? bitMapImage,
+        private void HandleProfileData(TextBox tb, ComboBox cb, Image img, BitmapImage? bitMapImage,
             Button insertImgBtn, Button deletImgBtn, string tbText, string cbRole, bool areBtnsEnabled)
         {
             tb.Text = tbText;
@@ -617,6 +628,7 @@ namespace Nemocnice.Database
                 deletImgBtn.IsEnabled = false;
             }
         }
+
         public void VypisZaznamu()
         {
             using (var command = new OracleCommand("ZiskaniDat", Connection))
@@ -633,7 +645,7 @@ namespace Nemocnice.Database
                 }
             }
         }
-        public void PacientiComboBoxyHandle(ref ComboBox skupiny, ref ComboBox diagnozy)
+        public void PacientsComboBoxesHandle(ref ComboBox skupiny, ref ComboBox diagnozy)
         {
             // Nastavení příkazů pro funkce
             string skupinyCmd = "BEGIN :result := GetKrevniSkupiny; END;";
@@ -753,6 +765,46 @@ namespace Nemocnice.Database
                         }
                         break;
                     }
+            }
+        }
+
+        public void RecipeesComboBoxHandle(ref ComboBox recipeesComboBox) 
+        {
+            recipeesComboBox.Items.Add("VŠE");
+            using (OracleCommand command = new OracleCommand("SELECT nazev_kategorie FROM kategorie_leku_ciselnik", Connection))
+            {
+                using (OracleDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        // Přidání hodnot do ComboBox
+                        string? nazevKategorie = reader["nazev_kategorie"].ToString();
+                        recipeesComboBox.Items.Add(nazevKategorie);
+                    }
+                    recipeesComboBox.SelectedIndex = 0;
+                }
+            }
+        }
+
+        public void ShowRecipees(ref ComboBox recipeesComboBox, ref DataGrid recipeesGrid)
+        {
+            string? category = recipeesComboBox.SelectedValue as string;
+            if (category == "VŠE") category = "all";
+            using (OracleCommand command = new OracleCommand("BEGIN :result := GetReceptyLekyByKategorie(:category); END;", Connection))
+            {
+                command.CommandType = CommandType.Text;
+
+                command.Parameters.Add("result", OracleDbType.RefCursor).Direction = ParameterDirection.ReturnValue;
+                command.Parameters.Add(new OracleParameter("category", category));
+                command.ExecuteNonQuery();
+
+                using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
+                {
+                    DataTable dataTable = new DataTable();
+                    dataTable.Load(reader);
+
+                    recipeesGrid.ItemsSource = dataTable.DefaultView;
+                }
             }
         }
     }

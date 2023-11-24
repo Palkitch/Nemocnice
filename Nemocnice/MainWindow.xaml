@@ -20,12 +20,12 @@
                     <ColumnDefinition Width="544*"/>
                 </Grid.ColumnDefinitions>
                 <DataGrid x:Name="grid" d:ItemsSource="{d:SampleData ItemCount=1}" Grid.Column="1" BorderBrush="White"/>
-                <Button x:Name="printButton" Grid.Column="0" Content="Zobraz" Click="printButtonOnAction" Margin="10,173,10,0" Height="35" VerticalAlignment="Top"/>
+                <Button x:Name="adminShowTables" Grid.Column="0" Content="Zobrazit" Click="AdminShowTables_Click" Margin="10,173,10,0" Height="35" VerticalAlignment="Top"/>
                 <Label Content="Menu" Grid.Column="0" FontSize="16" HorizontalContentAlignment="Center" Margin="0,10,0,0" Height="30" VerticalAlignment="Top"/>
                 <Label Content="Tabulka" Grid.Column="0" Height="30" FontSize="16" Margin="10,103,10,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="comboBox" Grid.Column="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="10,138,10,0" Height="30" VerticalAlignment="Top"/>
+                <ComboBox x:Name="comboBox" Grid.Column="0" VerticalContentAlignment="Center" Margin="10,138,10,0" Height="30" VerticalAlignment="Top"/>
                 <Label Content="Záznamy" Grid.Column="0" Height="30" FontSize="16" Margin="10,221,10,0" VerticalAlignment="Top"/>
-                <Button x:Name="printButton_Kopírovat" Grid.Column="0" Content="Zobrazit záznam" Click="ZaznamButtonOnAction" Margin="10,251,10,0" Height="35" VerticalAlignment="Top"/>
+                <Button x:Name="adminShowLogs" Grid.Column="0" Content="Zobrazit záznamy" Click="AdminShowLogs_Click" Margin="10,251,10,0" Height="35" VerticalAlignment="Top"/>
             </Grid>
         </TabItem>
         <TabItem Header="Profil">
@@ -36,9 +36,9 @@
                 <TextBox x:Name="profileUserTb" Margin="0,10,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="26" VerticalContentAlignment="Center" HorizontalAlignment="Right" Width="120"/>
                 <Label Content="Role" Margin="0,41,135,0" VerticalAlignment="Top" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="78"/>
                 <Label Content="Uživatel" Margin="0,10,135,0" VerticalAlignment="Top" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="78"/>
-                <Button x:Name="profInsertPictureBtn" Content="Vložit obrázek" Margin="218,0,0,101" Click="ProfInsertPicture_Click" HorizontalAlignment="Left" Width="162" Height="30" VerticalAlignment="Bottom"/>
+                <Button x:Name="profInsertPictureBtn" Content="Vložit obrázek" Margin="218,0,0,96" Click="ProfInsertPicture_Click" HorizontalAlignment="Left" Width="162" Height="35" VerticalAlignment="Bottom"/>
                 <Label x:Name="profileLoadedLbl" Content="" HorizontalAlignment="Left" Margin="38,126,0,0" VerticalAlignment="Top" Width="162" Height="30"/>
-                <Button x:Name="profDeletePictureBtn" Content="Smazat obrázek" Margin="0,0,218,101" Click="ProfDeletePicture_Click" RenderTransformOrigin="2.802,5.795" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="162"/>
+                <Button x:Name="profDeletePictureBtn" Content="Smazat obrázek" Margin="0,0,218,96" Click="ProfDeletePicture_Click" RenderTransformOrigin="2.802,5.795" Height="35" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="162"/>
             </Grid>
         </TabItem>
         <TabItem HorizontalAlignment="Center" Height="20" Header="Pacienti" VerticalAlignment="Center" Width="54">
@@ -55,23 +55,37 @@
                 </Grid.ColumnDefinitions>
                 <DataGrid x:Name="pacientiGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Grid.Column="1" BorderBrush="White"/>
                 <Label Content="Pacienti" Grid.Column="0" FontSize="16" HorizontalContentAlignment="Center" Margin="0,10,0,0" Height="30" VerticalAlignment="Top"/>
-
-                <StackPanel Margin="0,103,0,0">
-                    <RadioButton x:Name="diagnozyRadio" Content="Diagnózy" Height="20" Width="217" IsChecked="true" GroupName="ciselnikRadio"/>
-                    <ComboBox x:Name="diagnozyComboBox" Text="Některé stavy" Height="25" Width="220"/>
-                </StackPanel>
-
-                <StackPanel Margin="0,170,0,0">
-                    <RadioButton x:Name="skupinyRadio" Content="Skupiny"  Height="20" Width="215" GroupName="ciselnikRadio"/>
-                    <ComboBox x:Name="skupinyComboBox" Height="25" Width="70" Margin="-150,0,0,0" IsEnabled="False"/>
-                    <Button x:Name="zobrazitButton" Content="Zobrazit" Margin="0,15,0,0" Width="222" Height="30" Click="ZobrazitCiselnikOnAction"/>
-                </StackPanel>
-
+                <RadioButton x:Name="diagnozyRadio" Content="Diagnózy" Height="30" IsChecked="true" GroupName="ciselnikRadio" Margin="10,121,10,0" VerticalAlignment="Top"/>
+                <ComboBox x:Name="diagnozyComboBox" Text="Některé stavy" Height="30" Margin="10,151,10,0" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
+                <RadioButton x:Name="skupinyRadio" Content="Skupiny"  Height="30" GroupName="ciselnikRadio" Margin="10,198,10,0" VerticalAlignment="Top"/>
+                <ComboBox x:Name="skupinyComboBox" Height="30" Width="70" Margin="10,228,0,0" IsEnabled="False" VerticalAlignment="Top" HorizontalAlignment="Left" VerticalContentAlignment="Center"/>
+                <Button x:Name="pacientsShowTable" Content="Zobrazit" Margin="8,279,10,0" Height="35" Click="PacientsShowTable_Click" VerticalAlignment="Top"/>
             </Grid>
 
         </TabItem>
-        <TabItem HorizontalAlignment="Center" Height="20" Header="TabItem" VerticalAlignment="Center" Width="54">
-            <Grid Background="#FFE5E5E5"/>
+        <TabItem HorizontalAlignment="Center" Height="20" Header="Recepty" VerticalAlignment="Center" Width="54">
+            <Grid Background="#FFE5E5E5">
+                <DataGrid x:Name="pacientiGrid_Kopírovat" d:ItemsSource="{d:SampleData ItemCount=5}" BorderBrush="White" Margin="250,0,0,0"/>
+                <Label Content="Recepty" Grid.Column="0" FontSize="16" HorizontalContentAlignment="Center" Margin="0,10,544,0" Height="30" VerticalAlignment="Top"/>
+                <Grid>
+                    <Grid.Background>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                            <GradientStop Color="#FF908E8D" Offset="1"/>
+                            <GradientStop Color="#FFC6D6D5" Offset="0.012"/>
+                        </LinearGradientBrush>
+                    </Grid.Background>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="250*"/>
+                        <ColumnDefinition Width="544*"/>
+                    </Grid.ColumnDefinitions>
+                    <DataGrid x:Name="recipeesGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Grid.Column="1" BorderBrush="White"/>
+                    <Label Content="Recepty" Grid.Column="0" FontSize="16" HorizontalContentAlignment="Center" Margin="0,10,0,0" Height="30" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="recipeesComboBox" Text="Některé stavy" Margin="10,203,10,0" Height="30" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
+                    <Button x:Name="recipeesShowTable" Content="Zobrazit" Margin="10,252,10,0" Height="35" Click="RecipeesShowTable_Click" VerticalAlignment="Top"/>
+                    <Label Content="Kategorie" Margin="10,168,10,0" VerticalAlignment="Top" Height="30"/>
+
+                </Grid>
+            </Grid>
         </TabItem>
         <TabItem HorizontalAlignment="Center" Height="20" Header="TabItem" VerticalAlignment="Center" Width="54">
             <Grid Background="#FFE5E5E5"/>

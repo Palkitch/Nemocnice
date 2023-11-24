@@ -3,7 +3,7 @@ using System;
 using System.Data.OracleClient;
 using System.Windows.Forms;
 
-namespace Nemocnice.Database
+namespace Nemocnice
 {
     internal class ZaznamyDialog : Form
     {
@@ -20,11 +20,11 @@ namespace Nemocnice.Database
 
         private void InitializeComponents()
         {
-            this.Text = "Záznamy";
-            this.Size = new System.Drawing.Size(500, 400);
+            Text = "Záznamy";
+            Size = new System.Drawing.Size(600, 500);
 
             dataGridView = new DataGridView();
-            dataGridView.Dock = DockStyle.Fill;
+            dataGridView.Dock = DockStyle.Fill; 
             dataGridView.ReadOnly = true; // Nastavení jako pouze pro čtení
             dataGridView.AllowUserToAddRows = false; // Skryje prázdný řádek pro přidání nových dat
 
@@ -33,8 +33,8 @@ namespace Nemocnice.Database
             closeButton.Dock = DockStyle.Bottom;
             closeButton.Click += CloseButton_Click;
 
-            this.Controls.Add(dataGridView);
-            this.Controls.Add(closeButton);
+            Controls.Add(dataGridView);
+            Controls.Add(closeButton);
         }
 
         private void VypisDat()
@@ -57,7 +57,7 @@ namespace Nemocnice.Database
 
         private void CloseButton_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

@@ -9,6 +9,7 @@ namespace Nemocnice.ModelObjects
     public enum Ciselnik
     {
         DIAGNOZY,
-        SKUPINY
+        SKUPINY,
+        KATEGORIE_LEKU
     }
 }
