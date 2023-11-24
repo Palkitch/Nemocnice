@@ -1,4 +1,5 @@
-﻿using Nemocnice.ModelObjects;
+﻿using Nemocnice.Database;
+using Nemocnice.ModelObjects;
 using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Nemocnice.Database
+namespace Nemocnice.Config
 {
     public class LoginHandler
     {
@@ -29,7 +30,8 @@ namespace Nemocnice.Database
             password = HashPassword(password);
             string? storedHashedPassword = databaseHandler.Login(username, password);
 
-            if (storedHashedPassword != null && storedHashedPassword == password) {
+            if (storedHashedPassword != null && storedHashedPassword == password)
+            {
                 return true;
             }
             else

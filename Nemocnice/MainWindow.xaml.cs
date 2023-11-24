@@ -6,12 +6,12 @@ using Nemocnice.ModelObjects;
 using Oracle.ManagedDataAccess.Client;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Nemocnice.Database;
 using System.Windows.Forms;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.IO;
 using MessageBox = System.Windows.MessageBox;
+using Nemocnice.Config;
 
 namespace Nemocnice
 {

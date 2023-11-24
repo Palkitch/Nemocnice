@@ -1,4 +1,5 @@
-﻿using Nemocnice.ModelObjects;
+﻿using Nemocnice.Database;
+using Nemocnice.ModelObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,40 +11,80 @@ using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 
-namespace Nemocnice.Database
+namespace Nemocnice.Config
 {
     public class Launcher
     {
         MainWindow Window { get; set; }
         private DatabaseHandler Handler { get; }
 
-        public Launcher(MainWindow window) 
+        public Launcher(MainWindow window)
         {
-            Window = window; 
+            Window = window;
             Handler = DatabaseHandler.Instance;
         }
 
-        public void Launch() 
+        public void Launch()
         {
             Login login = new Login();
             login.WindowStartupLocation = WindowStartupLocation.CenterScreen;   // nastavení dialogu a mainApp aby byly vycentrovany
             Window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             login.ShowDialog();
-           
+
             if (login.DialogResult == true) // úspěšný login/register
                 login.Close();
             else  // Uživatel zavřel dialogové okno - ukončí aplikaci
                 System.Windows.Application.Current.Shutdown();
 
+            HandleUsersRights();
             FillAppComboBoxes();
             InitUserProfile();
             HandlePacientsRadioButtons();
         }
 
+        private void HandleUsersRights()
+        {
+            // TODO: v teto metodě dořešit uživatelska prava, možna dle enumu Role (switch Role)
+        }
+
         private void InitUserProfile()
         {
-            Handler.LoadLoggedUser(Window.profileUserTb, Window.profileRolesCb, Window.profileImg,
-            Window.profInsertPictureBtn, Window.profDeletePictureBtn, Login.Guest);
+            BitmapImage? img = Handler.LoadLoggedUser(Login.Guest);
+            HandleProfileData(Login.Guest, img);
+        }
+
+        private void HandleProfileData(bool guest, BitmapImage? img)
+        {
+            if (!guest)
+            {
+                Uzivatel? uzivatel = Handler.Uzivatel;
+                if (uzivatel != null)
+                {
+                    Window.profileUserTb.Text = uzivatel.Jmeno;
+                    Window.profileRolesCb.Items.Add(uzivatel.Role.ToString());
+                    Window.profInsertPictureBtn.IsEnabled = true;
+                    Window.profDeletePictureBtn.IsEnabled = true;
+                    if (img != null)    // Uživatel nemusí mít nastavený obrázek
+                    {
+                        Window.profileImg.Source = img;
+                        Window.profInsertPictureBtn.Content = "Upravit obrázek";
+                    }
+                    else
+                    {
+                        Window.profDeletePictureBtn.IsEnabled = false;
+                    }
+                }
+            }
+            else
+            {
+                Window.profInsertPictureBtn.IsEnabled = false;
+                Window.profDeletePictureBtn.IsEnabled = false;
+                Window.profileRolesCb.Items.Add("GUEST");
+                Window.profileUserTb.Text = "Nepřihlášený";
+            }
+            Window.profileRolesCb.SelectedIndex = 0;
+            Window.profileUserTb.IsReadOnly = true;
+            Window.profileRolesCb.IsReadOnly = true;
         }
 
         private void FillAppComboBoxes()
@@ -77,7 +118,7 @@ namespace Nemocnice.Database
                 string selectedFilePath;
                 // Po vybrání správného souboru se zpracuje, uloží do databáze a z ní načte do GUI
                 // tím je ověřena funkčnost a správnost ukládání binárních dat
-                if (result == System.Windows.Forms.DialogResult.OK)
+                if (result == DialogResult.OK)
                 {
                     selectedFilePath = openFileDialog.FileName;
                     if (Window.profileImg.Source == null)
@@ -100,6 +141,7 @@ namespace Nemocnice.Database
             {
                 Window.profileImg.Source = null;
                 Window.profDeletePictureBtn.IsEnabled = false;
+                Window.profInsertPictureBtn.Content = "Vložte obrázek";
             }
         }
 
@@ -117,23 +159,23 @@ namespace Nemocnice.Database
 
         public void AdminShowTables_Click()
         {
-            Handler.LoadDataFromTable(ref Window.comboBox, ref Window.grid);
+            Handler.AdminShowAllTables(ref Window.comboBox, ref Window.grid);
         }
 
         public void AdminShowLogs_Click()
         {
-            Handler.VypisZaznamu();
+            Handler.ShowLogs();
         }
 
         public void PacientsShowTable_Click()
         {
             if (Window.skupinyRadio.IsChecked == true)
             {
-                Handler.VypisPacientu(ref Window.pacientiGrid, ref Window.skupinyComboBox, Ciselnik.SKUPINY);
+                Handler.ShowPacients(ref Window.pacientiGrid, ref Window.skupinyComboBox, Ciselnik.SKUPINY);
             }
             else if (Window.diagnozyRadio.IsChecked == true)
             {
-                Handler.VypisPacientu(ref Window.pacientiGrid, ref Window.diagnozyComboBox, Ciselnik.DIAGNOZY);
+                Handler.ShowPacients(ref Window.pacientiGrid, ref Window.diagnozyComboBox, Ciselnik.DIAGNOZY);
             }
         }
 

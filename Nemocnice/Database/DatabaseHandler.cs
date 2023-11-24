@@ -38,9 +38,18 @@ namespace Nemocnice.Database
         private DatabaseConnection DatabaseConnection { get; }
         private OracleConnection Connection { get; }
         public Uzivatel? Uzivatel { get; set; }
-        private static DatabaseHandler? instance;
         public List<Diagnoza> Diagnozy { get; set; }
         public List<KrevniSkupina> KrevniSkupiny { get; set; }
+        private static DatabaseHandler? instance;
+
+        public static DatabaseHandler Instance  // singleton kvuli otevirani connection v konstruktoru
+        {
+            get
+            {
+                instance ??= new DatabaseHandler(); // ??= přiřazeni hodnoty pouze je proměnná null
+                return instance;
+            }
+        }
 
         public DatabaseHandler()
         {
@@ -50,18 +59,74 @@ namespace Nemocnice.Database
             TableAliasMapping = new Dictionary<string, string>();
             Connection = DatabaseConnection.OracleConnection;
             try { Connection.Open(); }
-            catch(Exception ex) { Console.WriteLine("ZAPNI SI VPN :)"); }
+            catch { Console.WriteLine("ZAPNI SI VPN :)"); }
         }
 
-        public static DatabaseHandler Instance  // singleton kvuli otevirani connection v konstruktoru
+        #region Login/Register
+        public string? Login(string username, string password)
         {
-            get
+            if (!UserExists(username))
             {
-                instance ??= new DatabaseHandler();
-                return instance;
+                MessageBox.Show($"Uživatel s jménem {username} neexistuje.", "Upozornění");
+                return null;
+            }
+
+            string? storedHashedPassword = GetHashedPassword(username);
+            return storedHashedPassword == password ? storedHashedPassword : null;
+        }
+
+        public bool Register(string username, string password)
+        {
+            if (UserExists(username))
+            {
+                MessageBox.Show($"Uživatel s jménem {username} již existuje.", "Upozornění");
+                return false;
+            }
+            string insertQuery = "INSERT INTO Uzivatele (nazev, role, heslo) VALUES (:uname, :urole, :pwd)";
+            OracleCommand cmd = new OracleCommand(insertQuery, Connection);
+            cmd.Parameters.Add(new OracleParameter("uname", username));
+            cmd.Parameters.Add(new OracleParameter("urole", Role.SESTRA.ToString()));
+            cmd.Parameters.Add(new OracleParameter("pwd", password));
+            cmd.ExecuteNonQuery();
+            Uzivatel = new Uzivatel(username, Role.SESTRA);
+            return true;
+        }
+
+        private bool UserExists(string username)
+        {
+            string query = "SELECT COUNT(*) FROM Uzivatele WHERE nazev = :uname";
+            OracleCommand cmd = new OracleCommand(query, Connection);
+            cmd.Parameters.Add(new OracleParameter("uname", username));
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
+            return count > 0;
+        }
+
+        private string? GetHashedPassword(string username)
+        {
+            string? heslo = null;
+            string sql = "SELECT heslo, role FROM Uzivatele WHERE nazev = :uname";
+            using (var cmd = new OracleCommand(sql, Connection))
+            {
+                cmd.Parameters.Add(new OracleParameter("uname", username));
+                using (var cmdReader = cmd.ExecuteReader())
+                {
+                    while (cmdReader.Read())
+                    {
+                        heslo = ReadString(cmdReader, 0);
+                        string roleString = ReadString(cmdReader, 1);
+                        if (Enum.TryParse<Role>(roleString, out Role role))
+                        {
+                            Uzivatel = new Uzivatel(username, role);
+                        }
+                    }
+                    cmdReader.Close();
+                    return heslo;
+                }
             }
         }
+        #endregion
 
+        #region TabItem: ADMIN
         public void AdminComboBoxHandle(ref ComboBox comboBox)
         {
             {
@@ -90,7 +155,7 @@ namespace Nemocnice.Database
             }
         }
 
-        public void LoadDataFromTable(ref ComboBox comboBox, ref DataGrid grid)
+        public void AdminShowAllTables(ref ComboBox comboBox, ref DataGrid grid)
         {
 
             ObservableCollection<object> collection = new ObservableCollection<object>();
@@ -325,6 +390,25 @@ namespace Nemocnice.Database
             // TODO: Ne moc dobrý řešení toho, jestli je vidět id nebo není. Mohlo by se to lišit podle role. Jestli tě napadá lepší řešení tak řekni
         }
 
+        public void ShowLogs()
+        {
+            using (var command = new OracleCommand("ZiskaniDat", Connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.Add("p_table_name", OracleDbType.Varchar2).Value = "ZAZNAMY";
+                command.Parameters.Add("result_cursor", OracleDbType.RefCursor, ParameterDirection.Output); // Explicitní kurzor? 
+                command.ExecuteNonQuery();
+                OracleRefCursor refCursor = (OracleRefCursor)command.Parameters["result_cursor"].Value;
+                using (OracleDataReader reader = refCursor.GetDataReader())
+                {
+                    ZaznamyDialog d = new ZaznamyDialog(reader);
+                    d.Show();
+                }
+            }
+        }
+        #endregion
+
+        #region TabItem: PROFIL 
         public int SaveImageToDatabase(string filePath)
         {
             try
@@ -499,69 +583,8 @@ namespace Nemocnice.Database
             }
             return false;
         }
-        public string? Login(string username, string password)
-        {
-            if (!UserExists(username))
-            {
-                MessageBox.Show($"Uživatel s jménem {username} neexistuje.", "Upozornění");
-                return null;
-            }
 
-            string? storedHashedPassword = GetHashedPassword(username);
-            return storedHashedPassword == password ? storedHashedPassword : null;
-        }
-
-        public bool Register(string username, string password)
-        {
-            if (UserExists(username))
-            {
-                MessageBox.Show($"Uživatel s jménem {username} již existuje.", "Upozornění");
-                return false;
-            }
-            string insertQuery = "INSERT INTO Uzivatele (nazev, role, heslo) VALUES (:uname, :urole, :pwd)";
-            OracleCommand cmd = new OracleCommand(insertQuery, Connection);
-            cmd.Parameters.Add(new OracleParameter("uname", username));
-            cmd.Parameters.Add(new OracleParameter("urole", Role.SESTRA.ToString()));
-            cmd.Parameters.Add(new OracleParameter("pwd", password));
-            cmd.ExecuteNonQuery();
-            Uzivatel = new Uzivatel(username, Role.SESTRA);
-            return true;
-        }
-
-        private bool UserExists(string username)
-        {
-            string query = "SELECT COUNT(*) FROM Uzivatele WHERE nazev = :uname";
-            OracleCommand cmd = new OracleCommand(query, Connection);
-            cmd.Parameters.Add(new OracleParameter("uname", username));
-            int count = Convert.ToInt32(cmd.ExecuteScalar());
-            return count > 0;
-        }
-
-        private string? GetHashedPassword(string username)
-        {
-            string? heslo = null;
-            string sql = "SELECT heslo, role FROM Uzivatele WHERE nazev = :uname";
-            using (var cmd = new OracleCommand(sql, Connection))
-            {
-                cmd.Parameters.Add(new OracleParameter("uname", username));
-                using (var cmdReader = cmd.ExecuteReader())
-                {
-                    while (cmdReader.Read())
-                    {
-                        heslo = ReadString(cmdReader, 0);
-                        string roleString = ReadString(cmdReader, 1);
-                        if (Enum.TryParse<Role>(roleString, out Role role))
-                        {
-                            Uzivatel = new Uzivatel(username, role);
-                        }
-                    }
-                    cmdReader.Close();
-                    return heslo;
-                }
-            }
-        }
-
-        public void LoadLoggedUser(TextBox tb, ComboBox cb, Image img, Button insertImgBtn, Button deleteImgBtn, bool guest)
+        public BitmapImage? LoadLoggedUser(bool guest)
         {
             if (!guest)
             {
@@ -574,77 +597,14 @@ namespace Nemocnice.Database
                 {
                     int imgId = Decimal.ToInt32((decimal)imgIdObject);
                     bitMapImage = LoadImageContentFromDatabase(imgId);
-                }
-                // Nastavení hodnot uzivatele do tabu profil
-                HandleProfileData(tb, cb, img, bitMapImage, insertImgBtn, deleteImgBtn,
-                    Uzivatel.Jmeno, Uzivatel.Role.ToString(), true);
-            }
-            else
-            {
-                HandleProfileData(tb, cb, img, null, insertImgBtn, deleteImgBtn, "Nepřihlášený", "Guest", false);
-            }
-        }
-
-        private static string ReadString(OracleDataReader reader, int columnIndex)
-        {
-            return reader.IsDBNull(columnIndex) ? "..." : reader.GetString(columnIndex);
-        }
-
-        private static string ReadString(OracleDataReader reader, string columnName)
-        {
-            int columnIndex = reader.GetOrdinal(columnName);
-            return ReadString(reader, columnIndex);
-        }
-
-        private static int? ParseNullableInt(string input)
-        {
-            if (int.TryParse(input, out int result))
-            {
-                return result;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private void HandleProfileData(TextBox tb, ComboBox cb, Image img, BitmapImage? bitMapImage,
-            Button insertImgBtn, Button deletImgBtn, string tbText, string cbRole, bool areBtnsEnabled)
-        {
-            tb.Text = tbText;
-            cb.Items.Add(cbRole);
-            cb.SelectedIndex = 0;
-            tb.IsReadOnly = true;
-            cb.IsReadOnly = true;
-            insertImgBtn.IsEnabled = areBtnsEnabled;
-            deletImgBtn.IsEnabled = areBtnsEnabled;
-            if (bitMapImage != null)    // Uživatel nemusí mít nastavený obrázek
-            {
-                img.Source = bitMapImage;
-                insertImgBtn.Content = "Upravit obrázek";
-            }
-            else
-            {
-                deletImgBtn.IsEnabled = false;
-            }
-        }
-
-        public void VypisZaznamu()
-        {
-            using (var command = new OracleCommand("ZiskaniDat", Connection))
-            {
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.Add("p_table_name", OracleDbType.Varchar2).Value = "ZAZNAMY";
-                command.Parameters.Add("result_cursor", OracleDbType.RefCursor, ParameterDirection.Output); // Explicitní kurzor? 
-                command.ExecuteNonQuery();
-                OracleRefCursor refCursor = (OracleRefCursor)command.Parameters["result_cursor"].Value;
-                using (OracleDataReader reader = refCursor.GetDataReader())
-                {
-                    ZaznamyDialog d = new ZaznamyDialog(reader);
-                    d.Show();
+                    return bitMapImage;
                 }
             }
+            return null;
         }
+        #endregion
+
+        #region TabItem: PACIENTI
         public void PacientsComboBoxesHandle(ref ComboBox skupiny, ref ComboBox diagnozy)
         {
             // Nastavení příkazů pro funkce
@@ -659,8 +619,8 @@ namespace Nemocnice.Database
                     // Volání první funkce
                     using (OracleCommand command1 = new OracleCommand(skupinyCmd, Connection))
                     {
-                        command1.CommandType = System.Data.CommandType.Text;
-                        command1.Parameters.Add("result", OracleDbType.RefCursor, System.Data.ParameterDirection.ReturnValue);
+                        command1.CommandType = CommandType.Text;
+                        command1.Parameters.Add("result", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
                         command1.Transaction = transaction;
 
                         using (OracleDataReader reader1 = command1.ExecuteReader())
@@ -669,8 +629,8 @@ namespace Nemocnice.Database
 
                             while (reader1.Read())
                             {
-                                string typ = reader1["TYP"].ToString();
-                                string id = reader1["ID_SKUPINA"].ToString();
+                                string typ = ReadString(reader1, "typ");
+                                string id = ReadString(reader1, "id_skupina");
                                 KrevniSkupina ks = new KrevniSkupina(int.Parse(id), typ);
                                 KrevniSkupiny.Add(ks);
                                 skupiny.Items.Add(ks);
@@ -693,8 +653,8 @@ namespace Nemocnice.Database
                             // Zpracování výsledků druhé funkce a naplnění ComboBoxu
                             while (reader2.Read())
                             {
-                                string nazev = reader2["NAZEV"].ToString();
-                                string id = reader2["ID"].ToString();
+                                string nazev = ReadString(reader2, "nazev");
+                                string id = ReadString(reader2, "id");
                                 Diagnoza d = new Diagnoza(int.Parse(id), nazev);
                                 diagnozy.Items.Add(d);
                                 Diagnozy.Add(d);
@@ -716,7 +676,7 @@ namespace Nemocnice.Database
             diagnozy.SelectedIndex = 0;
         }
 
-        public void VypisPacientu(ref DataGrid dataGrid, ref ComboBox comboBox, Ciselnik druhCiselniku)
+        public void ShowPacients(ref DataGrid dataGrid, ref ComboBox comboBox, Ciselnik druhCiselniku)
         {
             switch (druhCiselniku)
             {
@@ -725,22 +685,24 @@ namespace Nemocnice.Database
                         using (OracleCommand command = new OracleCommand("BEGIN :result := GetPacientiByDiagnoza(:id_param); END;", Connection))
                         {
                             command.CommandType = CommandType.Text;
-                            Diagnoza selectedDiagnoza = comboBox.SelectedValue as Diagnoza;
-                            int id = selectedDiagnoza.Id;
-
-                            command.Parameters.Add("result", OracleDbType.RefCursor).Direction = ParameterDirection.ReturnValue;
-                            command.Parameters.Add("id_param", OracleDbType.Int32).Value = id;
-                            command.ExecuteNonQuery();
-
-                            using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
+                            Diagnoza? selectedDiagnoza = comboBox.SelectedValue as Diagnoza;
+                            if (selectedDiagnoza != null)
                             {
-                                DataTable dataTable = new DataTable();
-                                dataTable.Load(reader);
+                                int id = selectedDiagnoza.Id;
 
-                                dataGrid.ItemsSource = dataTable.DefaultView;
+                                command.Parameters.Add("result", OracleDbType.RefCursor).Direction = ParameterDirection.ReturnValue;
+                                command.Parameters.Add("id_param", OracleDbType.Int32).Value = id;
+                                command.ExecuteNonQuery();
+
+                                using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
+                                {
+                                    DataTable dataTable = new DataTable();
+                                    dataTable.Load(reader);
+
+                                    dataGrid.ItemsSource = dataTable.DefaultView;
+                                }
                             }
                         }
-
                         break;
                     }
                 case Ciselnik.SKUPINY:
@@ -748,27 +710,31 @@ namespace Nemocnice.Database
                         using (OracleCommand command = new OracleCommand("BEGIN :result := GetPacientiBySkupina(:id_param); END;", Connection))
                         {
                             command.CommandType = CommandType.Text;
-                            KrevniSkupina selectedSkupina = comboBox.SelectedValue as KrevniSkupina;
-                            int id = selectedSkupina.Id;
-
-                            command.Parameters.Add("result", OracleDbType.RefCursor).Direction = ParameterDirection.ReturnValue;
-                            command.Parameters.Add("id_param", OracleDbType.Int32).Value = id;
-                            command.ExecuteNonQuery();
-
-                            using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
+                            KrevniSkupina? selectedSkupina = comboBox.SelectedValue as KrevniSkupina;
+                            if (selectedSkupina != null)
                             {
-                                DataTable dataTable = new DataTable();
-                                dataTable.Load(reader);
+                                int id = selectedSkupina.Id;
+                                command.Parameters.Add("result", OracleDbType.RefCursor).Direction = ParameterDirection.ReturnValue;
+                                command.Parameters.Add("id_param", OracleDbType.Int32).Value = id;
+                                command.ExecuteNonQuery();
 
-                                dataGrid.ItemsSource = dataTable.DefaultView;
+                                using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
+                                {
+                                    DataTable dataTable = new DataTable();
+                                    dataTable.Load(reader);
+
+                                    dataGrid.ItemsSource = dataTable.DefaultView;
+                                }
                             }
                         }
                         break;
                     }
             }
         }
+        #endregion
 
-        public void RecipeesComboBoxHandle(ref ComboBox recipeesComboBox) 
+        #region TabItem: RECEPTY
+        public void RecipeesComboBoxHandle(ref ComboBox recipeesComboBox)
         {
             recipeesComboBox.Items.Add("VŠE");
             using (OracleCommand command = new OracleCommand("SELECT nazev_kategorie FROM kategorie_leku_ciselnik", Connection))
@@ -778,7 +744,7 @@ namespace Nemocnice.Database
                     while (reader.Read())
                     {
                         // Přidání hodnot do ComboBox
-                        string? nazevKategorie = reader["nazev_kategorie"].ToString();
+                        string? nazevKategorie = ReadString(reader, "nazev_kategorie");
                         recipeesComboBox.Items.Add(nazevKategorie);
                     }
                     recipeesComboBox.SelectedIndex = 0;
@@ -807,5 +773,31 @@ namespace Nemocnice.Database
                 }
             }
         }
+        #endregion
+
+        #region ReaderMetody
+        private string ReadString(OracleDataReader reader, int columnIndex)
+        {
+            return reader.IsDBNull(columnIndex) ? "..." : reader.GetString(columnIndex);
+        }
+
+        private string ReadString(OracleDataReader reader, string columnName)
+        {
+            int columnIndex = reader.GetOrdinal(columnName);
+            return ReadString(reader, columnIndex);
+        }
+
+        private int? ParseNullableInt(string input)
+        {
+            if (int.TryParse(input, out int result))
+            {
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        #endregion
     }
 }

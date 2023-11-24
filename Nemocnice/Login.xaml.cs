@@ -1,4 +1,4 @@
-﻿using Nemocnice.Database;
+﻿using Nemocnice.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
