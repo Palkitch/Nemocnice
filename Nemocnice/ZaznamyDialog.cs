@@ -25,7 +25,7 @@ namespace Nemocnice
             Text = "Záznamy";
             Size = new System.Drawing.Size(600, 500);
 
-            dataGridView.Dock = DockStyle.Fill; 
+            dataGridView.Dock = DockStyle.Fill;
             dataGridView.ReadOnly = true; // Nastavení jako pouze pro čtení
             dataGridView.AllowUserToAddRows = false; // Skryje prázdný řádek pro přidání nových dat
 

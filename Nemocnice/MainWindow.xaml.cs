@@ -55,5 +55,10 @@ namespace Nemocnice
         {
             Launcher.RecipeesShowTable_Click();
         }
+
+        private void AdminShowKatalog_Click(object sender, RoutedEventArgs e)
+        {
+            Launcher.AdminShowKatalog_Click();
+        }
     }
 }

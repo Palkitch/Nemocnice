@@ -406,6 +406,12 @@ namespace Nemocnice.Database
                 }
             }
         }
+        public void ShowKatalog()
+        {
+            Katalog katalog = new Katalog(Connection);
+            katalog.Show();
+        }
+
         #endregion
 
         #region TabItem: PROFIL 

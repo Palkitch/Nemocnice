@@ -107,8 +107,6 @@ namespace Nemocnice.Config
                 Window.skupinyComboBox.IsEnabled = true;
             };
         }
-
-
         public void ProfInsertPicture_Click()
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -165,6 +163,10 @@ namespace Nemocnice.Config
         public void AdminShowLogs_Click()
         {
             Handler.ShowLogs();
+        }
+        public void AdminShowKatalog_Click()
+        {
+            Handler.ShowKatalog();
         }
 
         public void PacientsShowTable_Click()
