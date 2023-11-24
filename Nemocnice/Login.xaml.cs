@@ -72,7 +72,6 @@ namespace Nemocnice
         {
             DialogResult = true;
             Guest = true;
-            // TODO: Disable ruznejch items bo je to guest
         }
     }
 }

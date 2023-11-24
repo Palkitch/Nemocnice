@@ -14,6 +14,8 @@ namespace Nemocnice
         public ZaznamyDialog(OracleDataReader reader)
         {
             this.reader = reader;
+            dataGridView = new DataGridView();
+            closeButton = new Button();
             InitializeComponents();
             VypisDat();
         }
@@ -23,12 +25,10 @@ namespace Nemocnice
             Text = "Záznamy";
             Size = new System.Drawing.Size(600, 500);
 
-            dataGridView = new DataGridView();
             dataGridView.Dock = DockStyle.Fill; 
             dataGridView.ReadOnly = true; // Nastavení jako pouze pro čtení
             dataGridView.AllowUserToAddRows = false; // Skryje prázdný řádek pro přidání nových dat
 
-            closeButton = new Button();
             closeButton.Text = "Zavřít";
             closeButton.Dock = DockStyle.Bottom;
             closeButton.Click += CloseButton_Click;
