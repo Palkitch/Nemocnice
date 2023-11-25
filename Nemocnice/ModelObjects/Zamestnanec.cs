@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nemocnice.ModelObjects
 {
-    public class Zamestanec
+    public class Zamestnanec
     {
         public int Id { get; set; }
         public string Jmeno { get; set; }
@@ -16,7 +16,7 @@ namespace Nemocnice.ModelObjects
         public int? IdNadrizeneho { get; set; }
         public int IdAdresy { get; set; }
         public char Druh { get; set; }
-        public Zamestanec(int id, string jmeno, string prijmeni, int plat, int idOddeleni, int? idNadrizeneho, int idAdresy, char druh)
+        public Zamestnanec(int id, string jmeno, string prijmeni, int plat, int idOddeleni, int? idNadrizeneho, int idAdresy, char druh)
         {
             Id = id;
             Jmeno = jmeno;
@@ -26,6 +26,11 @@ namespace Nemocnice.ModelObjects
             IdNadrizeneho = idNadrizeneho;
             IdAdresy = idAdresy;
             Druh = druh;
+        }
+
+        public override string? ToString()
+        {
+            return $"{Jmeno} {Prijmeni}";
         }
     }
 }

@@ -24,5 +24,10 @@ namespace Nemocnice.ModelObjects
             Stat = country;
             PSC = postCode;
         }
+
+        public override string? ToString()
+        {
+            return $"{Ulice} {CisloPopisne}, {Mesto}, {PSC}, {Stat}";
+        }
     }
 }

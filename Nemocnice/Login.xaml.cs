@@ -39,12 +39,10 @@ namespace Nemocnice
 
                 if (loginResult)
                 {
-                    // Nastavte DialogResult na true a uzavřete okno
                     DialogResult = true;
                 }
                 else
                 {
-                    // Zde můžete obsloužit případ neúspěšného přihlášení
                     MessageBox.Show("Neplatné přihlašovací údaje.");
                 }
             }

@@ -17,5 +17,10 @@ namespace Nemocnice.ModelObjects
             Nazev = nazev;
             Cislo = cislo;
         }
+
+        public override string? ToString()
+        {
+            return $"{Nazev}, {Cislo}";
+        }
     }
 }

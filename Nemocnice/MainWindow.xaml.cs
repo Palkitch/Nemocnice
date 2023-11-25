@@ -60,5 +60,10 @@ namespace Nemocnice
         {
             Launcher.AdminShowKatalog_Click();
         }
+
+        private void PacientsAdd_Click(object sender, RoutedEventArgs e)
+        {
+            Launcher.AddPacient_Click();
+        }
     }
 }

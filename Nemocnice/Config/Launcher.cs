@@ -45,6 +45,10 @@ namespace Nemocnice.Config
         private void HandleUsersRights()
         {
             // TODO: v teto metodě dořešit uživatelska prava, možna dle enumu Role (switch Role)
+            if (Handler != null && Handler.Uzivatel.Role == Role.SESTRA)
+            {
+                Window.AdminTabItem.Visibility = Visibility.Hidden;
+            }
         }
 
         private void InitUserProfile()
@@ -184,6 +188,10 @@ namespace Nemocnice.Config
         public void RecipeesShowTable_Click()
         {
             Handler.ShowRecipees(ref Window.recipeesComboBox, ref Window.recipeesGrid);
+        }
+        public void AddPacient_Click()
+        {
+            Handler.AddPacient(ref Window.pacientiGrid);
         }
     }
 }

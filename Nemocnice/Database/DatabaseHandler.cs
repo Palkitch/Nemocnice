@@ -36,7 +36,7 @@ namespace Nemocnice.Database
     {
         private Dictionary<string, string> TableAliasMapping { get; set; }
         private DatabaseConnection DatabaseConnection { get; }
-        private OracleConnection Connection { get; }
+        public OracleConnection Connection { get; }
         public Uzivatel? Uzivatel { get; set; }
         public List<Diagnoza> Diagnozy { get; set; }
         public List<KrevniSkupina> KrevniSkupiny { get; set; }
@@ -198,7 +198,7 @@ namespace Nemocnice.Database
                                 int? superiorId = ParseNullableInt(ReadString(cmdReader, 5));
                                 int addressId = int.Parse(ReadString(cmdReader, 6));
                                 char type = ReadString(cmdReader, 7)[0];
-                                Zamestanec employee = new Zamestanec(id, name, surName, salary, hospWardId, superiorId, addressId, type);
+                                Zamestnanec employee = new Zamestnanec(id, name, surName, salary, hospWardId, superiorId, addressId, type);
                                 collection.Add(employee);
                             }
                             cmdReader.Close();
@@ -222,7 +222,7 @@ namespace Nemocnice.Database
                                 int? superiorId = ParseNullableInt(ReadString(cmdReader, 5));
                                 int addressId = int.Parse(ReadString(cmdReader, 6));
                                 char type = ReadString(cmdReader, 7)[0];
-                                Zamestanec employee = new Zamestanec(id, name, surName, salary, hospWardId, superiorId, addressId, type);
+                                Zamestnanec employee = new Zamestnanec(id, name, surName, salary, hospWardId, superiorId, addressId, type);
                                 collection.Add(employee);
                             }
                             cmdReader.Close();
@@ -376,7 +376,7 @@ namespace Nemocnice.Database
                                         int? superiorId = ParseNullableInt(ReadString(reader, 5));
                                         int addressId = int.Parse(ReadString(reader, 6));
                                         char type = char.Parse(ReadString(reader, 7));
-                                        Zamestanec employee = new Zamestanec(id, name, surname, salary, wardId, superiorId, addressId, type);
+                                        Zamestnanec employee = new Zamestnanec(id, name, surname, salary, wardId, superiorId, addressId, type);
                                         collection.Add(employee);
                                         break;
                                     }
@@ -737,12 +737,18 @@ namespace Nemocnice.Database
                     }
             }
         }
-        #endregion
+        public void AddPacient(ref DataGrid gridView)
+        {
+            PacientDialog dialog = new PacientDialog(Connection);
+            dialog.ShowDialog();
+        }
+
+        #endregion  
 
         #region TabItem: RECEPTY
         public void RecipeesComboBoxHandle(ref ComboBox recipeesComboBox)
         {
-            recipeesComboBox.Items.Add("VŠE");
+            recipeesComboBox.Items.Add("Vše");
             using (OracleCommand command = new OracleCommand("SELECT nazev_kategorie FROM kategorie_leku_ciselnik", Connection))
             {
                 using (OracleDataReader reader = command.ExecuteReader())
@@ -761,7 +767,7 @@ namespace Nemocnice.Database
         public void ShowRecipees(ref ComboBox recipeesComboBox, ref DataGrid recipeesGrid)
         {
             string? category = recipeesComboBox.SelectedValue as string;
-            if (category == "VŠE") category = "all";
+            if (category == "Vše") category = "all";
             using (OracleCommand command = new OracleCommand("BEGIN :result := GetReceptyLekyByKategorie(:category); END;", Connection))
             {
                 command.CommandType = CommandType.Text;
