@@ -16,6 +16,6 @@
         <Label HorizontalAlignment="Left" Margin="49,115,0,0" VerticalAlignment="Top"/>
         <Label Content="Jméno" Margin="10,61,0,0" VerticalAlignment="Top" Height="25" RenderTransformOrigin="0.204,0.496" HorizontalAlignment="Left" Width="45"/>
         <Label Content="Heslo" Margin="10,97,0,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Left" Width="44"/>
-        <Button x:Name="btnSkip" Content="Pokračovat" Margin="220,147,10,0" Height="27" VerticalAlignment="Top" Click="btnSkip_Click"  />
+        <Button x:Name="btnSkip" Content="Přeskočit" Margin="220,147,10,0" Height="27" VerticalAlignment="Top" Click="btnSkip_Click"  />
     </Grid>
 </Window>

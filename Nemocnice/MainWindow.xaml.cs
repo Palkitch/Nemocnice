@@ -65,5 +65,10 @@ namespace Nemocnice
         {
             Launcher.AddPacient_Click();
         }
-    }
+
+		private void allRadio_Checked(object sender, RoutedEventArgs e)
+		{
+
+		}
+	}
 }

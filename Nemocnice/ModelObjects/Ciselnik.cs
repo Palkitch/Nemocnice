@@ -10,6 +10,7 @@ namespace Nemocnice.ModelObjects
     {
         DIAGNOZY,
         SKUPINY,
-        KATEGORIE_LEKU
+        KATEGORIE_LEKU,
+        NONE
     }
 }
