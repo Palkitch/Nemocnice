@@ -112,7 +112,13 @@ namespace Nemocnice.Config
 			{
 				Window.diagnozyComboBox.IsEnabled = false;
 				Window.skupinyComboBox.IsEnabled = true;
+			};			
+			Window.allRadio.Checked += (sender, e) =>
+			{
+				Window.diagnozyComboBox.IsEnabled = false;
+				Window.skupinyComboBox.IsEnabled = false;
 			};
+			
 		}
 		public void ProfInsertPicture_Click()
 		{

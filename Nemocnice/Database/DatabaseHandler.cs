@@ -465,13 +465,12 @@ namespace Nemocnice.Database
 
 		public int UpdateImageInDatabase(string filePath)
 		{
-			using (OracleCommand cmd = new OracleCommand())
+			using (OracleCommand cmd = new OracleCommand("update_ikony", Connection))
 			{
 				int userImgId = GetUzivatelskeIdObrazku();
 				if (userImgId != 0)
 				{
 					// update obsahu daneho id v tabulce ikony
-					cmd.CommandText = "update_ikony";
 					cmd.CommandType = CommandType.StoredProcedure;
 
 					cmd.Parameters.Add("p_id", OracleDbType.Int32).Value = userImgId;
