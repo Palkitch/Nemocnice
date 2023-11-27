@@ -19,6 +19,12 @@ namespace Nemocnice
     {
         Launcher Launcher { get; set; }
 
+        // TODO
+        // 1) katalog a zaznamy dialog předělat to .xaml i s inicializací jejich komponent 
+        // 2) Edit, Add a Remove všem tabulkam pro admina
+        // 3) kouknout se do databaseHandleru a posoudit zda nějake metody nebude přehlednější udělat přes funkce/procedury
+
+
         public MainWindow()
         {
             InitializeComponent();

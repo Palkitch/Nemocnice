@@ -208,6 +208,7 @@ namespace Nemocnice.Config
             Window.profileUserTb.IsReadOnly = true;
             Window.profileRolesCb.IsReadOnly = true;
         }
+
         public void ProfInsertPicture_Click()
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())

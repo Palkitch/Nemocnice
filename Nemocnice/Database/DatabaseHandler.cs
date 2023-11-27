@@ -42,6 +42,7 @@ namespace Nemocnice.Database
 		public Uzivatel? Uzivatel { get; set; }
 		public List<Diagnoza> Diagnozy { get; set; }
 		public List<KrevniSkupina> KrevniSkupiny { get; set; }
+
 		private static DatabaseHandler? instance;
 
 		public static DatabaseHandler Instance  // singleton kvuli otevirani connection v konstruktoru
@@ -62,7 +63,7 @@ namespace Nemocnice.Database
 			Connection = DatabaseConnection.OracleConnection;
 			try { Connection.Open(); }
 			catch {
-				MessageBox.Show("ZAPNI SI VPN");
+				MessageBox.Show("ZAPNI SI VPN", "Chyba");
 				Environment.Exit(444);
 			}
 		}
@@ -185,7 +186,6 @@ namespace Nemocnice.Database
 				command.ExecuteNonQuery();
 				OracleRefCursor refCursor = (OracleRefCursor)command.Parameters["result_cursor"].Value;
 
-				// TODO: mby předělat reader aby četl podle nazvu sloupců (cmdReader["nazev"]) a oddělat vyčitání IDs
 				if (dictValue == "DOKTORI")
 				{
 					string? sql = "SELECT z.* FROM ZAMESTNANCI z JOIN DOKTORI d ON z.id_zamestnanec = d.id_zamestnanec";
@@ -291,8 +291,6 @@ namespace Nemocnice.Database
 
 								case "LUZKA":
 									{
-										// TODO: mby tohle nějak rozšiřit, že by se vypisovaly misto sestra_id_zamestanec informace o tom zaměstnanci
-										// pro admina bych nechal tyhle data, pro usera bych to nějakým způsobem rozšířil
 										int id = int.Parse(ReadString(reader, 0));
 										int bedNumber = int.Parse(ReadString(reader, 1));
 										int? nurseId = ParseNullableInt(ReadString(reader, 2));
@@ -392,29 +390,18 @@ namespace Nemocnice.Database
 			}
 			grid.ItemsSource = collection;
 			grid.Columns[0].Visibility = Visibility.Hidden;
-			// TODO: Ne moc dobrý řešení toho, jestli je vidět id nebo není. Mohlo by se to lišit podle role. Jestli tě napadá lepší řešení tak řekni
 		}
 
 		public void ShowLogs()
 		{
-			using (var command = new OracleCommand("ZiskaniDat", Connection))
-			{
-				command.CommandType = CommandType.StoredProcedure;
-				command.Parameters.Add("p_table_name", OracleDbType.Varchar2).Value = "ZAZNAMY";
-				command.Parameters.Add("result_cursor", OracleDbType.RefCursor, ParameterDirection.Output); // Explicitní kurzor? 
-				command.ExecuteNonQuery();
-				OracleRefCursor refCursor = (OracleRefCursor)command.Parameters["result_cursor"].Value;
-				using (OracleDataReader reader = refCursor.GetDataReader())
-				{
-					ZaznamyDialog d = new ZaznamyDialog(reader);
-					d.Show();
-				}
-			}
+			Logs logs = new Logs();
+			logs.ShowDialog();
 		}
+
 		public void ShowKatalog()
 		{
-			Katalog katalog = new Katalog(Connection);
-			katalog.Show();
+            Catalog katalog = new Catalog();
+			katalog.ShowDialog();
 		}
 
 		#endregion
