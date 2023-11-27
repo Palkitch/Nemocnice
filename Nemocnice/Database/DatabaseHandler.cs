@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.ApplicationServices;
+using Nemocnice.GUI;
 using Nemocnice.ModelObjects;
 using Oracle.ManagedDataAccess.Client;
 using Oracle.ManagedDataAccess.Types;
@@ -33,7 +34,7 @@ using TextBox = System.Windows.Controls.TextBox;
 
 namespace Nemocnice.Database
 {
-	public class DatabaseHandler
+    public class DatabaseHandler
 	{
 		private Dictionary<string, string> TableAliasMapping { get; set; }
 		private DatabaseConnection DatabaseConnection { get; }

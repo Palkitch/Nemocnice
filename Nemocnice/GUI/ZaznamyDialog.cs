@@ -3,7 +3,7 @@ using System;
 using System.Data.OracleClient;
 using System.Windows.Forms;
 
-namespace Nemocnice
+namespace Nemocnice.GUI
 {
     internal class ZaznamyDialog : Form
     {

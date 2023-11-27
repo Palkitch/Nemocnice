@@ -3,7 +3,7 @@ using System;
 using System.Data;
 using System.Windows.Forms;
 
-namespace Nemocnice
+namespace Nemocnice.GUI
 {
     internal class Katalog : Form
     {
