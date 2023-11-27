@@ -25,12 +25,14 @@ namespace Nemocnice
     {
         private OracleConnection connection;
         private List<Adresa> adresy;
+
         public PacientDialog(OracleConnection connection)
         {
             this.connection = connection;
             InitializeComponent();
             ComboBoxFill();
         }
+
         public PacientDialog(Pacient p, OracleConnection connection)
         {
             this.connection = connection;
