@@ -22,6 +22,7 @@ using System.Windows.Forms;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Xml;
 using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
@@ -833,6 +834,44 @@ namespace Nemocnice.Database
 				return null;
 			}
 		}
+		#endregion
+
+		#region TabItem: Uzivatele
+
+		public List<Uzivatel> LoadAllUsers()
+        {
+			List<Uzivatel> users = new List<Uzivatel>();
+            using (OracleCommand command = new OracleCommand("SELECT nazev, role FROM uzivatele", Connection))
+            {
+                using (OracleDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        // Přidání hodnot do ComboBox
+                        string? username = ReadString(reader, "nazev");
+                        string roleString = ReadString(reader, "role");
+                        if (Enum.TryParse<Role>(roleString, out Role role))
+                        {
+                            Uzivatel user = new Uzivatel(username, role);
+                            users.Add(user);
+                        }
+                    }
+                }
+            }
+			return users;
+        }
+
+		public void UpdateUserFromAdminTab(string originalUserName, string newUserName, string roleString) 
+		{
+            using (OracleCommand command = new OracleCommand("update_uzivatele_admin", Connection))
+            {
+				command.CommandType = CommandType.StoredProcedure;
+				command.Parameters.Add("p_stary_nazev", originalUserName);
+				command.Parameters.Add("p_novy_nazev", newUserName);
+				command.Parameters.Add("p_role", roleString);
+				command.ExecuteNonQuery();
+            }
+        }
 		#endregion
 	}
 }

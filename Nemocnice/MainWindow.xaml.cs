@@ -66,9 +66,14 @@ namespace Nemocnice
             Launcher.AddPacient_Click();
         }
 
-		private void allRadio_Checked(object sender, RoutedEventArgs e)
-		{
+        private void UsersSaveUser_Click(object sender, RoutedEventArgs e)
+        {
+            Launcher.UpdateUserFromAdminTab();
+        }
 
-		}
-	}
+        private void OnSelectionChange(object sender, SelectionChangedEventArgs e)
+        {
+            Launcher.ChangeUsersValues();
+        }
+    }
 }

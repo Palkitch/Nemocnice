@@ -1,8 +1,12 @@
-﻿using Nemocnice.Database;
+﻿using Microsoft.VisualBasic.ApplicationServices;
+using Nemocnice.Database;
 using Nemocnice.ModelObjects;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Nemocnice.Config
 {
@@ -17,11 +22,15 @@ namespace Nemocnice.Config
 	{
 		MainWindow Window { get; set; }
 		private DatabaseHandler Handler { get; }
+		private List<Uzivatel> Users { get; set; }
+		private Uzivatel? SelectedUser { get; set; }
 
 		public Launcher(MainWindow window)
 		{
 			Window = window;
 			Handler = DatabaseHandler.Instance;
+			Users = new List<Uzivatel>();
+			SelectedUser = null;
 		}
 
 		public void Launch()
@@ -36,63 +45,166 @@ namespace Nemocnice.Config
 			else  // Uživatel zavřel dialogové okno - ukončí aplikaci
 				System.Windows.Application.Current.Shutdown();
 
-			HandleUsersRights();
+			HandleCurrentlyLoggedUserRights();
 			FillAppComboBoxes();
 			InitUserProfile();
+			InitUsers();
 			HandlePacientsRadioButtons();
 		}
 
-		private void HandleUsersRights()
+        #region TabItem: Users
+
+        private void InitUsers()
+        {
+            RefreshUsers();
+        }
+        private void RefreshUsers()
+        {
+            Users = Handler.LoadAllUsers();
+            ObservableCollection<Uzivatel> collection = new ObservableCollection<Uzivatel>();
+            foreach (Uzivatel user in Users)
+            {
+                collection.Add(user);
+            }
+            Window.usersGrid.ItemsSource = Users;
+            Window.usersRoleCb.ItemsSource = Enum.GetValues(typeof(Role)).Cast<Role>().Select(role => role.ToString()).ToList();
+        }
+        public void ChangeUsersValues()	// při překlikávání uživatelů se mění hodnoty komponent na stránce
+        {
+            // Získání vybrané položky z DataGridu
+            SelectedUser = (Uzivatel)Window.usersGrid.SelectedItem;
+
+
+            if (SelectedUser != null)
+            {
+                Window.usersUsernameTb.Text = SelectedUser.Jmeno;
+                switch (SelectedUser.Role)
+                {
+                    case Role.PRIMAR: Window.usersRoleCb.SelectedIndex = 0; break;
+                    case Role.DOKTOR: Window.usersRoleCb.SelectedIndex = 1; break;
+                    case Role.SESTRA: Window.usersRoleCb.SelectedIndex = 2; break;
+                }
+            }
+        }
+
+        public void UpdateUserFromAdminTab()
+        {
+            string newName = Window.usersUsernameTb.Text;
+            string? roleText = Window.usersRoleCb.SelectedItem.ToString();
+            string? oldName = SelectedUser.Jmeno;
+
+            if (newName != null && roleText != null && oldName != null)
+            {
+                Handler.UpdateUserFromAdminTab(oldName, newName, roleText);
+            }
+            RefreshUsers();
+        }
+
+        #endregion
+
+        #region TabItem: Profile
+
+        private void InitUserProfile()
+        {
+            BitmapImage? img = Handler.LoadLoggedUser(Login.Guest);
+            HandleProfileData(Login.Guest, img);
+        }
+
+        private void HandleProfileData(bool guest, BitmapImage? img)
+        {
+            if (!guest)
+            {
+                Uzivatel? uzivatel = Handler.Uzivatel;
+                if (uzivatel != null)
+                {
+                    Window.profileUserTb.Text = uzivatel.Jmeno;
+                    Window.profileRolesCb.Items.Add(uzivatel.Role.ToString());
+                    Window.profInsertPictureBtn.IsEnabled = true;
+                    Window.profDeletePictureBtn.IsEnabled = true;
+                    if (img != null)    // Uživatel nemusí mít nastavený obrázek
+                    {
+                        Window.profileImg.Source = img;
+                        Window.profInsertPictureBtn.Content = "Upravit obrázek";
+                    }
+                    else
+                    {
+                        Window.profDeletePictureBtn.IsEnabled = false;
+                    }
+                }
+            }
+            else
+            {
+                Window.profInsertPictureBtn.IsEnabled = false;
+                Window.profDeletePictureBtn.IsEnabled = false;
+                Window.profileRolesCb.Items.Add("GUEST");
+                Window.profileUserTb.Text = "Nepřihlášený";
+            }
+            Window.profileRolesCb.SelectedIndex = 0;
+            Window.profileUserTb.IsReadOnly = true;
+            Window.profileRolesCb.IsReadOnly = true;
+        }
+        public void ProfInsertPicture_Click()
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Obrázky|*.jpg;*.jpeg;*.png";
+                DialogResult result = openFileDialog.ShowDialog();
+                string selectedFilePath;
+                // Po vybrání správného souboru se zpracuje, uloží do databáze a z ní načte do GUI
+                // tím je ověřena funkčnost a správnost ukládání binárních dat
+                if (result == DialogResult.OK)
+                {
+                    selectedFilePath = openFileDialog.FileName;
+                    if (Window.profileImg.Source == null)
+                    {
+                        int savedImgId = Handler.SaveImageToDatabase(selectedFilePath);
+                        InitImage(savedImgId);
+                    }
+                    else
+                    {
+                        int updatedImgId = Handler.UpdateImageInDatabase(selectedFilePath);
+                        InitImage(updatedImgId);
+                    }
+
+                }
+            }
+        }
+        public void ProfDeletePicture_Click()
+        {
+            if (Handler.DeleteCurrentUserImageFromDatabase())
+            {
+                Window.profileImg.Source = null;
+                Window.profDeletePictureBtn.IsEnabled = false;
+                Window.profInsertPictureBtn.Content = "Vložte obrázek";
+            }
+        }
+
+        private void InitImage(int id)
+        {
+            BitmapImage? bitmap = Handler.LoadImageContentFromDatabase(id);
+            if (bitmap != null)
+            {
+                Window.profileImg.Source = bitmap;
+                if (!Window.profDeletePictureBtn.IsEnabled)
+                    Window.profDeletePictureBtn.IsEnabled = true;
+                Window.profInsertPictureBtn.Content = "Změnit obrázek";
+            }
+        }
+        #endregion
+
+        private void HandleCurrentlyLoggedUserRights()
 		{
 			if (Login.Guest) 
 			{
-                Window.AdminTabItem.Visibility = Visibility.Hidden;
+                Window.adminTabItem.Visibility = Visibility.Hidden;
+                Window.usersTabItem.Visibility = Visibility.Hidden;
 				
             } else if (Handler.Uzivatel != null && Handler.Uzivatel.Role == Role.SESTRA)
 			{
-				Window.AdminTabItem.Visibility = Visibility.Hidden;
-			}
-		}
-
-		private void InitUserProfile()
-		{
-			BitmapImage? img = Handler.LoadLoggedUser(Login.Guest);
-			HandleProfileData(Login.Guest, img);
-		}
-
-		private void HandleProfileData(bool guest, BitmapImage? img)
-		{
-			if (!guest)
-			{
-				Uzivatel? uzivatel = Handler.Uzivatel;
-				if (uzivatel != null)
-				{
-					Window.profileUserTb.Text = uzivatel.Jmeno;
-					Window.profileRolesCb.Items.Add(uzivatel.Role.ToString());
-					Window.profInsertPictureBtn.IsEnabled = true;
-					Window.profDeletePictureBtn.IsEnabled = true;
-					if (img != null)    // Uživatel nemusí mít nastavený obrázek
-					{
-						Window.profileImg.Source = img;
-						Window.profInsertPictureBtn.Content = "Upravit obrázek";
-					}
-					else
-					{
-						Window.profDeletePictureBtn.IsEnabled = false;
-					}
-				}
-			}
-			else
-			{
-				Window.profInsertPictureBtn.IsEnabled = false;
-				Window.profDeletePictureBtn.IsEnabled = false;
-				Window.profileRolesCb.Items.Add("GUEST");
-				Window.profileUserTb.Text = "Nepřihlášený";
-			}
-			Window.profileRolesCb.SelectedIndex = 0;
-			Window.profileUserTb.IsReadOnly = true;
-			Window.profileRolesCb.IsReadOnly = true;
-		}
+				Window.adminTabItem.Visibility = Visibility.Hidden;
+                Window.usersTabItem.Visibility = Visibility.Hidden;
+            }
+        }
 
 		private void FillAppComboBoxes()
 		{
@@ -120,53 +232,7 @@ namespace Nemocnice.Config
 			};
 			
 		}
-		public void ProfInsertPicture_Click()
-		{
-			using (OpenFileDialog openFileDialog = new OpenFileDialog())
-			{
-				openFileDialog.Filter = "Obrázky|*.jpg;*.jpeg;*.png";
-				DialogResult result = openFileDialog.ShowDialog();
-				string selectedFilePath;
-				// Po vybrání správného souboru se zpracuje, uloží do databáze a z ní načte do GUI
-				// tím je ověřena funkčnost a správnost ukládání binárních dat
-				if (result == DialogResult.OK)
-				{
-					selectedFilePath = openFileDialog.FileName;
-					if (Window.profileImg.Source == null)
-					{
-						int savedImgId = Handler.SaveImageToDatabase(selectedFilePath);
-						InitImage(savedImgId);
-					}
-					else
-					{
-						int updatedImgId = Handler.UpdateImageInDatabase(selectedFilePath);
-						InitImage(updatedImgId);
-					}
 
-				}
-			}
-		}
-		public void ProfDeletePicture_Click()
-		{
-			if (Handler.DeleteCurrentUserImageFromDatabase())
-			{
-				Window.profileImg.Source = null;
-				Window.profDeletePictureBtn.IsEnabled = false;
-				Window.profInsertPictureBtn.Content = "Vložte obrázek";
-			}
-		}
-
-		private void InitImage(int id)
-		{
-			BitmapImage? bitmap = Handler.LoadImageContentFromDatabase(id);
-			if (bitmap != null)
-			{
-				Window.profileImg.Source = bitmap;
-				if (!Window.profDeletePictureBtn.IsEnabled)
-					Window.profDeletePictureBtn.IsEnabled = true;
-				Window.profInsertPictureBtn.Content = "Změnit obrázek";
-			}
-		}
 
 		public void AdminShowTables_Click()
 		{
@@ -206,5 +272,7 @@ namespace Nemocnice.Config
 		{
 			Handler.AddPacient(ref Window.pacientiGrid);
 		}
-	}
+
+
+    }
 }

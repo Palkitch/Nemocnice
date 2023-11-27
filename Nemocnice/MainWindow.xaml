@@ -36,7 +36,7 @@
                     <ColumnDefinition Width="544*"/>
                 </Grid.ColumnDefinitions>
                 <DataGrid x:Name="pacientiGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Grid.Column="1" BorderBrush="White"/>
-                <RadioButton x:Name="allRadio" Content="Vše" Height="30" IsChecked="true" GroupName="ciselnikRadio" Margin="10,91,10,0" VerticalAlignment="Top" Checked="allRadio_Checked"/>
+                <RadioButton x:Name="allRadio" Content="Vše" Height="30" IsChecked="true" GroupName="ciselnikRadio" Margin="10,91,10,0" VerticalAlignment="Top"/>
                 <Label Content="Pacienti" Grid.Column="0" FontSize="16" HorizontalContentAlignment="Center" Margin="0,10,0,0" Height="30" VerticalAlignment="Top"/>
                 <RadioButton x:Name="diagnozyRadio" Content="Diagnózy" Height="30" IsChecked="false" GroupName="ciselnikRadio" Margin="10,121,10,0" VerticalAlignment="Top"/>
                 <ComboBox x:Name="diagnozyComboBox" Text="Některé stavy" Height="30"  IsEnabled="False" Margin="10,151,10,0" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
@@ -71,10 +71,17 @@
                 </Grid>
             </Grid>
         </TabItem>
-        <TabItem HorizontalAlignment="Center" Height="20" Header="TabItem" VerticalAlignment="Center" Width="54">
-            <Grid Background="#FFE5E5E5"/>
+        <TabItem x:Name="usersTabItem" HorizontalAlignment="Center" Header="Uživatelé" Width="62" Height="20" VerticalAlignment="Center">
+            <Grid Background="#FFE5E5E5">
+                <DataGrid x:Name="usersGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,0,0,72" SelectionChanged="OnSelectionChange"/>
+                <TextBox x:Name="usersUsernameTb" HorizontalAlignment="Left" Margin="58,0,0,24" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Bottom" Width="120" Height="30" VerticalContentAlignment="Center"/>
+                <Label Content="Role" HorizontalAlignment="Left" Margin="309,0,0,22" Height="30" VerticalAlignment="Bottom"/>
+                <Label Content="Název" HorizontalAlignment="Left" Margin="10,0,0,24" Height="30" VerticalAlignment="Bottom"/>
+                <ComboBox x:Name="usersRoleCb" HorizontalAlignment="Left" Margin="352,0,0,24" Width="120" Height="30" VerticalAlignment="Bottom" VerticalContentAlignment="Center"/>
+                <Button x:Name="usersSaveUser" Content="Uložit" Margin="0,0,10,22" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="59" Click="UsersSaveUser_Click"/>
+            </Grid>
         </TabItem>
-        <TabItem x:Name="AdminTabItem" Header="Admin">
+        <TabItem x:Name="adminTabItem" Header="Admin">
             <Grid>
                 <Grid.Background>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
