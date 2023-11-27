@@ -71,9 +71,20 @@ namespace Nemocnice
             Launcher.UpdateUserFromAdminTab();
         }
 
-        private void OnSelectionChange(object sender, SelectionChangedEventArgs e)
+        private void UsersGrid_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Launcher.ChangeUsersValues();
+
+        }
+
+        private void ProfileEmulation_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Launcher.HandleEmulation();
+        }
+
+        private void UsersDeleteUser_Click(object sender, RoutedEventArgs e)
+        {
+            Launcher.DeleteUser();
         }
     }
 }

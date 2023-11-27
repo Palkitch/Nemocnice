@@ -15,6 +15,7 @@ using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using MessageBox = System.Windows.MessageBox;
 
 namespace Nemocnice.Config
 {
@@ -35,22 +36,63 @@ namespace Nemocnice.Config
 
 		public void Launch()
 		{
-			Login login = new Login();
-			login.WindowStartupLocation = WindowStartupLocation.CenterScreen;   // nastavení dialogu a mainApp aby byly vycentrovany
-			Window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-			login.ShowDialog();
-
-			if (login.DialogResult == true) // úspěšný login/register
-				login.Close();
-			else  // Uživatel zavřel dialogové okno - ukončí aplikaci
-				System.Windows.Application.Current.Shutdown();
-
-			HandleCurrentlyLoggedUserRights();
-			FillAppComboBoxes();
-			InitUserProfile();
+            HandleLogin();
+            FillAppComboBoxes();
+            HandleCurrentlyLoggedUserRights();
+            HandlePacientsRadioButtons();
+            InitUserProfile();
 			InitUsers();
-			HandlePacientsRadioButtons();
 		}
+
+        private void HandleLogin() 
+        {
+            Login login = new Login();
+            login.WindowStartupLocation = WindowStartupLocation.CenterScreen;   // nastavení dialogu a mainApp aby byly vycentrovany
+            Window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            login.ShowDialog();
+
+            if (login.DialogResult == true) // úspěšný login/register
+                login.Close();
+            else  // Uživatel zavřel dialogové okno - ukončí aplikaci
+                System.Windows.Application.Current.Shutdown();
+        }
+
+        private void HandleCurrentlyLoggedUserRights()
+		{
+			if (Login.Guest) 
+			{
+                Window.adminTabItem.Visibility = Visibility.Hidden;
+                Window.usersTabItem.Visibility = Visibility.Hidden;
+				
+            } else if (Handler.Uzivatel != null)
+			{
+                if (Handler.Uzivatel.Role == Role.SESTRA)
+                {
+                    Window.adminTabItem.Visibility = Visibility.Hidden;
+                    Window.usersTabItem.Visibility = Visibility.Hidden;
+                }
+                else if (Handler.Uzivatel.Role == Role.DOKTOR) 
+                {
+                    Window.adminTabItem.Visibility = Visibility.Hidden;
+                    Window.usersTabItem.Visibility = Visibility.Hidden;
+                } 
+                else if (Handler.Uzivatel.Role == Role.PRIMAR) 
+                {
+                    Window.profileEmulationCb.Visibility = Visibility.Visible;
+                    Window.profileEmulationLabel.Visibility = Visibility.Visible;
+                    Window.adminTabItem.Visibility = Visibility.Visible;
+                    Window.usersTabItem.Visibility = Visibility.Visible;
+                }
+            }
+        }
+
+        private void FillAppComboBoxes()
+		{
+			Handler.AdminComboBoxHandle(ref Window.comboBox);
+			Handler.PacientsComboBoxesHandle(ref Window.skupinyComboBox, ref Window.diagnozyComboBox);
+			Handler.RecipeesComboBoxHandle(ref Window.recipeesComboBox);
+            InitEmulationComboBox();
+        }
 
         #region TabItem: Users
 
@@ -58,6 +100,7 @@ namespace Nemocnice.Config
         {
             RefreshUsers();
         }
+
         private void RefreshUsers()
         {
             Users = Handler.LoadAllUsers();
@@ -69,11 +112,11 @@ namespace Nemocnice.Config
             Window.usersGrid.ItemsSource = Users;
             Window.usersRoleCb.ItemsSource = Enum.GetValues(typeof(Role)).Cast<Role>().Select(role => role.ToString()).ToList();
         }
+
         public void ChangeUsersValues()	// při překlikávání uživatelů se mění hodnoty komponent na stránce
         {
             // Získání vybrané položky z DataGridu
             SelectedUser = (Uzivatel)Window.usersGrid.SelectedItem;
-
 
             if (SelectedUser != null)
             {
@@ -100,6 +143,28 @@ namespace Nemocnice.Config
             RefreshUsers();
         }
 
+        public void DeleteUser()
+        {
+            string userName = Window.usersUsernameTb.Text;
+            string? roleText = Window.usersRoleCb.SelectedItem.ToString();
+
+            if (userName != null && Handler.Uzivatel != null) 
+            {
+                if (Handler.Uzivatel.Jmeno == userName)
+                {
+                    MessageBox.Show("Sám sebe není možno mazat", "Varování");
+                }
+                else if (Handler.Uzivatel.Role.ToString() == roleText) 
+                {
+                    MessageBox.Show("Není možno mazat uživatele s rolí PRIMAR", "Varování");
+                }
+                else
+                {
+                    Handler.DeleteUserFromAdminTab(userName);
+                }
+            }
+            RefreshUsers();
+        }
         #endregion
 
         #region TabItem: Profile
@@ -190,89 +255,89 @@ namespace Nemocnice.Config
                 Window.profInsertPictureBtn.Content = "Změnit obrázek";
             }
         }
+
+        private void InitEmulationComboBox()
+        {
+            Window.profileEmulationCb.ItemsSource = Enum.GetValues(typeof(Role)).Cast<Role>().Select(role => role.ToString()).ToList();
+        }
+
+        public void HandleEmulation()
+        {
+            if (Handler.Uzivatel != null)
+            {
+                Role selectedRole = (Role)Enum.Parse(typeof(Role), Window.profileEmulationCb.SelectedItem.ToString());
+                Handler.Uzivatel.Role = selectedRole;
+                HandleCurrentlyLoggedUserRights();
+            }
+        }
         #endregion
 
-        private void HandleCurrentlyLoggedUserRights()
-		{
-			if (Login.Guest) 
-			{
-                Window.adminTabItem.Visibility = Visibility.Hidden;
-                Window.usersTabItem.Visibility = Visibility.Hidden;
-				
-            } else if (Handler.Uzivatel != null && Handler.Uzivatel.Role == Role.SESTRA)
-			{
-				Window.adminTabItem.Visibility = Visibility.Hidden;
-                Window.usersTabItem.Visibility = Visibility.Hidden;
+        #region TabItem: Pacients
+
+        private void HandlePacientsRadioButtons()
+        {
+            Window.diagnozyRadio.Checked += (sender, e) =>
+            {
+                Window.diagnozyComboBox.IsEnabled = true;
+                Window.skupinyComboBox.IsEnabled = false;
+            };
+            Window.skupinyRadio.Checked += (sender, e) =>
+            {
+                Window.diagnozyComboBox.IsEnabled = false;
+                Window.skupinyComboBox.IsEnabled = true;
+            };
+            Window.allRadio.Checked += (sender, e) =>
+            {
+                Window.diagnozyComboBox.IsEnabled = false;
+                Window.skupinyComboBox.IsEnabled = false;
+            };
+
+        }
+        public void PacientsShowTable_Click()
+        {
+            if (Window.skupinyRadio.IsChecked == true)
+            {
+                Handler.ShowPacients(ref Window.pacientiGrid, ref Window.skupinyComboBox, Ciselnik.SKUPINY);
+            }
+            else if (Window.diagnozyRadio.IsChecked == true)
+            {
+                Handler.ShowPacients(ref Window.pacientiGrid, ref Window.diagnozyComboBox, Ciselnik.DIAGNOZY);
+            }
+            else if (Window.allRadio.IsChecked == true)
+            {
+                Handler.ShowPacients(ref Window.pacientiGrid, ref Window.diagnozyComboBox, Ciselnik.NONE);
             }
         }
 
-		private void FillAppComboBoxes()
-		{
-			Handler.AdminComboBoxHandle(ref Window.comboBox);
-			Handler.PacientsComboBoxesHandle(ref Window.skupinyComboBox, ref Window.diagnozyComboBox);
-			Handler.RecipeesComboBoxHandle(ref Window.recipeesComboBox);
-		}
+        public void AddPacient_Click()
+        {
+            Handler.AddPacient(ref Window.pacientiGrid);
+        }
+        #endregion
 
-		private void HandlePacientsRadioButtons()
-		{
-			Window.diagnozyRadio.Checked += (sender, e) =>
-			{
-				Window.diagnozyComboBox.IsEnabled = true;
-				Window.skupinyComboBox.IsEnabled = false;
-			};
-			Window.skupinyRadio.Checked += (sender, e) =>
-			{
-				Window.diagnozyComboBox.IsEnabled = false;
-				Window.skupinyComboBox.IsEnabled = true;
-			};			
-			Window.allRadio.Checked += (sender, e) =>
-			{
-				Window.diagnozyComboBox.IsEnabled = false;
-				Window.skupinyComboBox.IsEnabled = false;
-			};
-			
-		}
+        #region TabItem: Admin
 
+        public void AdminShowTables_Click()
+        {
+            Handler.AdminShowAllTables(ref Window.comboBox, ref Window.grid);
+        }
 
-		public void AdminShowTables_Click()
-		{
-			Handler.AdminShowAllTables(ref Window.comboBox, ref Window.grid);
-		}
+        public void AdminShowLogs_Click()
+        {
+            Handler.ShowLogs();
+        }
+        public void AdminShowKatalog_Click()
+        {
+            Handler.ShowKatalog();
+        }
+        #endregion
 
-		public void AdminShowLogs_Click()
-		{
-			Handler.ShowLogs();
-		}
-		public void AdminShowKatalog_Click()
-		{
-			Handler.ShowKatalog();
-		}
+        #region TabItem: Recipees
+        public void RecipeesShowTable_Click()
+        {
+            Handler.ShowRecipees(ref Window.recipeesComboBox, ref Window.recipeesGrid);
+        }
 
-		public void PacientsShowTable_Click()
-		{
-			if (Window.skupinyRadio.IsChecked == true)
-			{
-				Handler.ShowPacients(ref Window.pacientiGrid, ref Window.skupinyComboBox, Ciselnik.SKUPINY);
-			}
-			else if (Window.diagnozyRadio.IsChecked == true)
-			{
-				Handler.ShowPacients(ref Window.pacientiGrid, ref Window.diagnozyComboBox, Ciselnik.DIAGNOZY);
-			}
-			else if (Window.allRadio.IsChecked == true)
-			{
-				Handler.ShowPacients(ref Window.pacientiGrid, ref Window.diagnozyComboBox, Ciselnik.NONE);
-			}
-		}
-
-		public void RecipeesShowTable_Click()
-		{
-			Handler.ShowRecipees(ref Window.recipeesComboBox, ref Window.recipeesGrid);
-		}
-		public void AddPacient_Click()
-		{
-			Handler.AddPacient(ref Window.pacientiGrid);
-		}
-
-
+        #endregion
     }
 }

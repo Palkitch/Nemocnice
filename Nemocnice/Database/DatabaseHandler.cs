@@ -60,7 +60,10 @@ namespace Nemocnice.Database
 			TableAliasMapping = new Dictionary<string, string>();
 			Connection = DatabaseConnection.OracleConnection;
 			try { Connection.Open(); }
-			catch { MessageBox.Show("ZAPNI SI VPN"); }
+			catch {
+				MessageBox.Show("ZAPNI SI VPN");
+				Environment.Exit(444);
+			}
 		}
 
 		#region Login/Register
@@ -872,6 +875,16 @@ namespace Nemocnice.Database
 				command.ExecuteNonQuery();
             }
         }
-		#endregion
-	}
+
+        public void DeleteUserFromAdminTab(string userName)
+        {
+            using (OracleCommand command = new OracleCommand("delete_uzivatele_admin", Connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.Add("p_nazev", userName);
+                command.ExecuteNonQuery();
+            }
+        }
+        #endregion
+    }
 }
