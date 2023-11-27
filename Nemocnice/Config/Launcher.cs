@@ -265,9 +265,17 @@ namespace Nemocnice.Config
         {
             if (Handler.Uzivatel != null)
             {
-                Role selectedRole = (Role)Enum.Parse(typeof(Role), Window.profileEmulationCb.SelectedItem.ToString());
-                Handler.Uzivatel.Role = selectedRole;
-                HandleCurrentlyLoggedUserRights();
+                string? roleText = Window.profileEmulationCb.SelectedItem.ToString();
+                if (roleText != null)
+                {
+                    Role selectedRole = (Role)Enum.Parse(typeof(Role), roleText);
+                    Handler.Uzivatel.Role = selectedRole;
+                    HandleCurrentlyLoggedUserRights();
+                }
+                else 
+                {
+                    MessageBox.Show("Nelze zjistit vybranou roli", "Chyba");
+                }
             }
         }
         #endregion

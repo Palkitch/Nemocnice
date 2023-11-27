@@ -455,15 +455,19 @@ namespace Nemocnice.Database
 
 		private int GetUzivatelskeIdObrazku()
 		{
-			using (OracleCommand cmd = new OracleCommand("SELECT id_obrazek FROM uzivatele_s_ikony WHERE uzivatel_nazev LIKE :userName", Connection))
+			if (Uzivatel != null) 
 			{
-				// Vytahnout id obrazku pro update z uzivatele_s_ikony view
-				cmd.Parameters.Add(new OracleParameter("userName", Uzivatel.Jmeno));
-				object obj = cmd.ExecuteScalar();
-				if (obj != null)
-					if (int.TryParse(obj.ToString(), out int imageId))
-						return imageId;
-			}
+                using (OracleCommand cmd = new OracleCommand("SELECT id_obrazek FROM uzivatele_s_ikony WHERE uzivatel_nazev LIKE :userName", Connection))
+                {
+                    // Vytahnout id obrazku pro update z uzivatele_s_ikony view
+                    cmd.Parameters.Add(new OracleParameter("userName", Uzivatel.Jmeno));
+                    object obj = cmd.ExecuteScalar();
+					if (obj != null)
+						if (int.TryParse(obj.ToString(), out int imageId))
+							return imageId;
+                }
+            }
+	
 			return 0;
 		}
 
@@ -595,7 +599,7 @@ namespace Nemocnice.Database
 
 		public BitmapImage? LoadLoggedUser(bool guest)
 		{
-			if (!guest)
+			if (!guest && Uzivatel != null)
 			{
 				BitmapImage? bitMapImage = null;
 				string query = "SELECT id_obrazek FROM uzivatele_s_ikony WHERE uzivatel_nazev LIKE :userName";

@@ -87,6 +87,7 @@ namespace Nemocnice
             }
             doktorComboBox.SelectedIndex = 0;
         }
+
         private void FillAdresaComboBox()
         {
             try
