@@ -91,10 +91,11 @@ namespace Nemocnice.Config
 			Handler.AdminComboBoxHandle(ref Window.comboBox);
 			Handler.PacientsComboBoxesHandle(ref Window.skupinyComboBox, ref Window.diagnozyComboBox);
 			Handler.RecipeesComboBoxHandle(ref Window.recipeesComboBox);
+            Handler.ScheduleComboBoxHandle(ref Window.scheduleNurseCb);
             InitEmulationComboBox();
         }
 
-        #region TabItem: Users
+        #region TabItem: Uživatelé
 
         private void InitUsers()
         {
@@ -167,7 +168,7 @@ namespace Nemocnice.Config
         }
         #endregion
 
-        #region TabItem: Profile
+        #region TabItem: Profil
 
         private void InitUserProfile()
         {
@@ -281,7 +282,7 @@ namespace Nemocnice.Config
         }
         #endregion
 
-        #region TabItem: Pacients
+        #region TabItem: Pacienti
 
         private void HandlePacientsRadioButtons()
         {
@@ -341,12 +342,20 @@ namespace Nemocnice.Config
         }
         #endregion
 
-        #region TabItem: Recipees
+        #region TabItem: Recepty
         public void RecipeesShowTable_Click()
         {
             Handler.ShowRecipees(ref Window.recipeesComboBox, ref Window.recipeesGrid);
         }
 
         #endregion
+
+        #region TabItem: Rozpis
+        public void ShowSchedule()
+        {
+            Handler.ShowShedule(ref Window.scheduleNurseCb, ref Window.scheduleGrid);
+        }
+        #endregion
+
     }
 }

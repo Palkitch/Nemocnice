@@ -73,6 +73,14 @@
                 </Grid>
             </Grid>
         </TabItem>
+        <TabItem x:Name="scheduleTabItem" HorizontalAlignment="Center" Header="Rozpis" Width="62" Height="20" VerticalAlignment="Center">
+            <Grid Background="#FFE5E5E5">
+                <DataGrid x:Name="scheduleGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,0,0,72"/>
+                <Label Content="Sestra" HorizontalAlignment="Left" Margin="10,0,0,22" Height="30" VerticalAlignment="Bottom"/>
+                <ComboBox x:Name="scheduleNurseCb" HorizontalAlignment="Left" Margin="53,0,0,24" Width="150" Height="30" VerticalAlignment="Bottom" VerticalContentAlignment="Center"/>
+                <Button x:Name="scheduleShowShedule" Content="Zobrazit" Margin="0,0,10,22" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100" Click="ScheduleShowShedule"/>
+            </Grid>
+        </TabItem>
         <TabItem x:Name="usersTabItem" HorizontalAlignment="Center" Header="Uživatelé" Width="62" Height="20" VerticalAlignment="Center">
             <Grid Background="#FFE5E5E5">
                 <DataGrid x:Name="usersGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,0,0,72" SelectionChanged="UsersGrid_OnSelectionChanged"/>
@@ -107,6 +115,7 @@
                 <Button x:Name="adminShowKatalog" Grid.Column="0" Content="Zobrazit katalog" Click="AdminShowKatalog_Click" Margin="10,290,10,0" Height="35" VerticalAlignment="Top"/>
             </Grid>
         </TabItem>
+
 
     </TabControl>
 

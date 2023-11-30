@@ -49,7 +49,7 @@ namespace Nemocnice.Database
 		{
 			get
 			{
-				instance ??= new DatabaseHandler(); // ??= přiřazeni hodnoty pouze pokud je proměnná null
+				instance ??= new DatabaseHandler(); // ??= přiřazeni hodnoty pouze je proměnná null
 				return instance;
 			}
 		}
@@ -355,6 +355,18 @@ namespace Nemocnice.Database
 										int count = int.Parse(ReadString(reader, 2));
 										Pomucka pomucka = new Pomucka(id, name, count);
 										collection.Add(pomucka);
+										break;
+									}
+
+								case "RECEPTY":
+									{
+										int id = int.Parse(ReadString(reader, 0));
+										int docId = int.Parse(ReadString(reader, 1));
+										int patId = int.Parse(ReadString(reader, 2));
+										DateTime date = DateTime.Parse(ReadString(reader, 3));
+										string? formattedDate = date.ToString("yyyy-MM-dd");
+										Recept prescription = new Recept(id, docId, patId, formattedDate);
+										collection.Add(prescription);
 										break;
 									}
 								case "ZAMESTNANCI":
@@ -794,31 +806,6 @@ namespace Nemocnice.Database
 		}
 		#endregion
 
-		#region ReaderMetody
-		private string ReadString(OracleDataReader reader, int columnIndex)
-		{
-			return reader.IsDBNull(columnIndex) ? "..." : reader.GetString(columnIndex);
-		}
-
-		private string ReadString(OracleDataReader reader, string columnName)
-		{
-			int columnIndex = reader.GetOrdinal(columnName);
-			return ReadString(reader, columnIndex);
-		}
-
-		private int? ParseNullableInt(string input)
-		{
-			if (int.TryParse(input, out int result))
-			{
-				return result;
-			}
-			else
-			{
-				return null;
-			}
-		}
-		#endregion
-
 		#region TabItem: Uzivatele
 
 		public List<Uzivatel> LoadAllUsers()
@@ -865,6 +852,77 @@ namespace Nemocnice.Database
                 command.ExecuteNonQuery();
             }
         }
+
+		#endregion
+
+		#region TabItem: Rozpis
+
+		public void ScheduleComboBoxHandle(ref ComboBox scheduleNurseCb)
+        {
+            scheduleNurseCb.Items.Add("Vše");
+            using (OracleCommand command = new OracleCommand("SELECT prijmeni FROM zamestnanci z JOIN sestry s ON z.id_zamestnanec = s.id_zamestnanec", Connection))
+            {
+                using (OracleDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        // Přidání hodnot do ComboBox
+                        string? prijmeni = ReadString(reader, "prijmeni");
+                        scheduleNurseCb.Items.Add(prijmeni);
+                    }
+                    scheduleNurseCb.SelectedIndex = 0;
+                }
+            }
+        }
+
+        public void ShowShedule(ref ComboBox scheduleNurseCb, ref DataGrid scheduleGrid)
+        {
+            string? surname = scheduleNurseCb.SelectedValue as string;
+            if (surname == "Vše") surname = "all";
+            using (OracleCommand command = new OracleCommand("BEGIN :result := GetRozpisBySestra(:surname); END;", Connection))
+            {
+                command.CommandType = CommandType.Text;
+
+                command.Parameters.Add("result", OracleDbType.RefCursor).Direction = ParameterDirection.ReturnValue;
+                command.Parameters.Add(new OracleParameter("p_prijmeni_sestry", surname));
+                command.ExecuteNonQuery();
+
+                using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
+                {
+                    DataTable dataTable = new DataTable();
+                    dataTable.Load(reader);
+
+                    scheduleGrid.ItemsSource = dataTable.DefaultView;
+                }
+            }
+        }
+
         #endregion
+
+        #region ReaderMetody
+        private string ReadString(OracleDataReader reader, int columnIndex)
+        {
+            return reader.IsDBNull(columnIndex) ? "..." : reader.GetString(columnIndex);
+        }
+
+        private string ReadString(OracleDataReader reader, string columnName)
+        {
+            int columnIndex = reader.GetOrdinal(columnName);
+            return ReadString(reader, columnIndex);
+        }
+
+        private int? ParseNullableInt(string input)
+        {
+            if (int.TryParse(input, out int result))
+            {
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        #endregion
+
     }
 }
