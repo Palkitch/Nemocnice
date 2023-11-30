@@ -49,7 +49,7 @@ namespace Nemocnice.Database
 		{
 			get
 			{
-				instance ??= new DatabaseHandler(); // ??= přiřazeni hodnoty pouze je proměnná null
+				instance ??= new DatabaseHandler(); // ??= přiřazeni hodnoty pouze pokud je proměnná null
 				return instance;
 			}
 		}
@@ -355,18 +355,6 @@ namespace Nemocnice.Database
 										int count = int.Parse(ReadString(reader, 2));
 										Pomucka pomucka = new Pomucka(id, name, count);
 										collection.Add(pomucka);
-										break;
-									}
-
-								case "RECEPTY":
-									{
-										int id = int.Parse(ReadString(reader, 0));
-										int docId = int.Parse(ReadString(reader, 1));
-										int patId = int.Parse(ReadString(reader, 2));
-										DateTime date = DateTime.Parse(ReadString(reader, 3));
-										string? formattedDate = date.ToString("yyyy-MM-dd");
-										Recept prescription = new Recept(id, docId, patId, formattedDate);
-										collection.Add(prescription);
 										break;
 									}
 								case "ZAMESTNANCI":
