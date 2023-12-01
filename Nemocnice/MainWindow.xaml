@@ -45,7 +45,8 @@
                 <RadioButton x:Name="skupinyRadio" Content="Skupiny"  Height="30" GroupName="ciselnikRadio" Margin="10,198,10,0" VerticalAlignment="Top"/>
                 <ComboBox x:Name="skupinyComboBox" Height="30" Width="70" Margin="10,228,0,0" IsEnabled="False" VerticalAlignment="Top" HorizontalAlignment="Left" VerticalContentAlignment="Center"/>
                 <Button x:Name="pacientsShowTable" Content="Zobrazit" Margin="10,279,10,0" Height="35" Click="PacientsShowTable_Click" VerticalAlignment="Top"/>
-                <Button x:Name="pacientsAdd" Content="Přidat" Margin="10,320,10,0" Height="35" Click="PacientsAdd_Click" VerticalAlignment="Top"/>
+                <Button x:Name="pacientsAdd" Content="Přidat" Margin="10,320,130,0" Height="35" Click="PacientsAdd_Click" VerticalAlignment="Top"/>
+                <Button x:Name="pacientsEdit" Content="Upravit" Margin="125,320,10,0" Height="35" Click="PacientsEdit_Click" VerticalAlignment="Top"/>
             </Grid>
 
         </TabItem>

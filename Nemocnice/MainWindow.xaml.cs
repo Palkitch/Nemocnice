@@ -19,11 +19,11 @@ namespace Nemocnice
     {
         Launcher Launcher { get; set; }
 
-		// TODO
-		// 1) Edit, Add a Remove všem tabulkam pro admina
-		// 2) kouknout se do databaseHandleru a posoudit zda nějake metody nebude přehlednější udělat přes funkce/procedury
+        // TODO
+        // 1) Edit, Add a Remove všem tabulkam pro admina
+        // 2) kouknout se do databaseHandleru a posoudit zda nějake metody nebude přehlednější udělat přes funkce/procedury
 
-		public MainWindow()
+        public MainWindow()
         {
             InitializeComponent();
             Launcher = new Launcher(this);
@@ -109,6 +109,11 @@ namespace Nemocnice
         private void EmployeesAddEmployee(object sender, RoutedEventArgs e)
         {
             Launcher.AddEmployee();
+        }
+
+        private void PacientsEdit_Click(object sender, RoutedEventArgs e)
+        {
+            Launcher.EditPacient_Click();
         }
     }
 }

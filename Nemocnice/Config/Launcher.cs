@@ -19,32 +19,32 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace Nemocnice.Config
 {
-	public class Launcher
-	{
-		MainWindow Window { get; set; }
-		private DatabaseHandler Handler { get; }
-		private List<Uzivatel> Users { get; set; }
-		private Uzivatel? SelectedUser { get; set; }
+    public class Launcher
+    {
+        MainWindow Window { get; set; }
+        private DatabaseHandler Handler { get; }
+        private List<Uzivatel> Users { get; set; }
+        private Uzivatel? SelectedUser { get; set; }
 
-		public Launcher(MainWindow window)
-		{
-			Window = window;
-			Handler = DatabaseHandler.Instance;
-			Users = new List<Uzivatel>();
-			SelectedUser = null;
-		}
+        public Launcher(MainWindow window)
+        {
+            Window = window;
+            Handler = DatabaseHandler.Instance;
+            Users = new List<Uzivatel>();
+            SelectedUser = null;
+        }
 
-		public void Launch()
-		{
+        public void Launch()
+        {
             HandleLogin();
             FillAppComboBoxes();
             HandleCurrentlyLoggedUserRights();
             HandlePacientsRadioButtons();
             InitUserProfile();
-			InitUsers();
-		}
+            InitUsers();
+        }
 
-        private void HandleLogin() 
+        private void HandleLogin()
         {
             Login login = new Login();
             login.WindowStartupLocation = WindowStartupLocation.CenterScreen;   // nastavení dialogu a mainApp aby byly vycentrovany
@@ -58,36 +58,37 @@ namespace Nemocnice.Config
         }
 
         private void HandleCurrentlyLoggedUserRights()
-		{
-			if (Login.Guest) 
-			{
+        {
+            if (Login.Guest)
+            {
                 Window.adminTabItem.Visibility = Visibility.Hidden;
                 Window.usersTabItem.Visibility = Visibility.Hidden;
-				
-            } else if (Handler.Uzivatel != null)
-			{
+
+            }
+            else if (Handler.Uzivatel != null)
+            {
                 if (Handler.Uzivatel.Role == Role.SESTRA || Handler.Uzivatel.Role == Role.DOKTOR)
                 {
                     Window.adminTabItem.Visibility = Visibility.Hidden;
                     Window.usersTabItem.Visibility = Visibility.Hidden;
                     Window.employeesTabItem.Visibility = Visibility.Hidden;
                 }
-                else if (Handler.Uzivatel.Role == Role.PRIMAR) 
+                else if (Handler.Uzivatel.Role == Role.PRIMAR)
                 {
                     Window.profileEmulationCb.Visibility = Visibility.Visible;
                     Window.profileEmulationLabel.Visibility = Visibility.Visible;
                     Window.adminTabItem.Visibility = Visibility.Visible;
-                    Window.usersTabItem.Visibility = Visibility.Visible; 
+                    Window.usersTabItem.Visibility = Visibility.Visible;
                     Window.employeesTabItem.Visibility = Visibility.Visible;
                 }
             }
         }
 
         private void FillAppComboBoxes()
-		{
-			Handler.AdminComboBoxHandle(ref Window.comboBox);
-			Handler.PacientsComboBoxesHandle(ref Window.skupinyComboBox, ref Window.diagnozyComboBox);
-			Handler.RecipeesComboBoxHandle(ref Window.recipeesComboBox);
+        {
+            Handler.AdminComboBoxHandle(ref Window.comboBox);
+            Handler.PacientsComboBoxesHandle(ref Window.skupinyComboBox, ref Window.diagnozyComboBox);
+            Handler.RecipeesComboBoxHandle(ref Window.recipeesComboBox);
             Handler.ScheduleComboBoxHandle(ref Window.scheduleNurseCb);
             InitEmulationComboBox();
         }
@@ -146,13 +147,13 @@ namespace Nemocnice.Config
             string userName = Window.usersUsernameTb.Text;
             string? roleText = Window.usersRoleCb.SelectedItem.ToString();
 
-            if (userName != null && Handler.Uzivatel != null) 
+            if (userName != null && Handler.Uzivatel != null)
             {
                 if (Handler.Uzivatel.Jmeno == userName)
                 {
                     MessageBox.Show("Sám sebe není možno mazat", "Varování");
                 }
-                else if (Handler.Uzivatel.Role.ToString() == roleText) 
+                else if (Handler.Uzivatel.Role.ToString() == roleText)
                 {
                     MessageBox.Show("Není možno mazat uživatele s rolí PRIMAR", "Varování");
                 }
@@ -271,7 +272,7 @@ namespace Nemocnice.Config
                     Handler.Uzivatel.Role = selectedRole;
                     HandleCurrentlyLoggedUserRights();
                 }
-                else 
+                else
                 {
                     MessageBox.Show("Nelze zjistit vybranou roli", "Chyba");
                 }
@@ -319,6 +320,10 @@ namespace Nemocnice.Config
         public void AddPacient_Click()
         {
             Handler.AddPacient(ref Window.pacientiGrid);
+        }
+        public void EditPacient_Click()
+        {
+            Handler.EditPacient(ref Window.pacientiGrid);
         }
         #endregion
 
