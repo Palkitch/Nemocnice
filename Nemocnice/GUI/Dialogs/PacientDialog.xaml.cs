@@ -267,9 +267,11 @@ namespace Nemocnice
                         break;
                     }
             }
+            this.Close();
         }
         #endregion
 
+        #region Funkcionalita
         private void AddPacient()
         {
             switch (uzivatel.Role)
@@ -400,6 +402,7 @@ namespace Nemocnice
                             int idDiagnoza = ((Diagnoza)diagnozaComboBox.SelectedItem).Id;
 
                             // Parametry pro volání procedury VytvorZadostPacienti
+                            command.Parameters.Add("p_IdPacient", OracleDbType.Int32).Value = pacientId;
                             command.Parameters.Add("p_Jmeno", OracleDbType.Varchar2).Value = jmeno;
                             command.Parameters.Add("p_Prijmeni", OracleDbType.Varchar2).Value = prijmeni;
                             command.Parameters.Add("p_DatumNarozeni", OracleDbType.Date).Value = datumNarozeni;
@@ -492,6 +495,6 @@ namespace Nemocnice
                 MessageBox.Show("Chyba při načítání dat pacienta: " + ex.Message);
             }
         }
-
+        #endregion
     }
 }
