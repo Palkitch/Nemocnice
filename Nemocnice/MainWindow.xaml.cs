@@ -95,5 +95,20 @@ namespace Nemocnice
         {
             Launcher.ShowSchedule();
         }
+
+        private void EmployeesShowEmployees(object sender, RoutedEventArgs e)
+        {
+            Launcher.ShowEmployees();
+        }
+
+        private void EmployeesEditEmployee(object sender, RoutedEventArgs e)
+        {
+            Launcher.EditEmployee();
+        }
+
+        private void EmployeesAddEmployee(object sender, RoutedEventArgs e)
+        {
+            Launcher.AddEmployee();
+        }
     }
 }

@@ -642,7 +642,7 @@ namespace Nemocnice.Database
 					// Volání druhé funkce
 					using (OracleCommand command2 = new OracleCommand(diagnozyCmd, Connection))
 					{
-						command2.CommandType = System.Data.CommandType.Text;
+						command2.CommandType = CommandType.Text;
 						command2.Parameters.Add("result", OracleDbType.RefCursor, System.Data.ParameterDirection.ReturnValue);
 						command2.Transaction = transaction;
 
@@ -675,12 +675,13 @@ namespace Nemocnice.Database
 			}
 			skupiny.SelectedIndex = 0;
 			diagnozy.SelectedIndex = 0;
-		}
 
-		public void ShowPacients(ref DataGrid dataGrid, ref ComboBox comboBox, Ciselnik druhCiselniku)
+        }
+
+		public void ShowPacients(ref DataGrid pacientsGrid, ref ComboBox comboBox, Ciselnik druhCiselniku)
 		{
-			dataGrid.IsReadOnly = true;
-			dataGrid.Columns.Clear();
+			pacientsGrid.IsReadOnly = true;
+			pacientsGrid.Columns.Clear();
 
 			switch (druhCiselniku)
 			{
@@ -703,7 +704,7 @@ namespace Nemocnice.Database
 									DataTable dataTable = new DataTable();
 									dataTable.Load(reader);
 
-									dataGrid.ItemsSource = dataTable.DefaultView;
+									pacientsGrid.ItemsSource = dataTable.DefaultView;
 								}
 							}
 						}
@@ -727,7 +728,7 @@ namespace Nemocnice.Database
 									DataTable dataTable = new DataTable();
 									dataTable.Load(reader);
 
-									dataGrid.ItemsSource = dataTable.DefaultView;
+									pacientsGrid.ItemsSource = dataTable.DefaultView;
 								}
 							}
 						}
@@ -747,14 +748,21 @@ namespace Nemocnice.Database
 								DataTable dataTable = new DataTable();
 								dataTable.Load(reader);
 
-								dataGrid.ItemsSource = dataTable.DefaultView;
+								pacientsGrid.ItemsSource = dataTable.DefaultView;
 							}
 						}
 					}
 					break;
 			}
-			dataGrid.Columns[0].Visibility = Visibility.Collapsed;
-		}
+			pacientsGrid.Columns[0].Visibility = Visibility.Collapsed;
+
+            if (Uzivatel != null && Uzivatel.Role != Role.PRIMAR)
+            {
+                pacientsGrid.Columns[3].Visibility = Visibility.Hidden;
+                pacientsGrid.Columns[4].Visibility = Visibility.Hidden;
+
+            }
+        }
 
 		public void AddPacient(ref DataGrid gridView)
 		{
@@ -894,7 +902,30 @@ namespace Nemocnice.Database
 
                     scheduleGrid.ItemsSource = dataTable.DefaultView;
                 }
+				
             }
+        }
+
+        #endregion
+
+        #region TabItem: Zamestnanci
+        public void ShowEmployees(ref DataGrid employeesGrid)
+        {
+            using (OracleCommand command = new OracleCommand("BEGIN :result := GetZamestnanciSNadrizenymi(); END;", Connection))
+            {
+                command.CommandType = CommandType.Text;
+                command.Parameters.Add("result", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                command.ExecuteNonQuery();
+
+                using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
+                {
+                    DataTable dataTable = new DataTable();
+                    dataTable.Load(reader);
+
+                    employeesGrid.ItemsSource = dataTable.DefaultView;
+                }
+            }
+            employeesGrid.Columns[0].Visibility = Visibility.Hidden;
         }
 
         #endregion
@@ -922,7 +953,8 @@ namespace Nemocnice.Database
                 return null;
             }
         }
-        #endregion
+
+		#endregion
 
     }
 }

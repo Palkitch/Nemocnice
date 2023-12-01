@@ -66,22 +66,19 @@ namespace Nemocnice.Config
 				
             } else if (Handler.Uzivatel != null)
 			{
-                if (Handler.Uzivatel.Role == Role.SESTRA)
+                if (Handler.Uzivatel.Role == Role.SESTRA || Handler.Uzivatel.Role == Role.DOKTOR)
                 {
                     Window.adminTabItem.Visibility = Visibility.Hidden;
                     Window.usersTabItem.Visibility = Visibility.Hidden;
+                    Window.employeesTabItem.Visibility = Visibility.Hidden;
                 }
-                else if (Handler.Uzivatel.Role == Role.DOKTOR) 
-                {
-                    Window.adminTabItem.Visibility = Visibility.Hidden;
-                    Window.usersTabItem.Visibility = Visibility.Hidden;
-                } 
                 else if (Handler.Uzivatel.Role == Role.PRIMAR) 
                 {
                     Window.profileEmulationCb.Visibility = Visibility.Visible;
                     Window.profileEmulationLabel.Visibility = Visibility.Visible;
                     Window.adminTabItem.Visibility = Visibility.Visible;
-                    Window.usersTabItem.Visibility = Visibility.Visible;
+                    Window.usersTabItem.Visibility = Visibility.Visible; 
+                    Window.employeesTabItem.Visibility = Visibility.Visible;
                 }
             }
         }
@@ -354,6 +351,24 @@ namespace Nemocnice.Config
         public void ShowSchedule()
         {
             Handler.ShowShedule(ref Window.scheduleNurseCb, ref Window.scheduleGrid);
+        }
+        #endregion
+
+        #region TabItem: Zamestnanci
+
+        public void ShowEmployees()
+        {
+            Handler.ShowEmployees(ref Window.employeesGrid);
+        }
+
+        public void EditEmployee()
+        {
+            // TODO: přidat do database handleru metodu pro edit employee
+        }
+
+        public void AddEmployee()
+        {
+            // TODO: přidat do database handleru metodu pro add employee
         }
         #endregion
 
