@@ -52,6 +52,13 @@ namespace Nemocnice
             InitializeComponent();
             ComboBoxFill();
             LoadPatientData();
+            if (uzivatel.Role == Role.DOKTOR || uzivatel.Role == Role.SESTRA)
+            {
+                rodneCisloLabel.Visibility = Visibility.Collapsed;
+                rodneCisloTextBox.Visibility = Visibility.Collapsed;
+                datumNarozeniDatePicker.Visibility = Visibility.Collapsed;
+                datumNarozeniLabel.Visibility = Visibility.Collapsed;
+            }
         }
 
         #region ComboBox
