@@ -115,5 +115,7 @@ namespace Nemocnice
         {
             Launcher.EditPacient_Click();
         }
+
+       
     }
 }
