@@ -347,6 +347,7 @@ namespace Nemocnice
                             int idDiagnoza = ((Diagnoza)diagnozaComboBox.SelectedItem).Id;
 
                             // Parametry pro volání procedury VytvorZadostPacienti
+                            command.Parameters.Add("p_IdPacient", OracleDbType.Int32).Value = 0;
                             command.Parameters.Add("p_Jmeno", OracleDbType.Varchar2).Value = jmeno;
                             command.Parameters.Add("p_Prijmeni", OracleDbType.Varchar2).Value = prijmeni;
                             command.Parameters.Add("p_DatumNarozeni", OracleDbType.Date).Value = datumNarozeni;
