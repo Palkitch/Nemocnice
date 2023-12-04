@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.ApplicationServices;
 using Nemocnice.GUI;
+using Nemocnice.Model;
 using Nemocnice.ModelObjects;
 using Newtonsoft.Json.Linq;
 using Oracle.ManagedDataAccess.Client;
@@ -950,31 +951,79 @@ namespace Nemocnice.Database
 
 		#endregion
 
-		#region ReaderMetody
-		private string ReadString(OracleDataReader reader, int columnIndex)
-		{
-			return reader.IsDBNull(columnIndex) ? "..." : reader.GetString(columnIndex);
-		}
-
-		private string ReadString(OracleDataReader reader, string columnName)
-		{
-			int columnIndex = reader.GetOrdinal(columnName);
-			return ReadString(reader, columnIndex);
-		}
-
-		private int? ParseNullableInt(string input)
-		{
-			if (int.TryParse(input, out int result))
+        #region TabItem: Zadosti
+        public void DenyRequest(ref DataGrid requestsGrid, int id)
+        {
+			using (OracleCommand command = new OracleCommand("DELETE_NESCHVALENE_ZMENY", Connection))
 			{
-				return result;
+				command.CommandType = CommandType.StoredProcedure;
+				command.Parameters.Add(new OracleParameter("p_id", id));
+				command.ExecuteNonQuery();
+				ShowRequests(ref requestsGrid);
 			}
-			else
-			{
-				return null;
+        }
+
+        public void ShowRequests(ref DataGrid requestsGrid)
+		{
+            using (OracleCommand command = new OracleCommand("BEGIN :result := GetNeschvaleneZadosti(); END;", Connection))
+            {
+                command.CommandType = CommandType.Text;
+                command.Parameters.Add("result", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                command.ExecuteNonQuery();
+
+                using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
+                {
+					DataTable dataTable = new DataTable();
+                    dataTable.Load(reader);
+
+                    requestsGrid.ItemsSource = dataTable.DefaultView;
+                }
+				requestsGrid.Columns[0].Visibility = Visibility.Hidden;
 			}
 		}
 
-		#endregion
+        public bool AcceptRequest(ref DataGrid requestsGrid, int id)
+        {
+            using (OracleCommand command = new OracleCommand("ZpracujZadostPacienti", Connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.Add(new OracleParameter("p_id", id));
+                int results = command.ExecuteNonQuery();
+                ShowRequests(ref requestsGrid);
+				if (results == 0) 
+				{
+					return false;
+				}
+				return true;
+            }
+        }
 
-	}
+        #endregion
+
+        #region ReaderMetody
+        private string ReadString(OracleDataReader reader, int columnIndex)
+        {
+            return reader.IsDBNull(columnIndex) ? "..." : reader.GetString(columnIndex);
+        }
+
+        private string ReadString(OracleDataReader reader, string columnName)
+        {
+            int columnIndex = reader.GetOrdinal(columnName);
+            return ReadString(reader, columnIndex);
+        }
+
+        private int? ParseNullableInt(string input)
+        {
+            if (int.TryParse(input, out int result))
+            {
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        #endregion
+
+    }
 }

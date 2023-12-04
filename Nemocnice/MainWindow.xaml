@@ -19,7 +19,6 @@
                 <Label Content="Role" Margin="0,41,135,0" VerticalAlignment="Top" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="78" Grid.Column="1"/>
                 <Label Content="Uživatel" Margin="0,10,135,0" VerticalAlignment="Top" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="78" Grid.Column="1"/>
                 <Button x:Name="profInsertPictureBtn" Content="Vložit obrázek" Margin="170,0,0,96" Click="ProfInsertPicture_Click" HorizontalAlignment="Left" Width="162" Height="35" VerticalAlignment="Bottom" Grid.Column="1"/>
-                <Label x:Name="profileLoadedLbl" Content="" HorizontalAlignment="Left" Margin="38,126,0,0" VerticalAlignment="Top" Width="162" Height="30" Grid.ColumnSpan="2"/>
                 <Button x:Name="profDeletePictureBtn" Content="Smazat obrázek" Margin="0,0,218,96" Click="ProfDeletePicture_Click" RenderTransformOrigin="2.802,5.795" Height="35" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="162" Grid.Column="1"/>
                 <ComboBox x:Name="profileEmulationCb" HorizontalContentAlignment="Stretch" VerticalAlignment="Top" Height="22" Margin="0,133,10,0" HorizontalAlignment="Right" Width="120" Visibility="Hidden" SelectionChanged="ProfileEmulation_OnSelectionChanged"/>
                 <Label x:Name="profileEmulationLabel" Content="Emulace" Margin="0,130,135,0" VerticalAlignment="Top" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="78" Visibility="Hidden"/>
@@ -45,8 +44,8 @@
                 <RadioButton x:Name="skupinyRadio" Content="Skupiny"  Height="30" GroupName="ciselnikRadio" Margin="10,198,10,0" VerticalAlignment="Top"/>
                 <ComboBox x:Name="skupinyComboBox" Height="30" Width="70" Margin="10,228,0,0" IsEnabled="False" VerticalAlignment="Top" HorizontalAlignment="Left" VerticalContentAlignment="Center"/>
                 <Button x:Name="pacientsShowTable" Content="Zobrazit" Margin="10,279,10,0" Height="35" Click="PacientsShowTable_Click" VerticalAlignment="Top"/>
-                <Button x:Name="pacientsAdd" Content="Přidat" Margin="10,320,130,0" Height="35" Click="PacientsAdd_Click" VerticalAlignment="Top"/>
-                <Button x:Name="pacientsEdit" Content="Upravit" Margin="125,320,10,0" Height="35" Click="PacientsEdit_Click" VerticalAlignment="Top"/>
+                <Button x:Name="pacientsAdd" Content="Přidat" Margin="10,320,0,0" Height="35" Click="PacientsAdd_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Width="110"/>
+                <Button x:Name="pacientsEdit" Content="Upravit" Margin="0,320,10,0" Height="35" Click="PacientsEdit_Click" VerticalAlignment="Top" HorizontalAlignment="Right" Width="115"/>
             </Grid>
 
         </TabItem>
@@ -93,12 +92,20 @@
         <TabItem x:Name="usersTabItem" HorizontalAlignment="Center" Header="Uživatelé" Width="62" Height="20" VerticalAlignment="Center">
             <Grid Background="#FFE5E5E5">
                 <DataGrid x:Name="usersGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,0,0,72" SelectionChanged="UsersGrid_OnSelectionChanged"/>
-                <TextBox x:Name="usersUsernameTb" HorizontalAlignment="Left" Margin="58,0,0,24" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Bottom" Width="120" Height="30" VerticalContentAlignment="Center"/>
+                <TextBox x:Name="usersUsernameTb" HorizontalAlignment="Left" Margin="58,0,0,24" TextWrapping="Wrap" Text=" " VerticalAlignment="Bottom" Width="120" Height="30" VerticalContentAlignment="Center"/>
                 <Label Content="Role" HorizontalAlignment="Left" Margin="309,0,0,22" Height="30" VerticalAlignment="Bottom"/>
                 <Label Content="Název" HorizontalAlignment="Left" Margin="10,0,0,24" Height="30" VerticalAlignment="Bottom"/>
                 <ComboBox x:Name="usersRoleCb" HorizontalAlignment="Left" Margin="352,0,0,24" Width="120" Height="30" VerticalAlignment="Bottom" VerticalContentAlignment="Center"/>
                 <Button x:Name="usersSaveUser" Content="Uložit" Margin="0,0,74,24" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="59" Click="UsersSaveUser_Click"/>
                 <Button x:Name="usersDeleteUser" Content="Smazat" Margin="0,0,10,24" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="59" Click="UsersDeleteUser_Click"/>
+            </Grid>
+        </TabItem>
+        <TabItem x:Name="requestsTabItem" HorizontalAlignment="Center" Header="Žádosti" Width="62" Height="20" VerticalAlignment="Center">
+            <Grid Background="#FFE5E5E5" HorizontalAlignment="Center" Width="794">
+                <DataGrid x:Name="requestsGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,0,0,45" SelectionChanged="UsersGrid_OnSelectionChanged"/>
+                <Button x:Name="requestsDenyRequest" Content="Zamítnout" Margin="90,0,0,10" Height="30" VerticalAlignment="Bottom" Click="RequestsDenyRequest_Click" HorizontalAlignment="Left" Width="75"/>
+                <Button x:Name="requestsShowRequests" Content="Zobrazit" Margin="0,0,10,10" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="74" Click="RequestsShowRequests_Click"/>
+                <Button x:Name="requestsAcceptRequest" Content="Přijmout" Margin="10,0,709,10" Height="30" VerticalAlignment="Bottom" Click="RequestsAcceptRequest_Click" RenderTransformOrigin="0.731,0.713"/>
             </Grid>
         </TabItem>
         <TabItem x:Name="adminTabItem" Header="Admin">
@@ -124,9 +131,6 @@
                 <Button x:Name="adminShowKatalog" Grid.Column="0" Content="Zobrazit katalog" Click="AdminShowKatalog_Click" Margin="10,290,10,0" Height="35" VerticalAlignment="Top"/>
             </Grid>
         </TabItem>
-
-
-
     </TabControl>
 
 </Window>

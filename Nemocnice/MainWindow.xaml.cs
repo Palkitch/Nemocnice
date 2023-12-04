@@ -115,5 +115,20 @@ namespace Nemocnice
         {
             Launcher.EditPacient_Click();
         }
+
+        private void RequestsAcceptRequest_Click(object sender, RoutedEventArgs e)
+        {
+            Launcher.RequestsAcceptRequest_Click();
+        }
+
+        private void RequestsShowRequests_Click(object sender, RoutedEventArgs e)
+        {
+            Launcher.RequestsShowRequests_Click();
+        }
+
+        private void RequestsDenyRequest_Click(object sender, RoutedEventArgs e)
+        {
+            Launcher.RequestsDenyRequest_Click();
+        }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using Microsoft.VisualBasic.ApplicationServices;
 using Nemocnice.Database;
+using Nemocnice.Model;
 using Nemocnice.ModelObjects;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -63,6 +65,7 @@ namespace Nemocnice.Config
             {
                 Window.adminTabItem.Visibility = Visibility.Hidden;
                 Window.usersTabItem.Visibility = Visibility.Hidden;
+                Window.requestsTabItem.Visibility = Visibility.Hidden;
 
             }
             else if (Handler.Uzivatel != null)
@@ -72,6 +75,7 @@ namespace Nemocnice.Config
                     Window.adminTabItem.Visibility = Visibility.Hidden;
                     Window.usersTabItem.Visibility = Visibility.Hidden;
                     Window.employeesTabItem.Visibility = Visibility.Hidden;
+                    Window.requestsTabItem.Visibility = Visibility.Hidden;
                 }
                 else if (Handler.Uzivatel.Role == Role.PRIMAR)
                 {
@@ -80,6 +84,7 @@ namespace Nemocnice.Config
                     Window.adminTabItem.Visibility = Visibility.Visible;
                     Window.usersTabItem.Visibility = Visibility.Visible;
                     Window.employeesTabItem.Visibility = Visibility.Visible;
+                    Window.requestsTabItem.Visibility = Visibility.Visible;
                 }
             }
         }
@@ -375,7 +380,58 @@ namespace Nemocnice.Config
         {
             // TODO: přidat do database handleru metodu pro add employee
         }
+
         #endregion
 
+        #region TabItem: Zadosti
+        public void RequestsDenyRequest_Click()
+        {
+            if (Window.requestsGrid.SelectedItem != null)
+            {
+                DataRowView? selectedItem = Window.requestsGrid.SelectedItem as DataRowView;
+                if (selectedItem != null)
+                {
+                    int id = Convert.ToInt32(selectedItem.Row[0]);
+                    Handler.DenyRequest(ref Window.requestsGrid, id);
+                }
+                else
+                {
+                    MessageBox.Show("Vyber nějaký řádek!", "Chyba");
+                }
+            }
+        }
+
+        public void RequestsShowRequests_Click()
+        {
+            Handler.ShowRequests(ref Window.requestsGrid);
+
+        }
+
+        public void RequestsAcceptRequest_Click()
+        {
+            if (Window.requestsGrid.SelectedItem != null) 
+            {
+                DataRowView? selectedItem = Window.requestsGrid.SelectedItem as DataRowView;
+                if (selectedItem != null)
+                {
+                    int id = Convert.ToInt32(selectedItem.Row[0]);
+                    bool accepted = Handler.AcceptRequest(ref Window.requestsGrid, id);
+                    if (accepted)
+                    {
+                        MessageBox.Show("Žádost úspěšně schválena!", "Souhlas");
+                    }
+                    else 
+                    {
+                        MessageBox.Show("Žádost nebyla schválena!", "Chyba");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Vyber nějaký řádek!", "Chyba");
+                }
+            }
+        }
+
+        #endregion
     }
 }
