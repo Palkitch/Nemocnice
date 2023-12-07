@@ -791,10 +791,34 @@ namespace Nemocnice.Database
 			}
 		}
 
-		#endregion
 
-		#region TabItem: RECEPTY
-		public void RecipeesComboBoxHandle(ref ComboBox recipeesComboBox)
+        public void FindPacient(ref DataGrid pacientiGrid, ref TextBox pacientsPacientTb)
+        {
+            string? pacient = pacientsPacientTb.Text;
+            if (pacient != null)
+            {
+                using (OracleCommand command = new OracleCommand("BEGIN :result := NajdiPacientaPodleJmena(:pacient); END;", Connection))
+                {
+                    command.CommandType = CommandType.Text;
+                    command.Parameters.Add("result", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                    command.Parameters.Add(new OracleParameter("p_pacient", pacient));
+                    command.ExecuteNonQuery();
+
+                    using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
+                    {
+                        DataTable dataTable = new DataTable();
+                        dataTable.Load(reader);
+
+                        pacientiGrid.ItemsSource = dataTable.DefaultView;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region TabItem: RECEPTY
+        public void RecipeesComboBoxHandle(ref ComboBox recipeesComboBox)
 		{
 			recipeesComboBox.Items.Add("Vše");
 			using (OracleCommand command = new OracleCommand("SELECT nazev_kategorie FROM kategorie_leku_ciselnik", Connection))
@@ -1023,6 +1047,7 @@ namespace Nemocnice.Database
                 return null;
             }
         }
+
         #endregion
 
     }

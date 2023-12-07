@@ -115,6 +115,10 @@ namespace Nemocnice
         {
             Launcher.EditPacient_Click();
         }
+        private void PacientsFindPacient_Click(object sender, RoutedEventArgs e)
+        {
+            Launcher.PacientsFindPacient();
+        }
 
         private void RequestsAcceptRequest_Click(object sender, RoutedEventArgs e)
         {

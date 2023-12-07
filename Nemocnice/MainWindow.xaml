@@ -37,15 +37,19 @@
                     <ColumnDefinition Width="544*"/>
                 </Grid.ColumnDefinitions>
                 <DataGrid x:Name="pacientiGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Grid.Column="1" BorderBrush="White"/>
-                <RadioButton x:Name="allRadio" Content="Vše" Height="30" IsChecked="true" GroupName="ciselnikRadio" Margin="10,91,10,0" VerticalAlignment="Top"/>
+                <RadioButton x:Name="allRadio" Content="Vše" Height="20" IsChecked="true" GroupName="ciselnikRadio" Margin="0,102,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60"/>
                 <Label Content="Pacienti" Grid.Column="0" FontSize="16" HorizontalContentAlignment="Center" Margin="0,10,0,0" Height="30" VerticalAlignment="Top"/>
-                <RadioButton x:Name="diagnozyRadio" Content="Diagnózy" Height="30" IsChecked="false" GroupName="ciselnikRadio" Margin="10,121,10,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="diagnozyComboBox" Text="Některé stavy" Height="30"  IsEnabled="False" Margin="10,151,10,0" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
-                <RadioButton x:Name="skupinyRadio" Content="Skupiny"  Height="30" GroupName="ciselnikRadio" Margin="10,198,10,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="skupinyComboBox" Height="30" Width="70" Margin="10,228,0,0" IsEnabled="False" VerticalAlignment="Top" HorizontalAlignment="Left" VerticalContentAlignment="Center"/>
-                <Button x:Name="pacientsShowTable" Content="Zobrazit" Margin="10,279,10,0" Height="35" Click="PacientsShowTable_Click" VerticalAlignment="Top"/>
-                <Button x:Name="pacientsAdd" Content="Přidat" Margin="10,320,0,0" Height="35" Click="PacientsAdd_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Width="110"/>
-                <Button x:Name="pacientsEdit" Content="Upravit" Margin="0,320,10,0" Height="35" Click="PacientsEdit_Click" VerticalAlignment="Top" HorizontalAlignment="Right" Width="115"/>
+                <RadioButton x:Name="diagnozyRadio" Content="Diagnózy" Height="20" IsChecked="false" GroupName="ciselnikRadio" Margin="10,42,10,0" VerticalAlignment="Top"/>
+                <ComboBox x:Name="diagnozyComboBox" Text="Některé stavy" Height="30"  IsEnabled="False" Margin="10,67,10,0" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
+                <RadioButton x:Name="skupinyRadio" Content="Skupiny"  Height="20" GroupName="ciselnikRadio" Margin="10,102,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="60"/>
+                <ComboBox x:Name="skupinyComboBox" Height="30" Width="70" Margin="10,127,0,0" IsEnabled="False" VerticalAlignment="Top" HorizontalAlignment="Left" VerticalContentAlignment="Center"/>
+                <Button x:Name="pacientsShowTable" Content="Zobrazit" Margin="10,0,10,50" Click="PacientsShowTable_Click" Height="35" VerticalAlignment="Bottom"/>
+                <Button x:Name="pacientsAdd" Content="Přidat" Margin="10,0,0,10" Height="35" Click="PacientsAdd_Click" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="110"/>
+                <Button x:Name="pacientsEdit" Content="Upravit" Margin="0,0,10,10" Click="PacientsEdit_Click" HorizontalAlignment="Right" Width="115" Height="35" VerticalAlignment="Bottom"/>
+                <Label Content="Hledání" Grid.Column="0" FontSize="16" HorizontalContentAlignment="Center" Margin="0,0,0,209" Height="32" VerticalAlignment="Bottom"/>
+                <Label Content="Pacient" Grid.Column="0" FontSize="16" HorizontalContentAlignment="Center" Margin="0,0,0,175" HorizontalAlignment="Left" Width="80" Height="30" VerticalAlignment="Bottom"/>
+                <TextBox x:Name="pacientsPacientTb" Margin="80,0,10,175" TextWrapping="Wrap" VerticalContentAlignment="Center" Height="30" VerticalAlignment="Bottom"/>
+                <Button x:Name="pacientsFindPacient" Content="Hledat" Margin="10,236,10,0" Click="PacientsFindPacient_Click" Height="35" VerticalAlignment="Top"/>
             </Grid>
 
         </TabItem>

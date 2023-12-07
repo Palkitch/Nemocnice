@@ -330,6 +330,12 @@ namespace Nemocnice.Config
         {
             Handler.EditPacient(ref Window.pacientiGrid);
         }
+
+        public void PacientsFindPacient()
+        {
+            Handler.FindPacient(ref Window.pacientiGrid, ref Window.pacientsPacientTb);
+        }
+
         #endregion
 
         #region TabItem: Admin
@@ -431,6 +437,7 @@ namespace Nemocnice.Config
                 }
             }
         }
+
 
         #endregion
     }
