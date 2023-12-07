@@ -18,7 +18,10 @@ namespace Nemocnice.ModelObjects
         public int IdDoktora { get; set; }
         public int IdAdresy { get; set; }
         public int IdPojistovny { get; set; }
-        public Pacient(int id, string jmeno, string prijmeni, string datumNarozeni, string rodneCislo, string datumNastupu, int idDoktora, int idAdresy, int idPojistovny)
+        public int IdSkupiny{ get; set; }
+        public int IdDiagnozy { get; set; }
+
+        public Pacient(int id, string jmeno, string prijmeni, string datumNarozeni, string rodneCislo, string datumNastupu, int idDoktora, int idAdresy, int idPojistovny, int idSkupiny, int idDiagnozy)
         {
             Id = id;
             Jmeno = jmeno;
@@ -29,6 +32,8 @@ namespace Nemocnice.ModelObjects
             IdDoktora = idDoktora;
             IdAdresy = idAdresy;
             IdPojistovny = idPojistovny;
+            IdSkupiny = idSkupiny;
+            IdDiagnozy = idDiagnozy;
         }
     }
 }

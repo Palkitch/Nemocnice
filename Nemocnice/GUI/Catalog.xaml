@@ -9,6 +9,6 @@
     <Grid>
         <ComboBox Name="comboBox" DockPanel.Dock="Top" SelectedIndex="0" SelectionChanged="ComboBox_SelectedIndexChanged" Height="29" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
         <DataGrid Name="dataGridView" AutoGenerateColumns="True" Margin="0,29,0,32" />
-        <Button Name="closeButton" Content="Zavřít" DockPanel.Dock="Bottom" Click="CloseButton_Click" Height="32" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,402,0,0" Width="800"/>
+        <Button Name="closeButton" Content="Zavřít" DockPanel.Dock="Bottom" Click="CloseButton_Click" Height="32" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="800"/>
     </Grid>
 </Window>

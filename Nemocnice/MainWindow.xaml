@@ -122,14 +122,13 @@
                 </Grid.Background>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="125*"/>
-                    <ColumnDefinition Width="17*"/>
                     <ColumnDefinition Width="255*"/>
                 </Grid.ColumnDefinitions>
-                <DataGrid x:Name="grid" d:ItemsSource="{d:SampleData ItemCount=1}" Grid.Column="1" BorderBrush="White" Grid.ColumnSpan="2"/>
+                <DataGrid x:Name="adminGrid" d:ItemsSource="{d:SampleData ItemCount=1}" Grid.Column="1" BorderBrush="White" Grid.ColumnSpan="2" CellEditEnding="AdminGridCellEditEnding"/>
                 <Button x:Name="adminShowTables" Grid.Column="0" Content="Zobrazit" Click="AdminShowTables_Click" Margin="10,173,10,0" Height="35" VerticalAlignment="Top"/>
                 <Label Content="Menu" Grid.Column="0" FontSize="16" HorizontalContentAlignment="Center" Margin="0,10,0,0" Height="30" VerticalAlignment="Top"/>
                 <Label Content="Tabulka" Grid.Column="0" Height="30" FontSize="16" Margin="10,103,10,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="comboBox" Grid.Column="0" VerticalContentAlignment="Center" Margin="10,138,10,0" Height="30" VerticalAlignment="Top"/>
+                <ComboBox x:Name="adminCb" Grid.Column="0" VerticalContentAlignment="Center" Margin="10,138,10,0" Height="30" VerticalAlignment="Top"/>
                 <Label Content="Informace" Grid.Column="0" Height="30" FontSize="16" Margin="10,221,10,0" VerticalAlignment="Top"/>
                 <Button x:Name="adminShowLogs" Grid.Column="0" Content="Zobrazit záznamy" Click="AdminShowLogs_Click" Margin="10,250,10,0" Height="35" VerticalAlignment="Top"/>
                 <Button x:Name="adminShowKatalog" Grid.Column="0" Content="Zobrazit katalog" Click="AdminShowKatalog_Click" Margin="10,290,10,0" Height="35" VerticalAlignment="Top"/>

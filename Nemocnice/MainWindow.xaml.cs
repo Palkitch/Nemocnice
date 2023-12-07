@@ -12,6 +12,8 @@ using System.Windows.Media.Imaging;
 using System.IO;
 using MessageBox = System.Windows.MessageBox;
 using Nemocnice.Config;
+using System.Data.Common;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace Nemocnice
 {
@@ -133,6 +135,14 @@ namespace Nemocnice
         private void RequestsDenyRequest_Click(object sender, RoutedEventArgs e)
         {
             Launcher.RequestsDenyRequest_Click();
+        }
+
+        private void AdminGridCellEditEnding(object sender, DataGridCellEditEndingEventArgs cell)
+        {
+            if (cell.EditAction == DataGridEditAction.Commit && cell.Column is DataGridTextColumn)
+            {
+                Launcher.AdminEditRow(cell);
+            }
         }
     }
 }

@@ -18,6 +18,7 @@ using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using MessageBox = System.Windows.MessageBox;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace Nemocnice.Config
 {
@@ -66,6 +67,9 @@ namespace Nemocnice.Config
                 Window.adminTabItem.Visibility = Visibility.Hidden;
                 Window.usersTabItem.Visibility = Visibility.Hidden;
                 Window.requestsTabItem.Visibility = Visibility.Hidden;
+                Window.pacientsAdd.IsEnabled = false;
+                Window.pacientsEdit.IsEnabled = false;
+                Window.employeesTabItem.Visibility = Visibility.Hidden;
 
             }
             else if (Handler.Uzivatel != null)
@@ -76,6 +80,7 @@ namespace Nemocnice.Config
                     Window.usersTabItem.Visibility = Visibility.Hidden;
                     Window.employeesTabItem.Visibility = Visibility.Hidden;
                     Window.requestsTabItem.Visibility = Visibility.Hidden;
+                    Window.employeesTabItem.Visibility = Visibility.Hidden;
                 }
                 else if (Handler.Uzivatel.Role == Role.PRIMAR)
                 {
@@ -84,6 +89,7 @@ namespace Nemocnice.Config
                     Window.adminTabItem.Visibility = Visibility.Visible;
                     Window.usersTabItem.Visibility = Visibility.Visible;
                     Window.employeesTabItem.Visibility = Visibility.Visible;
+                    Window.employeesTabItem.Visibility = Visibility.Visible;
                     Window.requestsTabItem.Visibility = Visibility.Visible;
                 }
             }
@@ -91,7 +97,7 @@ namespace Nemocnice.Config
 
         private void FillAppComboBoxes()
         {
-            Handler.AdminComboBoxHandle(ref Window.comboBox);
+            Handler.AdminComboBoxHandle(ref Window.adminCb);
             Handler.PacientsComboBoxesHandle(ref Window.skupinyComboBox, ref Window.diagnozyComboBox);
             Handler.RecipeesComboBoxHandle(ref Window.recipeesComboBox);
             Handler.ScheduleComboBoxHandle(ref Window.scheduleNurseCb);
@@ -342,7 +348,7 @@ namespace Nemocnice.Config
 
         public void AdminShowTables_Click()
         {
-            Handler.AdminShowAllTables(ref Window.comboBox, ref Window.grid);
+            Handler.AdminShowAllTables(ref Window.adminCb, ref Window.adminGrid);
         }
 
         public void AdminShowLogs_Click()
@@ -353,6 +359,25 @@ namespace Nemocnice.Config
         {
             Handler.ShowKatalog();
         }
+
+        public void AdminEditRow(DataGridCellEditEndingEventArgs cell)
+        {
+            TextBox editedTextBox = cell.EditingElement as TextBox;
+
+            // Získání textové hodnoty editované buňky
+            string newValue = editedTextBox?.Text ?? "";
+
+            // Získání editované hodnoty
+            string objectProperty = cell.Column.Header?.ToString() ?? "";
+
+            // Získání původní hodnoty buňky pro konkrétní sloupec
+            var modelObject = cell.Row.Item;
+            Type objectType = modelObject.GetType();
+            string objectName = objectType.Name;
+
+            Handler.UpdateAdminTable(modelObject, objectProperty, newValue);
+        }
+
         #endregion
 
         #region TabItem: Recepty
@@ -437,6 +462,7 @@ namespace Nemocnice.Config
                 }
             }
         }
+
 
 
         #endregion
