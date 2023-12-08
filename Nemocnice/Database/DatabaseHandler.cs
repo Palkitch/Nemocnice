@@ -418,10 +418,15 @@ namespace Nemocnice.Database
 								var property = adresa.GetType().GetProperty(objectProperty);
 								try
 								{
-									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+									if (property != null)
 									{
 										if (newValue != null)
-											property.SetValue(adresa, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
+										{
+                                            if (property.PropertyType == typeof(int))
+                                                property.SetValue(adresa, int.Parse(newValue));
+                                            else
+                                                property.SetValue(adresa, newValue);
+                                        }
 										else
 											property.SetValue(adresa, null);
 									}
@@ -446,17 +451,22 @@ namespace Nemocnice.Database
 								Budova budova = (Budova)modelObject;
 								var property = budova.GetType().GetProperty(objectProperty);
 
-								try
-								{
-									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-									{
-										if (newValue != null)
-											property.SetValue(budova, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-										else
-											property.SetValue(budova, null);
-									}
-								}
-								catch (Exception ex)
+                                try
+                                {
+                                    if (property != null)
+                                    {
+                                        if (newValue != null)
+                                        {
+                                            if (property.PropertyType == typeof(int))
+                                                property.SetValue(budova, int.Parse(newValue));
+                                            else
+                                                property.SetValue(budova, newValue);
+                                        }
+                                        else
+                                            property.SetValue(budova, null);
+                                    }
+                                }
+                                catch (Exception ex)
 								{
 									showInvalidDataTypeAlert(objectName, property, newValue);
 								}
@@ -474,21 +484,22 @@ namespace Nemocnice.Database
 								Diagnoza diagnoza = (Diagnoza)modelObject;
 								var property = diagnoza.GetType().GetProperty(objectProperty);
 
-								try
-								{
-									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-									{
-										if (newValue != null)
-											property.SetValue(diagnoza, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-										else
-											property.SetValue(diagnoza, null);
-									}
-									else
-									{
-										property.SetValue(diagnoza, Convert.ChangeType(newValue, property.PropertyType));
-									}
-								}
-								catch (Exception ex)
+                                try
+                                {
+                                    if (property != null)
+                                    {
+                                        if (newValue != null)
+                                        {
+                                            if (property.PropertyType == typeof(int))
+                                                property.SetValue(diagnoza, int.Parse(newValue));
+                                            else
+                                                property.SetValue(diagnoza, newValue);
+                                        }
+                                        else
+                                            property.SetValue(diagnoza, null);
+                                    }
+                                }
+                                catch (Exception ex)
 								{
 									showInvalidDataTypeAlert(objectName, property, newValue);
 								}
@@ -505,21 +516,22 @@ namespace Nemocnice.Database
 								Lek lek = (Lek)modelObject;
 								var property = lek.GetType().GetProperty(objectProperty);
 
-								try
-								{
-									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-									{
-										if (newValue != null)
-											property.SetValue(lek, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-										else
-											property.SetValue(lek, null);
-									}
-									else
-									{
-										property.SetValue(lek, Convert.ChangeType(newValue, property.PropertyType));
-									}
-								}
-								catch (Exception ex)
+                                try
+                                {
+                                    if (property != null)
+                                    {
+                                        if (newValue != null)
+                                        {
+                                            if (property.PropertyType == typeof(int))
+                                                property.SetValue(lek, int.Parse(newValue));
+                                            else
+                                                property.SetValue(lek, newValue);
+                                        }
+                                        else
+                                            property.SetValue(lek, null);
+                                    }
+                                }
+                                catch (Exception ex)
 								{
 									showInvalidDataTypeAlert(objectName, property, newValue);
 								}
@@ -538,21 +550,22 @@ namespace Nemocnice.Database
 								Pomucka pomucka = (Pomucka)modelObject;
 								var property = pomucka.GetType().GetProperty(objectProperty);
 
-								try
-								{
-									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-									{
-										if (newValue != null)
-											property.SetValue(pomucka, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-										else
-											property.SetValue(pomucka, null);
-									}
-									else
-									{
-										property.SetValue(pomucka, Convert.ChangeType(newValue, property.PropertyType));
-									}
-								}
-								catch (Exception ex)
+                                try
+                                {
+                                    if (property != null)
+                                    {
+                                        if (newValue != null)
+                                        {
+                                            if (property.PropertyType == typeof(int))
+                                                property.SetValue(pomucka, int.Parse(newValue));
+                                            else
+                                                property.SetValue(pomucka, newValue);
+                                        }
+                                        else
+                                            property.SetValue(pomucka, null);
+                                    }
+                                }
+                                catch (Exception ex)
 								{
 									showInvalidDataTypeAlert(objectName, property, newValue);
 								}
@@ -572,21 +585,22 @@ namespace Nemocnice.Database
 								Zamestnanec zamestnanec = (Zamestnanec)modelObject;
 								var property = zamestnanec.GetType().GetProperty(objectProperty);
 
-								try
-								{
-									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-									{
-										if (newValue != null)
-											property.SetValue(zamestnanec, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-										else
-											property.SetValue(zamestnanec, null);
-									}
-									else
-									{
-										property.SetValue(zamestnanec, Convert.ChangeType(newValue, property.PropertyType));
-									}
-								}
-								catch (Exception ex)
+                                try
+                                {
+                                    if (property != null)
+                                    {
+                                        if (newValue != null)
+                                        {
+                                            if (property.PropertyType == typeof(int))
+                                                property.SetValue(modelObject, int.Parse(newValue));
+                                            else
+                                                property.SetValue(zamestnanec, newValue);
+                                        }
+                                        else
+                                            property.SetValue(zamestnanec, null);
+                                    }
+                                }
+                                catch (Exception ex)
 								{
 									showInvalidDataTypeAlert(objectName, property, newValue);
 								}
@@ -609,21 +623,22 @@ namespace Nemocnice.Database
 								Luzko luzko = (Luzko)modelObject;
 								var property = luzko.GetType().GetProperty(objectProperty);
 
-								try
-								{
-									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-									{
-										if (newValue != null)
-											property.SetValue(luzko, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-										else
-											property.SetValue(luzko, null);
-									}
-									else
-									{
-										property.SetValue(luzko, Convert.ChangeType(newValue, property.PropertyType));
-									}
-								}
-								catch (Exception ex)
+                                try
+                                {
+                                    if (property != null)
+                                    {
+                                        if (newValue != null)
+                                        {
+                                            if (property.PropertyType == typeof(int))
+                                                property.SetValue(luzko, int.Parse(newValue));
+                                            else
+                                                property.SetValue(luzko, newValue);
+                                        }
+                                        else
+                                            property.SetValue(luzko, null);
+                                    }
+                                }
+                                catch (Exception ex)
 								{
 									showInvalidDataTypeAlert(objectName, property, newValue);
 								}
@@ -642,21 +657,22 @@ namespace Nemocnice.Database
 								Pacient pacient = (Pacient)modelObject;
 								var property = pacient.GetType().GetProperty(objectProperty);
 
-								try
-								{
-									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-									{
-										if (newValue != null)
-											property.SetValue(pacient, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-										else
-											property.SetValue(pacient, null);
-									}
-									else
-									{
-										property.SetValue(pacient, Convert.ChangeType(newValue, property.PropertyType));
-									}
-								}
-								catch (Exception ex)
+                                try
+                                {
+                                    if (property != null)
+                                    {
+                                        if (newValue != null)
+                                        {
+                                            if (property.PropertyType == typeof(int))
+                                                property.SetValue(pacient, int.Parse(newValue));
+                                            else
+                                                property.SetValue(pacient, newValue);
+                                        }
+                                        else
+                                            property.SetValue(pacient, null);
+                                    }
+                                }
+                                catch (Exception ex)
 								{
 									showInvalidDataTypeAlert(objectName, property, newValue);
 								}
@@ -682,21 +698,22 @@ namespace Nemocnice.Database
 								Pojistovna pojistovna = (Pojistovna)modelObject;
 								var property = pojistovna.GetType().GetProperty(objectProperty);
 
-								try
-								{
-									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-									{
-										if (newValue != null)
-											property.SetValue(pojistovna, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-										else
-											property.SetValue(pojistovna, null);
-									}
-									else
-									{
-										property.SetValue(pojistovna, Convert.ChangeType(newValue, property.PropertyType));
-									}
-								}
-								catch (Exception ex)
+                                try
+                                {
+                                    if (property != null)
+                                    {
+                                        if (newValue != null)
+                                        {
+                                            if (property.PropertyType == typeof(int))
+                                                property.SetValue(pojistovna, int.Parse(newValue));
+                                            else
+                                                property.SetValue(pojistovna, newValue);
+                                        }
+                                        else
+                                            property.SetValue(pojistovna, null);
+                                    }
+                                }
+                                catch (Exception ex)
 								{
 									showInvalidDataTypeAlert(objectName, property, newValue);
 								}
@@ -714,21 +731,22 @@ namespace Nemocnice.Database
 								Oddeleni oddeleni = (Oddeleni)modelObject;
 								var property = oddeleni.GetType().GetProperty(objectProperty);
 
-								try
-								{
-									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-									{
-										if (newValue != null)
-											property.SetValue(oddeleni, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-										else
-											property.SetValue(oddeleni, null);
-									}
-									else
-									{
-										property.SetValue(oddeleni, Convert.ChangeType(newValue, property.PropertyType));
-									}
-								}
-								catch (Exception ex)
+                                try
+                                {
+                                    if (property != null)
+                                    {
+                                        if (newValue != null)
+                                        {
+                                            if (property.PropertyType == typeof(int))
+                                                property.SetValue(oddeleni, int.Parse(newValue));
+                                            else
+                                                property.SetValue(oddeleni, newValue);
+                                        }
+                                        else
+                                            property.SetValue(oddeleni, null);
+                                    }
+                                }
+                                catch (Exception ex)
 								{
 									showInvalidDataTypeAlert(objectName, property, newValue);
 								}
@@ -746,21 +764,22 @@ namespace Nemocnice.Database
 								Pokoj pokoj = (Pokoj)modelObject;
 								var property = pokoj.GetType().GetProperty(objectProperty);
 
-								try
-								{
-									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-									{
-										if (newValue != null)
-											property.SetValue(pokoj, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-										else
-											property.SetValue(pokoj, null);
-									}
-									else
-									{
-										property.SetValue(pokoj, Convert.ChangeType(newValue, property.PropertyType));
-									}
-								}
-								catch (Exception ex)
+                                try
+                                {
+                                    if (property != null)
+                                    {
+                                        if (newValue != null)
+                                        {
+                                            if (property.PropertyType == typeof(int))
+                                                property.SetValue(pokoj, int.Parse(newValue));
+                                            else
+                                                property.SetValue(pokoj, newValue);
+                                        }
+                                        else
+                                            property.SetValue(pokoj, null);
+                                    }
+                                }
+                                catch (Exception ex)
 								{
 									showInvalidDataTypeAlert(objectName, property, newValue);
 								}
@@ -772,8 +791,6 @@ namespace Nemocnice.Database
 								cmd.ExecuteNonQuery();
 								break;
 							}
-
-
 					}
 				}
 
@@ -809,11 +826,12 @@ namespace Nemocnice.Database
 					*/
 			}
 		}
+
 		private void DeleteRow(string tableName, int rowId, string idName)
 		{
 			using (OracleCommand cmd = new OracleCommand("delete_radek", Connection))
 			{
-				cmd.CommandType = System.Data.CommandType.StoredProcedure;
+				cmd.CommandType = CommandType.StoredProcedure;
 
 				cmd.Parameters.Add("p_id", OracleDbType.Int32).Value = rowId;
 				cmd.Parameters.Add("p_nazev_tabulky", OracleDbType.Varchar2).Value = tableName;

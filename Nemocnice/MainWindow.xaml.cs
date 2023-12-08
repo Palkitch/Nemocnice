@@ -147,10 +147,8 @@ namespace Nemocnice
 
 		private void AdminDeleteTables_Click(object sender, RoutedEventArgs e)
 		{
-			string nazevTabulky = adminCb.Text.Trim();
-			Launcher.DeleteTableClick(nazevTabulky, ref adminGrid);
+			Launcher.DeleteTableClick();
 		}
-
 
 	}
 }

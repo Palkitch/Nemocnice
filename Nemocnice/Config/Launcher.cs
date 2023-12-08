@@ -17,6 +17,7 @@ using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using ComboBox = System.Windows.Controls.ComboBox;
 using MessageBox = System.Windows.MessageBox;
 using TextBox = System.Windows.Controls.TextBox;
 
@@ -377,9 +378,11 @@ namespace Nemocnice.Config
 
 			Handler.UpdateAdminTable(modelObject, objectProperty, newValue);
 		}
-		public void DeleteTableClick(string nazevTabulky, ref DataGrid grid)
+
+		public void DeleteTableClick()
 		{
-			Handler.DeleteAdminTable(nazevTabulky, ref grid);
+            string nazevTabulky = Window.adminCb.Text.Trim();
+            Handler.DeleteAdminTable(nazevTabulky, ref Window.adminGrid);
 		}
 
 		#endregion
