@@ -287,8 +287,8 @@ namespace Nemocnice.Database
 										int id = int.Parse(ReadString(reader, 0));
 										string? name = ReadString(reader, 1);
 										int price = int.Parse(ReadString(reader, 2));
-                                        string? category = ReadString(reader, 3);
-                                        Lek medicament = new Lek(id, name, category, price);
+										string? category = ReadString(reader, 3);
+										Lek medicament = new Lek(id, name, category, price);
 										collection.Add(medicament);
 										break;
 									}
@@ -397,396 +397,439 @@ namespace Nemocnice.Database
 			adminGrid.ItemsSource = collection;
 		}
 
-        public void UpdateAdminTable(object modelObject, string objectProperty, string? newValue)
-        {
-			if (modelObject != null) 
+		public void UpdateAdminTable(object modelObject, string objectProperty, string? newValue)
+		{
+			if (modelObject != null)
 			{
 				if (newValue == "") newValue = null;
-                Type objectType = modelObject.GetType();
-                string objectName = objectType.Name;
-                using (OracleCommand cmd = new OracleCommand())
+				Type objectType = modelObject.GetType();
+				string objectName = objectType.Name;
+				using (OracleCommand cmd = new OracleCommand())
 				{
 					cmd.Connection = Connection;
 					cmd.CommandType = CommandType.StoredProcedure;
 					cmd.Parameters.Clear();
 
-                    switch (objectName)
-                    {
-                        case "Adresa":
-                            {
-                                Adresa adresa = (Adresa)modelObject;
-                                var property = adresa.GetType().GetProperty(objectProperty);
-                                try
-                                {
-                                    if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                    {
-                                        if (newValue != null)
-                                            property.SetValue(adresa, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-                                        else
-                                            property.SetValue(adresa, null);
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    showInvalidDataTypeAlert(objectName, property, newValue);
-                                }
+					switch (objectName)
+					{
+						case "Adresa":
+							{
+								Adresa adresa = (Adresa)modelObject;
+								var property = adresa.GetType().GetProperty(objectProperty);
+								try
+								{
+									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+									{
+										if (newValue != null)
+											property.SetValue(adresa, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
+										else
+											property.SetValue(adresa, null);
+									}
+								}
+								catch (Exception ex)
+								{
+									showInvalidDataTypeAlert(objectName, property, newValue);
+								}
 
-                                cmd.CommandText = "update_adresy";
+								cmd.CommandText = "update_adresy";
 								cmd.Parameters.Add(new OracleParameter("p_id", adresa.Id));
 								cmd.Parameters.Add(new OracleParameter("p_cislo_popisne", adresa.CisloPopisne));
 								cmd.Parameters.Add(new OracleParameter("p_ulice", adresa.Ulice));
 								cmd.Parameters.Add(new OracleParameter("p_mesto", adresa.Mesto));
 								cmd.Parameters.Add(new OracleParameter("p_psc", adresa.PSC));
 								cmd.Parameters.Add(new OracleParameter("p_stat", adresa.Stat));
-                                cmd.ExecuteNonQuery();
-                                break;
-                            }
-                        case "Budova":
-                            {
-                                Budova budova = (Budova)modelObject;
-                                var property = budova.GetType().GetProperty(objectProperty);
+								cmd.ExecuteNonQuery();
+								break;
+							}
+						case "Budova":
+							{
+								Budova budova = (Budova)modelObject;
+								var property = budova.GetType().GetProperty(objectProperty);
 
-                                try
-                                {
-                                    if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                    {
-                                        if (newValue != null)
-                                            property.SetValue(budova, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-                                        else
-                                            property.SetValue(budova, null);
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
+								try
+								{
+									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+									{
+										if (newValue != null)
+											property.SetValue(budova, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
+										else
+											property.SetValue(budova, null);
+									}
+								}
+								catch (Exception ex)
+								{
 									showInvalidDataTypeAlert(objectName, property, newValue);
-                                }
+								}
 
-                                cmd.CommandText = "update_budovy";
-                                cmd.Parameters.Add(new OracleParameter("p_id_budova", budova.Id));
-                                cmd.Parameters.Add(new OracleParameter("p_nazev", budova.Nazev));
-                                cmd.Parameters.Add(new OracleParameter("p_pocet_pater", budova.PocetPater));
-                                cmd.Parameters.Add(new OracleParameter("p_id_adresa", budova.IdAdresa));
-                                cmd.ExecuteNonQuery();
-                                break;
-                            }
-                        case "Diagnoza":
-                            {
-                                Diagnoza diagnoza = (Diagnoza)modelObject;
-                                var property = diagnoza.GetType().GetProperty(objectProperty);
+								cmd.CommandText = "update_budovy";
+								cmd.Parameters.Add(new OracleParameter("p_id_budova", budova.Id));
+								cmd.Parameters.Add(new OracleParameter("p_nazev", budova.Nazev));
+								cmd.Parameters.Add(new OracleParameter("p_pocet_pater", budova.PocetPater));
+								cmd.Parameters.Add(new OracleParameter("p_id_adresa", budova.IdAdresa));
+								cmd.ExecuteNonQuery();
+								break;
+							}
+						case "Diagnoza":
+							{
+								Diagnoza diagnoza = (Diagnoza)modelObject;
+								var property = diagnoza.GetType().GetProperty(objectProperty);
 
-                                try
-                                {
-                                    if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                    {
-                                        if (newValue != null)
-                                            property.SetValue(diagnoza, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-                                        else
-                                            property.SetValue(diagnoza, null);
-                                    }
-                                    else
-                                    {
-                                        property.SetValue(diagnoza, Convert.ChangeType(newValue, property.PropertyType));
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    showInvalidDataTypeAlert(objectName, property, newValue);
-                                }
+								try
+								{
+									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+									{
+										if (newValue != null)
+											property.SetValue(diagnoza, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
+										else
+											property.SetValue(diagnoza, null);
+									}
+									else
+									{
+										property.SetValue(diagnoza, Convert.ChangeType(newValue, property.PropertyType));
+									}
+								}
+								catch (Exception ex)
+								{
+									showInvalidDataTypeAlert(objectName, property, newValue);
+								}
 
-                                cmd.CommandText = "update_diagnozy_ciselnik";
-                                cmd.Parameters.Add(new OracleParameter("p_id", diagnoza.Id));
-                                cmd.Parameters.Add(new OracleParameter("p_nazev", diagnoza.Nazev));
-                                cmd.ExecuteNonQuery();
-                                break;
-                            }
+								cmd.CommandText = "update_diagnozy_ciselnik";
+								cmd.Parameters.Add(new OracleParameter("p_id", diagnoza.Id));
+								cmd.Parameters.Add(new OracleParameter("p_nazev", diagnoza.Nazev));
+								cmd.ExecuteNonQuery();
+								break;
+							}
 
-                        case "Lek":
-                            {
-                                Lek lek = (Lek)modelObject;
-                                var property = lek.GetType().GetProperty(objectProperty);
+						case "Lek":
+							{
+								Lek lek = (Lek)modelObject;
+								var property = lek.GetType().GetProperty(objectProperty);
 
-                                try
-                                {
-                                    if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                    {
-                                        if (newValue != null)
-                                            property.SetValue(lek, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-                                        else
-                                            property.SetValue(lek, null);
-                                    }
-                                    else
-                                    {
-                                        property.SetValue(lek, Convert.ChangeType(newValue, property.PropertyType));
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    showInvalidDataTypeAlert(objectName, property, newValue);
-                                }
+								try
+								{
+									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+									{
+										if (newValue != null)
+											property.SetValue(lek, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
+										else
+											property.SetValue(lek, null);
+									}
+									else
+									{
+										property.SetValue(lek, Convert.ChangeType(newValue, property.PropertyType));
+									}
+								}
+								catch (Exception ex)
+								{
+									showInvalidDataTypeAlert(objectName, property, newValue);
+								}
 
-                                cmd.CommandText = "update_leky";
-                                cmd.Parameters.Add(new OracleParameter("p_id_lek", lek.Id));
-                                cmd.Parameters.Add(new OracleParameter("p_nazev", lek.Nazev));
-                                cmd.Parameters.Add(new OracleParameter("p_cena", lek.Cena));
-                                cmd.Parameters.Add(new OracleParameter("p_id_kategorie", lek.Kategorie));
-                                cmd.ExecuteNonQuery();
-                                break;
-                            }
+								cmd.CommandText = "update_leky";
+								cmd.Parameters.Add(new OracleParameter("p_id_lek", lek.Id));
+								cmd.Parameters.Add(new OracleParameter("p_nazev", lek.Nazev));
+								cmd.Parameters.Add(new OracleParameter("p_cena", lek.Cena));
+								cmd.Parameters.Add(new OracleParameter("p_id_kategorie", lek.Kategorie));
+								cmd.ExecuteNonQuery();
+								break;
+							}
 
-                        case "Pomucka":
-                            {
-                                Pomucka pomucka = (Pomucka)modelObject;
-                                var property = pomucka.GetType().GetProperty(objectProperty);
+						case "Pomucka":
+							{
+								Pomucka pomucka = (Pomucka)modelObject;
+								var property = pomucka.GetType().GetProperty(objectProperty);
 
-                                try
-                                {
-                                    if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                    {
-                                        if (newValue != null)
-                                            property.SetValue(pomucka, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-                                        else
-                                            property.SetValue(pomucka, null);
-                                    }
-                                    else
-                                    {
-                                        property.SetValue(pomucka, Convert.ChangeType(newValue, property.PropertyType));
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    showInvalidDataTypeAlert(objectName, property, newValue);
-                                }
+								try
+								{
+									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+									{
+										if (newValue != null)
+											property.SetValue(pomucka, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
+										else
+											property.SetValue(pomucka, null);
+									}
+									else
+									{
+										property.SetValue(pomucka, Convert.ChangeType(newValue, property.PropertyType));
+									}
+								}
+								catch (Exception ex)
+								{
+									showInvalidDataTypeAlert(objectName, property, newValue);
+								}
 
-                                cmd.CommandText = "update_pomucky";
-                                cmd.Parameters.Add(new OracleParameter("p_id", pomucka.Id));
-                                cmd.Parameters.Add(new OracleParameter("p_nazev", pomucka.Nazev));
-                                cmd.Parameters.Add(new OracleParameter("p_pocet", pomucka.Pocet));
-                                cmd.ExecuteNonQuery();
-                                break;
-                            }
+								cmd.CommandText = "update_pomucky";
+								cmd.Parameters.Add(new OracleParameter("p_id", pomucka.Id));
+								cmd.Parameters.Add(new OracleParameter("p_nazev", pomucka.Nazev));
+								cmd.Parameters.Add(new OracleParameter("p_pocet", pomucka.Pocet));
+								cmd.ExecuteNonQuery();
+								break;
+							}
 
-                        case "Zamestnanec":
+						case "Zamestnanec":
 						case "Sestra":
 						case "Doktor":
-                            {
-                                Zamestnanec zamestnanec = (Zamestnanec)modelObject;
-                                var property = zamestnanec.GetType().GetProperty(objectProperty);
+							{
+								Zamestnanec zamestnanec = (Zamestnanec)modelObject;
+								var property = zamestnanec.GetType().GetProperty(objectProperty);
 
-                                try
-                                {
-                                    if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                    {
-                                        if (newValue != null)
-                                            property.SetValue(zamestnanec, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-                                        else
-                                            property.SetValue(zamestnanec, null);
-                                    }
-                                    else
-                                    {
-                                        property.SetValue(zamestnanec, Convert.ChangeType(newValue, property.PropertyType));
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    showInvalidDataTypeAlert(objectName, property, newValue);
-                                }
+								try
+								{
+									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+									{
+										if (newValue != null)
+											property.SetValue(zamestnanec, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
+										else
+											property.SetValue(zamestnanec, null);
+									}
+									else
+									{
+										property.SetValue(zamestnanec, Convert.ChangeType(newValue, property.PropertyType));
+									}
+								}
+								catch (Exception ex)
+								{
+									showInvalidDataTypeAlert(objectName, property, newValue);
+								}
 
-                                cmd.CommandText = "update_zamestnanci";
-                                cmd.Parameters.Add(new OracleParameter("p_id_zamestnanec", zamestnanec.Id));
-                                cmd.Parameters.Add(new OracleParameter("p_jmeno", zamestnanec.Jmeno));
-                                cmd.Parameters.Add(new OracleParameter("p_prijmeni", zamestnanec.Prijmeni));
-                                cmd.Parameters.Add(new OracleParameter("p_plat", zamestnanec.Plat));
-                                cmd.Parameters.Add(new OracleParameter("p_id_oddeleni", zamestnanec.IdOddeleni));
-                                cmd.Parameters.Add(new OracleParameter("p_id_nadrizeny", zamestnanec.IdNadrizeneho));
-                                cmd.Parameters.Add(new OracleParameter("p_id_adresa", zamestnanec.IdAdresy));
-                                cmd.Parameters.Add(new OracleParameter("p_druh", zamestnanec.Druh));
-                                cmd.ExecuteNonQuery();
-                                break;
-                            }
+								cmd.CommandText = "update_zamestnanci";
+								cmd.Parameters.Add(new OracleParameter("p_id_zamestnanec", zamestnanec.Id));
+								cmd.Parameters.Add(new OracleParameter("p_jmeno", zamestnanec.Jmeno));
+								cmd.Parameters.Add(new OracleParameter("p_prijmeni", zamestnanec.Prijmeni));
+								cmd.Parameters.Add(new OracleParameter("p_plat", zamestnanec.Plat));
+								cmd.Parameters.Add(new OracleParameter("p_id_oddeleni", zamestnanec.IdOddeleni));
+								cmd.Parameters.Add(new OracleParameter("p_id_nadrizeny", zamestnanec.IdNadrizeneho));
+								cmd.Parameters.Add(new OracleParameter("p_id_adresa", zamestnanec.IdAdresy));
+								cmd.Parameters.Add(new OracleParameter("p_druh", zamestnanec.Druh));
+								cmd.ExecuteNonQuery();
+								break;
+							}
 
-                        case "Luzko":	// jen validni id sestry z tabulky sestry, jinak se nic nestane
-                            {
-                                Luzko luzko = (Luzko)modelObject;
-                                var property = luzko.GetType().GetProperty(objectProperty);
+						case "Luzko":   // jen validni id sestry z tabulky sestry, jinak se nic nestane
+							{
+								Luzko luzko = (Luzko)modelObject;
+								var property = luzko.GetType().GetProperty(objectProperty);
 
-                                try
-                                {
-                                    if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                    {
-                                        if (newValue != null)
-                                            property.SetValue(luzko, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-                                        else
-                                            property.SetValue(luzko, null);
-                                    }
-                                    else
-                                    {
-                                        property.SetValue(luzko, Convert.ChangeType(newValue, property.PropertyType));
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    showInvalidDataTypeAlert(objectName, property, newValue);
-                                }
+								try
+								{
+									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+									{
+										if (newValue != null)
+											property.SetValue(luzko, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
+										else
+											property.SetValue(luzko, null);
+									}
+									else
+									{
+										property.SetValue(luzko, Convert.ChangeType(newValue, property.PropertyType));
+									}
+								}
+								catch (Exception ex)
+								{
+									showInvalidDataTypeAlert(objectName, property, newValue);
+								}
 
-                                cmd.CommandText = "update_luzka";
-                                cmd.Parameters.Add(new OracleParameter("p_id", luzko.Id));
-                                cmd.Parameters.Add(new OracleParameter("p_cislo", luzko.Cislo));
-                                cmd.Parameters.Add(new OracleParameter("p_sestra_id_zamestnanec", luzko.IdSestra));
-                                cmd.Parameters.Add(new OracleParameter("p_id_pokoj", luzko.IdPokoje));
-                                cmd.ExecuteNonQuery();
-                                break;
-                            }
+								cmd.CommandText = "update_luzka";
+								cmd.Parameters.Add(new OracleParameter("p_id", luzko.Id));
+								cmd.Parameters.Add(new OracleParameter("p_cislo", luzko.Cislo));
+								cmd.Parameters.Add(new OracleParameter("p_sestra_id_zamestnanec", luzko.IdSestra));
+								cmd.Parameters.Add(new OracleParameter("p_id_pokoj", luzko.IdPokoje));
+								cmd.ExecuteNonQuery();
+								break;
+							}
 
-                        case "Pacient":
-                            {
-                                Pacient pacient = (Pacient)modelObject;
-                                var property = pacient.GetType().GetProperty(objectProperty);
+						case "Pacient":
+							{
+								Pacient pacient = (Pacient)modelObject;
+								var property = pacient.GetType().GetProperty(objectProperty);
 
-                                try
-                                {
-                                    if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                    {
-                                        if (newValue != null)
-                                            property.SetValue(pacient, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-                                        else
-                                            property.SetValue(pacient, null);
-                                    }
-                                    else
-                                    {
-                                        property.SetValue(pacient, Convert.ChangeType(newValue, property.PropertyType));
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    showInvalidDataTypeAlert(objectName, property, newValue);
-                                }
+								try
+								{
+									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+									{
+										if (newValue != null)
+											property.SetValue(pacient, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
+										else
+											property.SetValue(pacient, null);
+									}
+									else
+									{
+										property.SetValue(pacient, Convert.ChangeType(newValue, property.PropertyType));
+									}
+								}
+								catch (Exception ex)
+								{
+									showInvalidDataTypeAlert(objectName, property, newValue);
+								}
 
-                                cmd.CommandText = "update_pacienti";
-                                cmd.Parameters.Add(new OracleParameter("p_id_pacient", pacient.Id));
-                                cmd.Parameters.Add(new OracleParameter("p_jmeno", pacient.Jmeno));
-                                cmd.Parameters.Add(new OracleParameter("p_prijmeni", pacient.Prijmeni));
-                                cmd.Parameters.Add(new OracleParameter("p_datum_narozeni", DateTime.Parse(pacient.DatumNarozeni)));
-                                cmd.Parameters.Add(new OracleParameter("p_rodne_cislo", pacient.RodneCislo));
-                                cmd.Parameters.Add(new OracleParameter("p_datum_nastupu", DateTime.Parse(pacient.DatumNastupu)));
-                                cmd.Parameters.Add(new OracleParameter("p_id_doktor", pacient.IdDoktora));
-                                cmd.Parameters.Add(new OracleParameter("p_id_adresa", pacient.IdAdresy));
-                                cmd.Parameters.Add(new OracleParameter("p_id_pojistovna", pacient.IdPojistovny));
+								cmd.CommandText = "update_pacienti";
+								cmd.Parameters.Add(new OracleParameter("p_id_pacient", pacient.Id));
+								cmd.Parameters.Add(new OracleParameter("p_jmeno", pacient.Jmeno));
+								cmd.Parameters.Add(new OracleParameter("p_prijmeni", pacient.Prijmeni));
+								cmd.Parameters.Add(new OracleParameter("p_datum_narozeni", DateTime.Parse(pacient.DatumNarozeni)));
+								cmd.Parameters.Add(new OracleParameter("p_rodne_cislo", pacient.RodneCislo));
+								cmd.Parameters.Add(new OracleParameter("p_datum_nastupu", DateTime.Parse(pacient.DatumNastupu)));
+								cmd.Parameters.Add(new OracleParameter("p_id_doktor", pacient.IdDoktora));
+								cmd.Parameters.Add(new OracleParameter("p_id_adresa", pacient.IdAdresy));
+								cmd.Parameters.Add(new OracleParameter("p_id_pojistovna", pacient.IdPojistovny));
 								cmd.Parameters.Add(new OracleParameter("p_id_skupina", pacient.IdSkupiny));
 								cmd.Parameters.Add(new OracleParameter("p_id_diagnoza", pacient.IdDiagnozy));
 								cmd.ExecuteNonQuery();
-                                break;
-                            }
+								break;
+							}
 
-                        case "Pojistovna":
-                            {
-                                Pojistovna pojistovna = (Pojistovna)modelObject;
-                                var property = pojistovna.GetType().GetProperty(objectProperty);
+						case "Pojistovna":
+							{
+								Pojistovna pojistovna = (Pojistovna)modelObject;
+								var property = pojistovna.GetType().GetProperty(objectProperty);
 
-                                try
-                                {
-                                    if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                    {
-                                        if (newValue != null)
-                                            property.SetValue(pojistovna, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-                                        else
-                                            property.SetValue(pojistovna, null);
-                                    }
-                                    else
-                                    {
-                                        property.SetValue(pojistovna, Convert.ChangeType(newValue, property.PropertyType));
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    showInvalidDataTypeAlert(objectName, property, newValue);
-                                }
+								try
+								{
+									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+									{
+										if (newValue != null)
+											property.SetValue(pojistovna, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
+										else
+											property.SetValue(pojistovna, null);
+									}
+									else
+									{
+										property.SetValue(pojistovna, Convert.ChangeType(newValue, property.PropertyType));
+									}
+								}
+								catch (Exception ex)
+								{
+									showInvalidDataTypeAlert(objectName, property, newValue);
+								}
 
-                                cmd.CommandText = "update_pojistovny";
-                                cmd.Parameters.Add(new OracleParameter("p_id_pojistovna", pojistovna.Id));
-                                cmd.Parameters.Add(new OracleParameter("p_nazev", pojistovna.Nazev));
-                                cmd.Parameters.Add(new OracleParameter("p_cislo", pojistovna.Cislo));
-                                cmd.ExecuteNonQuery();
-                                break;
-                            }
+								cmd.CommandText = "update_pojistovny";
+								cmd.Parameters.Add(new OracleParameter("p_id_pojistovna", pojistovna.Id));
+								cmd.Parameters.Add(new OracleParameter("p_nazev", pojistovna.Nazev));
+								cmd.Parameters.Add(new OracleParameter("p_cislo", pojistovna.Cislo));
+								cmd.ExecuteNonQuery();
+								break;
+							}
 
-                        case "Oddeleni":
-                            {
-                                Oddeleni oddeleni = (Oddeleni)modelObject;
-                                var property = oddeleni.GetType().GetProperty(objectProperty);
+						case "Oddeleni":
+							{
+								Oddeleni oddeleni = (Oddeleni)modelObject;
+								var property = oddeleni.GetType().GetProperty(objectProperty);
 
-                                try
-                                {
-                                    if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                    {
-                                        if (newValue != null)
-                                            property.SetValue(oddeleni, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-                                        else
-                                            property.SetValue(oddeleni, null);
-                                    }
-                                    else
-                                    {
-                                        property.SetValue(oddeleni, Convert.ChangeType(newValue, property.PropertyType));
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    showInvalidDataTypeAlert(objectName, property, newValue);
-                                }
+								try
+								{
+									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+									{
+										if (newValue != null)
+											property.SetValue(oddeleni, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
+										else
+											property.SetValue(oddeleni, null);
+									}
+									else
+									{
+										property.SetValue(oddeleni, Convert.ChangeType(newValue, property.PropertyType));
+									}
+								}
+								catch (Exception ex)
+								{
+									showInvalidDataTypeAlert(objectName, property, newValue);
+								}
 
-                                cmd.CommandText = "update_oddeleni";
-                                cmd.Parameters.Add(new OracleParameter("p_id_oddeleni", oddeleni.ID));
-                                cmd.Parameters.Add(new OracleParameter("p_nazev", oddeleni.Nazev));
-                                cmd.Parameters.Add(new OracleParameter("p_id_budova", oddeleni.IdBudovy));
-                                cmd.ExecuteNonQuery();
-                                break;
-                            }
+								cmd.CommandText = "update_oddeleni";
+								cmd.Parameters.Add(new OracleParameter("p_id_oddeleni", oddeleni.ID));
+								cmd.Parameters.Add(new OracleParameter("p_nazev", oddeleni.Nazev));
+								cmd.Parameters.Add(new OracleParameter("p_id_budova", oddeleni.IdBudovy));
+								cmd.ExecuteNonQuery();
+								break;
+							}
 
-                        case "Pokoj":
-                            {
-                                Pokoj pokoj = (Pokoj)modelObject;
-                                var property = pokoj.GetType().GetProperty(objectProperty);
+						case "Pokoj":
+							{
+								Pokoj pokoj = (Pokoj)modelObject;
+								var property = pokoj.GetType().GetProperty(objectProperty);
 
-                                try
-                                {
-                                    if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                    {
-                                        if (newValue != null)
-                                            property.SetValue(pokoj, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
-                                        else
-                                            property.SetValue(pokoj, null);
-                                    }
-                                    else
-                                    {
-                                        property.SetValue(pokoj, Convert.ChangeType(newValue, property.PropertyType));
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    showInvalidDataTypeAlert(objectName, property, newValue);
-                                }
+								try
+								{
+									if (property != null && property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+									{
+										if (newValue != null)
+											property.SetValue(pokoj, Convert.ChangeType(newValue, Nullable.GetUnderlyingType(property.PropertyType)));
+										else
+											property.SetValue(pokoj, null);
+									}
+									else
+									{
+										property.SetValue(pokoj, Convert.ChangeType(newValue, property.PropertyType));
+									}
+								}
+								catch (Exception ex)
+								{
+									showInvalidDataTypeAlert(objectName, property, newValue);
+								}
 
-                                cmd.CommandText = "update_pokoje";
-                                cmd.Parameters.Add(new OracleParameter("p_id_pokoj", pokoj.Id));
-                                cmd.Parameters.Add(new OracleParameter("p_cislo_pokoje", pokoj.CisloPokoje));
-                                cmd.Parameters.Add(new OracleParameter("p_id_oddeleni", pokoj.IdOddeleni));
-                                cmd.ExecuteNonQuery();
-                                break;
-                            }
+								cmd.CommandText = "update_pokoje";
+								cmd.Parameters.Add(new OracleParameter("p_id_pokoj", pokoj.Id));
+								cmd.Parameters.Add(new OracleParameter("p_cislo_pokoje", pokoj.CisloPokoje));
+								cmd.Parameters.Add(new OracleParameter("p_id_oddeleni", pokoj.IdOddeleni));
+								cmd.ExecuteNonQuery();
+								break;
+							}
 
 
-                    }
-                }
-        
-            }
-        }
+					}
+				}
 
-        private void showInvalidDataTypeAlert(string objectName, PropertyInfo? property, string? newValue)
-        {
+			}
+		}
+
+		public void DeleteAdminTable(string tableName, ref DataGrid grid)
+		{
+			if (grid.SelectedItem == null)
+			{
+				MessageBox.Show("Prosím vyberte řádek");
+				return;
+			}
+			int id;
+			switch (tableName)
+			{
+				case "Adresy":
+					{
+						Adresa data = (Adresa)grid.SelectedItem;
+						id = data.Id;
+						DeleteRow(tableName, id, "id_adresa");
+						DeleteRow("budovy", id, "id_adresa");
+						break;
+					}
+					/*
+			case "Budovy":
+				{
+					Budova data = (Budova)grid.SelectedItem;
+					id = data.Id;
+					DeleteRow(tableName, id);
+					break;
+				}
+					*/
+			}
+		}
+		private void DeleteRow(string tableName, int rowId, string idName)
+		{
+			using (OracleCommand cmd = new OracleCommand("delete_radek", Connection))
+			{
+				cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+				cmd.Parameters.Add("p_id", OracleDbType.Int32).Value = rowId;
+				cmd.Parameters.Add("p_nazev_tabulky", OracleDbType.Varchar2).Value = tableName;
+				cmd.Parameters.Add("p_nazev_id", OracleDbType.Varchar2).Value = idName;
+
+				cmd.ExecuteNonQuery();
+			}
+		}
+
+		private void showInvalidDataTypeAlert(string objectName, PropertyInfo? property, string? newValue)
+		{
 			if (property != null)
 				MessageBox.Show(objectName + " - " + property.Name + " nemůže být nastaveno na " + newValue);
-        }
+		}
 
-        public void ShowLogs()
+		public void ShowLogs()
 		{
 			Logs logs = new Logs();
 			logs.ShowDialog();
@@ -1183,33 +1226,33 @@ namespace Nemocnice.Database
 		}
 
 
-        public void FindPacient(ref DataGrid pacientiGrid, ref TextBox pacientsPacientTb)
-        {
-            string? pacient = pacientsPacientTb.Text;
-            if (pacient != null)
-            {
-                using (OracleCommand command = new OracleCommand("BEGIN :result := NajdiPacientaPodleJmena(:pacient); END;", Connection))
-                {
-                    command.CommandType = CommandType.Text;
-                    command.Parameters.Add("result", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
-                    command.Parameters.Add(new OracleParameter("p_pacient", pacient));
-                    command.ExecuteNonQuery();
+		public void FindPacient(ref DataGrid pacientiGrid, ref TextBox pacientsPacientTb)
+		{
+			string? pacient = pacientsPacientTb.Text;
+			if (pacient != null)
+			{
+				using (OracleCommand command = new OracleCommand("BEGIN :result := NajdiPacientaPodleJmena(:pacient); END;", Connection))
+				{
+					command.CommandType = CommandType.Text;
+					command.Parameters.Add("result", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+					command.Parameters.Add(new OracleParameter("p_pacient", pacient));
+					command.ExecuteNonQuery();
 
-                    using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
-                    {
-                        DataTable dataTable = new DataTable();
-                        dataTable.Load(reader);
+					using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
+					{
+						DataTable dataTable = new DataTable();
+						dataTable.Load(reader);
 
-                        pacientiGrid.ItemsSource = dataTable.DefaultView;
-                    }
-                }
-            }
-        }
+						pacientiGrid.ItemsSource = dataTable.DefaultView;
+					}
+				}
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region TabItem: RECEPTY
-        public void RecipeesComboBoxHandle(ref ComboBox recipeesComboBox)
+		#region TabItem: RECEPTY
+		public void RecipeesComboBoxHandle(ref ComboBox recipeesComboBox)
 		{
 			recipeesComboBox.Items.Add("Vše");
 			using (OracleCommand command = new OracleCommand("SELECT nazev_kategorie FROM kategorie_leku_ciselnik", Connection))
@@ -1366,9 +1409,9 @@ namespace Nemocnice.Database
 
 		#endregion
 
-        #region TabItem: Zadosti
-        public void DenyRequest(ref DataGrid requestsGrid, int id)
-        {
+		#region TabItem: Zadosti
+		public void DenyRequest(ref DataGrid requestsGrid, int id)
+		{
 			using (OracleCommand command = new OracleCommand("DELETE_NESCHVALENE_ZMENY", Connection))
 			{
 				command.CommandType = CommandType.StoredProcedure;
@@ -1376,69 +1419,69 @@ namespace Nemocnice.Database
 				command.ExecuteNonQuery();
 				ShowRequests(ref requestsGrid);
 			}
-        }
+		}
 
-        public void ShowRequests(ref DataGrid requestsGrid)
+		public void ShowRequests(ref DataGrid requestsGrid)
 		{
-            using (OracleCommand command = new OracleCommand("BEGIN :result := GetNeschvaleneZadosti(); END;", Connection))
-            {
-                command.CommandType = CommandType.Text;
-                command.Parameters.Add("result", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
-                command.ExecuteNonQuery();
+			using (OracleCommand command = new OracleCommand("BEGIN :result := GetNeschvaleneZadosti(); END;", Connection))
+			{
+				command.CommandType = CommandType.Text;
+				command.Parameters.Add("result", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+				command.ExecuteNonQuery();
 
-                using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
-                {
+				using (OracleDataReader reader = ((OracleRefCursor)command.Parameters["result"].Value).GetDataReader())
+				{
 					DataTable dataTable = new DataTable();
-                    dataTable.Load(reader);
+					dataTable.Load(reader);
 
-                    requestsGrid.ItemsSource = dataTable.DefaultView;
-                }
+					requestsGrid.ItemsSource = dataTable.DefaultView;
+				}
 				requestsGrid.Columns[0].Visibility = Visibility.Hidden;
 			}
 		}
 
-        public bool AcceptRequest(ref DataGrid requestsGrid, int id)
-        {
-            using (OracleCommand command = new OracleCommand("ZpracujZadostPacienti", Connection))
-            {
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.Add(new OracleParameter("p_id", id));
-                int results = command.ExecuteNonQuery();
-                ShowRequests(ref requestsGrid);
-				if (results == 0) 
+		public bool AcceptRequest(ref DataGrid requestsGrid, int id)
+		{
+			using (OracleCommand command = new OracleCommand("ZpracujZadostPacienti", Connection))
+			{
+				command.CommandType = CommandType.StoredProcedure;
+				command.Parameters.Add(new OracleParameter("p_id", id));
+				int results = command.ExecuteNonQuery();
+				ShowRequests(ref requestsGrid);
+				if (results == 0)
 				{
 					return false;
 				}
 				return true;
-            }
-        }
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region ReaderMetody
-        private string ReadString(OracleDataReader reader, int columnIndex)
-        {
-            return reader.IsDBNull(columnIndex) ? "..." : reader.GetString(columnIndex);
-        }
+		#region ReaderMetody
+		private string ReadString(OracleDataReader reader, int columnIndex)
+		{
+			return reader.IsDBNull(columnIndex) ? "..." : reader.GetString(columnIndex);
+		}
 
-        private string ReadString(OracleDataReader reader, string columnName)
-        {
-            int columnIndex = reader.GetOrdinal(columnName);
-            return ReadString(reader, columnIndex);
-        }
+		private string ReadString(OracleDataReader reader, string columnName)
+		{
+			int columnIndex = reader.GetOrdinal(columnName);
+			return ReadString(reader, columnIndex);
+		}
 
-        private int? ParseNullableInt(string input)
-        {
-            if (int.TryParse(input, out int result))
-            {
-                return result;
-            }
-            else
-            {
-                return null;
-            }
-        }
+		private int? ParseNullableInt(string input)
+		{
+			if (int.TryParse(input, out int result))
+			{
+				return result;
+			}
+			else
+			{
+				return null;
+			}
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
