@@ -1209,13 +1209,12 @@ namespace Nemocnice.Database
 					}
 					break;
 			}
-			pacientsGrid.Columns[0].Visibility = Visibility.Collapsed;
+			pacientsGrid.Columns[0].Visibility = Visibility.Hidden;
 
 			if (Uzivatel != null && Uzivatel.Role != Role.PRIMAR)
 			{
 				pacientsGrid.Columns[3].Visibility = Visibility.Hidden;
 				pacientsGrid.Columns[4].Visibility = Visibility.Hidden;
-
 			}
 		}
 
@@ -1265,7 +1264,14 @@ namespace Nemocnice.Database
 					}
 				}
 			}
-		}
+            pacientiGrid.Columns[0].Visibility = Visibility.Hidden;
+
+            if (Uzivatel != null && Uzivatel.Role != Role.PRIMAR)
+            {
+                pacientiGrid.Columns[3].Visibility = Visibility.Hidden;
+                pacientiGrid.Columns[4].Visibility = Visibility.Hidden;
+            }
+        }
 
 		#endregion
 
