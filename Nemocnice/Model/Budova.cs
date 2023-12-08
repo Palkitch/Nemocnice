@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.AxHost;
+using System.Windows.Shapes;
 
 namespace Nemocnice.ModelObjects
 {
@@ -19,6 +21,11 @@ namespace Nemocnice.ModelObjects
             Nazev = nazev;
             PocetPater = pocetPater;
             IdAdresa = idAdresa;
+        }
+
+        public override string? ToString()
+        {
+            return $"{Nazev}";
         }
     }
 }

@@ -28,27 +28,34 @@ namespace Nemocnice
 	}
 	public partial class PacientDialog
 	{
-		private OracleConnection connection;
-		private List<Adresa> adresy;
-		private Uzivatel uzivatel;
-		private PacientDialogType type;
-		private int pacientId;
+		private List<Adresa> Adresy { get; set; }
+		private PacientDialogType PacientDialogType { get; set; }
+		private Uzivatel Uzivatel { get; set; }
+        private int PacientId { get; set; }
+        private DatabaseConnection DatabaseConnection { get; }
+        private OracleConnection Connection { get; }
 
-		public PacientDialog(OracleConnection connection, Uzivatel u)
+
+        public PacientDialog(Uzivatel u)
 		{
-			this.connection = connection;
-			this.uzivatel = u;
-			this.type = PacientDialogType.ADD;
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            Adresy = new List<Adresa>();
+            DatabaseConnection = DatabaseConnection.Instance;
+            Connection = DatabaseConnection.OracleConnection;
+			Uzivatel = u;
+			PacientDialogType = PacientDialogType.ADD;
 			InitializeComponent();
 			ComboBoxFill();
 		}
 
-		public PacientDialog(int p, OracleConnection connection, Uzivatel u)
+		public PacientDialog(int pacientId, Uzivatel uzivatel)
 		{
-			this.connection = connection;
-			this.uzivatel = u;
-			this.pacientId = p;
-			this.type = PacientDialogType.EDIT;
+            Adresy = new List<Adresa>();
+            DatabaseConnection = DatabaseConnection.Instance;
+            Connection = DatabaseConnection.OracleConnection;
+            Uzivatel = uzivatel;
+			PacientId = pacientId;
+			PacientDialogType = PacientDialogType.EDIT;
 			InitializeComponent();
 			ComboBoxFill();
 			LoadPatientData();
@@ -76,7 +83,7 @@ namespace Nemocnice
 			{
 				doktorComboBox.Items.Clear();
 
-				using (OracleCommand command = new OracleCommand("VypisDoktori", connection))
+				using (OracleCommand command = new OracleCommand("VypisDoktori", Connection))
 				{
 					command.CommandType = CommandType.StoredProcedure;
 					command.Parameters.Add("cur", OracleDbType.RefCursor, ParameterDirection.Output);
@@ -116,7 +123,7 @@ namespace Nemocnice
 			{
 				adresaComboBox.Items.Clear();
 
-				using (OracleCommand command = new OracleCommand("VypisAdresy", connection))
+				using (OracleCommand command = new OracleCommand("VypisAdresy", Connection))
 				{
 					command.CommandType = CommandType.StoredProcedure;
 					command.Parameters.Add("cur", OracleDbType.RefCursor, ParameterDirection.Output);
@@ -140,17 +147,18 @@ namespace Nemocnice
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Chyba při vyplňování adresy: " + ex.Message);
+				MessageBox.Show("Chyba při vyplňování Adresy: " + ex.Message);
 			}
 			adresaComboBox.SelectedIndex = 0;
 		}
+
 		private void FillPojistovnaComboBox()
 		{
 			try
 			{
 				pojistovnaComboBox.Items.Clear();
 
-				using (OracleCommand command = new OracleCommand("VypisPojistovny", connection))
+				using (OracleCommand command = new OracleCommand("VypisPojistovny", Connection))
 				{
 					command.CommandType = CommandType.StoredProcedure;
 					command.Parameters.Add("cur", OracleDbType.RefCursor, ParameterDirection.Output);
@@ -184,7 +192,7 @@ namespace Nemocnice
 			{
 				krevniSkupinaComboBox.Items.Clear();
 
-				using (OracleCommand command = new OracleCommand("GetKrevniSkupiny", connection))
+				using (OracleCommand command = new OracleCommand("GetKrevniSkupiny", Connection))
 				{
 					command.CommandType = CommandType.StoredProcedure;
 					command.Parameters.Add("result", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
@@ -217,7 +225,7 @@ namespace Nemocnice
 			{
 				diagnozaComboBox.Items.Clear();
 
-				using (OracleCommand command = new OracleCommand("GetDiagnozy", connection))
+				using (OracleCommand command = new OracleCommand("GetDiagnozy", Connection))
 				{
 					command.CommandType = CommandType.StoredProcedure;
 					command.Parameters.Add("result", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
@@ -261,7 +269,7 @@ namespace Nemocnice
 		}
 		private void HotovoOnClick(object sender, RoutedEventArgs e)
 		{
-			switch (type)
+			switch (PacientDialogType)
 			{
 				case PacientDialogType.ADD:
 					{
@@ -281,14 +289,14 @@ namespace Nemocnice
 		#region Funkcionalita
 		private void AddPacient()
 		{
-			switch (uzivatel.Role)
+			switch (Uzivatel.Role)
 			{
 				case Role.PRIMAR:
 					{
 						{
 							try
 							{
-								using (OracleCommand command = new OracleCommand("insert_data", connection))
+								using (OracleCommand command = new OracleCommand("insert_data", Connection))
 								{
 									command.CommandType = CommandType.StoredProcedure;
 
@@ -330,7 +338,7 @@ namespace Nemocnice
 				case Role.DOKTOR:
 				case Role.SESTRA:
 					{
-						using (OracleCommand command = new OracleCommand("VytvorZadostPacienti", connection))
+						using (OracleCommand command = new OracleCommand("VytvorZadostPacienti", Connection))
 						{
 							command.CommandType = CommandType.StoredProcedure;
 
@@ -371,11 +379,11 @@ namespace Nemocnice
 		}
 		private void EditPacient()
 		{
-			switch (uzivatel.Role)
+			switch (Uzivatel.Role)
 			{
 				case Role.PRIMAR:
 					{
-						int id = pacientId;
+						int id = PacientId;
 						string jmeno = jmenoTextBox.Text;
 						string prijmeni = prijmeniTextBox.Text;
 						DateTime datumNarozeni = datumNarozeniDatePicker.SelectedDate ?? DateTime.Now;
@@ -393,7 +401,7 @@ namespace Nemocnice
 				case Role.DOKTOR:
 				case Role.SESTRA:
 					{
-						using (OracleCommand command = new OracleCommand("VytvorZadostPacienti", connection))
+						using (OracleCommand command = new OracleCommand("VytvorZadostPacienti", Connection))
 						{
 							command.CommandType = CommandType.StoredProcedure;
 
@@ -410,7 +418,7 @@ namespace Nemocnice
 							int idDiagnoza = ((Diagnoza)diagnozaComboBox.SelectedItem).Id;
 
 							// Parametry pro volání procedury VytvorZadostPacienti
-							command.Parameters.Add("p_IdPacient", OracleDbType.Int32).Value = pacientId;
+							command.Parameters.Add("p_IdPacient", OracleDbType.Int32).Value = PacientId;
 							command.Parameters.Add("p_Jmeno", OracleDbType.Varchar2).Value = jmeno;
 							command.Parameters.Add("p_Prijmeni", OracleDbType.Varchar2).Value = prijmeni;
 							command.Parameters.Add("p_DatumNarozeni", OracleDbType.Date).Value = datumNarozeni;
@@ -438,7 +446,7 @@ namespace Nemocnice
 		{
 			try
 			{
-				using (OracleCommand command = new OracleCommand("update_data", connection))
+				using (OracleCommand command = new OracleCommand("update_data", Connection))
 				{
 					command.CommandType = CommandType.StoredProcedure;
 					command.Parameters.Add("p_tabulka", OracleDbType.Varchar2).Value = "Pacienti";
@@ -459,10 +467,10 @@ namespace Nemocnice
 		{
 			try
 			{
-				using (OracleCommand command = new OracleCommand("NactiHodnotyPacienta", connection))
+				using (OracleCommand command = new OracleCommand("NactiHodnotyPacienta", Connection))
 				{
 					command.CommandType = CommandType.StoredProcedure;
-					command.Parameters.Add("p_IdPacient", OracleDbType.Int32).Value = pacientId;
+					command.Parameters.Add("p_IdPacient", OracleDbType.Int32).Value = PacientId;
 					command.Parameters.Add("cur", OracleDbType.RefCursor, ParameterDirection.Output);
 
 					using (OracleDataReader reader = command.ExecuteReader())

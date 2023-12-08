@@ -273,7 +273,6 @@ namespace Nemocnice.Database
 									}
 
 
-
 								case "DIAGNOZY_CISELNIK":
 									{
 										int id = int.Parse(ReadString(reader, 0));
@@ -422,7 +421,7 @@ namespace Nemocnice.Database
 									{
 										if (newValue != null)
 										{
-                                            if (property.PropertyType == typeof(int))
+                                            if (property.PropertyType == typeof(int) || Nullable.GetUnderlyingType(property.PropertyType) == typeof(int))
                                                 property.SetValue(adresa, int.Parse(newValue));
                                             else
                                                 property.SetValue(adresa, newValue);
@@ -457,7 +456,7 @@ namespace Nemocnice.Database
                                     {
                                         if (newValue != null)
                                         {
-                                            if (property.PropertyType == typeof(int))
+                                            if (property.PropertyType == typeof(int) || Nullable.GetUnderlyingType(property.PropertyType) == typeof(int))
                                                 property.SetValue(budova, int.Parse(newValue));
                                             else
                                                 property.SetValue(budova, newValue);
@@ -490,7 +489,7 @@ namespace Nemocnice.Database
                                     {
                                         if (newValue != null)
                                         {
-                                            if (property.PropertyType == typeof(int))
+                                            if (property.PropertyType == typeof(int) || Nullable.GetUnderlyingType(property.PropertyType) == typeof(int))
                                                 property.SetValue(diagnoza, int.Parse(newValue));
                                             else
                                                 property.SetValue(diagnoza, newValue);
@@ -522,7 +521,7 @@ namespace Nemocnice.Database
                                     {
                                         if (newValue != null)
                                         {
-                                            if (property.PropertyType == typeof(int))
+                                            if (property.PropertyType == typeof(int) || Nullable.GetUnderlyingType(property.PropertyType) == typeof(int))
                                                 property.SetValue(lek, int.Parse(newValue));
                                             else
                                                 property.SetValue(lek, newValue);
@@ -556,7 +555,7 @@ namespace Nemocnice.Database
                                     {
                                         if (newValue != null)
                                         {
-                                            if (property.PropertyType == typeof(int))
+                                            if (property.PropertyType == typeof(int) || Nullable.GetUnderlyingType(property.PropertyType) == typeof(int))
                                                 property.SetValue(pomucka, int.Parse(newValue));
                                             else
                                                 property.SetValue(pomucka, newValue);
@@ -591,7 +590,7 @@ namespace Nemocnice.Database
                                     {
                                         if (newValue != null)
                                         {
-                                            if (property.PropertyType == typeof(int))
+                                            if (property.PropertyType == typeof(int) || Nullable.GetUnderlyingType(property.PropertyType) == typeof(int))
                                                 property.SetValue(modelObject, int.Parse(newValue));
                                             else
                                                 property.SetValue(zamestnanec, newValue);
@@ -629,7 +628,7 @@ namespace Nemocnice.Database
                                     {
                                         if (newValue != null)
                                         {
-                                            if (property.PropertyType == typeof(int))
+                                            if (property.PropertyType == typeof(int) || Nullable.GetUnderlyingType(property.PropertyType) == typeof(int))
                                                 property.SetValue(luzko, int.Parse(newValue));
                                             else
                                                 property.SetValue(luzko, newValue);
@@ -663,7 +662,7 @@ namespace Nemocnice.Database
                                     {
                                         if (newValue != null)
                                         {
-                                            if (property.PropertyType == typeof(int))
+                                            if (property.PropertyType == typeof(int) || Nullable.GetUnderlyingType(property.PropertyType) == typeof(int))
                                                 property.SetValue(pacient, int.Parse(newValue));
                                             else
                                                 property.SetValue(pacient, newValue);
@@ -704,7 +703,7 @@ namespace Nemocnice.Database
                                     {
                                         if (newValue != null)
                                         {
-                                            if (property.PropertyType == typeof(int))
+                                            if (property.PropertyType == typeof(int) || Nullable.GetUnderlyingType(property.PropertyType) == typeof(int))
                                                 property.SetValue(pojistovna, int.Parse(newValue));
                                             else
                                                 property.SetValue(pojistovna, newValue);
@@ -737,7 +736,7 @@ namespace Nemocnice.Database
                                     {
                                         if (newValue != null)
                                         {
-                                            if (property.PropertyType == typeof(int))
+                                            if (property.PropertyType == typeof(int) || Nullable.GetUnderlyingType(property.PropertyType) == typeof(int))
                                                 property.SetValue(oddeleni, int.Parse(newValue));
                                             else
                                                 property.SetValue(oddeleni, newValue);
@@ -770,7 +769,7 @@ namespace Nemocnice.Database
                                     {
                                         if (newValue != null)
                                         {
-                                            if (property.PropertyType == typeof(int))
+                                            if (property.PropertyType == typeof(int) || Nullable.GetUnderlyingType(property.PropertyType) == typeof(int))
                                                 property.SetValue(pokoj, int.Parse(newValue));
                                             else
                                                 property.SetValue(pokoj, newValue);
@@ -1220,7 +1219,7 @@ namespace Nemocnice.Database
 
 		public void AddPacient(ref DataGrid gridView)
 		{
-			PacientDialog dialog = new PacientDialog(Connection, Uzivatel);
+			PacientDialog dialog = new PacientDialog(Uzivatel);
 			dialog.ShowDialog();
 		}
 		public void EditPacient(ref DataGrid gridView)
@@ -1233,7 +1232,7 @@ namespace Nemocnice.Database
 				string[] values = cells.Row.ItemArray.Select(cell => cell.ToString()).ToArray();
 
 				string prvniSloupec = values[0];
-				PacientDialog dialog = new PacientDialog(int.Parse(prvniSloupec), Connection, Uzivatel);
+				PacientDialog dialog = new PacientDialog(int.Parse(prvniSloupec), Uzivatel);
 				dialog.ShowDialog();
 			}
 			catch (Exception ex)

@@ -150,5 +150,9 @@ namespace Nemocnice
 			Launcher.DeleteTableClick();
 		}
 
-	}
+        private void AdminAddData_Click(object sender, RoutedEventArgs e)
+        {
+            Launcher.AddDataClick();
+        }
+    }
 }

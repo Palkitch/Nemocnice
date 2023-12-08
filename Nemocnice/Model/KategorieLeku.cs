@@ -4,24 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nemocnice.ModelObjects
+namespace Nemocnice.Model
 {
-    public class Oddeleni
-    {
-        public int ID { get; set; }
-        public string Nazev { get; set; }
-        public int IdBudovy { get; set; }
 
-        public Oddeleni(int id, string nazev, int idBudovy) 
+    public class KategorieLeku
+    {
+        public int Id { get; set; }
+        public string Nazev { get; set; }
+
+        public KategorieLeku(int id, string nazev) 
         {
-            ID = id;
+            Id = id;
             Nazev = nazev;
-            IdBudovy = idBudovy;
         }
 
         public override string? ToString()
         {
-            return $"{Nazev}";
+            return Nazev;
         }
     }
 }

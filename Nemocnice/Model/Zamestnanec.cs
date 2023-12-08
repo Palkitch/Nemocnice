@@ -28,6 +28,13 @@ namespace Nemocnice.ModelObjects
             Druh = druh;
         }
 
+        public Zamestnanec(int id, string jmeno, string prijmeni)   // sestra + doktor
+        {
+            Id = id;
+            Jmeno = jmeno;
+            Prijmeni = prijmeni;
+        }
+
         public override string? ToString()
         {
             return $"{Jmeno} {Prijmeni}";

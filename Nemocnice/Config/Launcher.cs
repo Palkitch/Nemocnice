@@ -1,8 +1,11 @@
 ﻿using Microsoft.VisualBasic.ApplicationServices;
 using Nemocnice.Database;
+using Nemocnice.GUI.Dialogs;
 using Nemocnice.Model;
 using Nemocnice.ModelObjects;
+using Oracle.ManagedDataAccess.Client;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,6 +13,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -29,9 +33,13 @@ namespace Nemocnice.Config
 		private DatabaseHandler Handler { get; }
 		private List<Uzivatel> Users { get; set; }
 		private Uzivatel? SelectedUser { get; set; }
+		private DatabaseConnection DatabaseConnection { get; }	
+		private OracleConnection Connection { get; }
 
 		public Launcher(MainWindow window)
 		{
+			DatabaseConnection = DatabaseConnection.Instance;
+            Connection = DatabaseConnection.OracleConnection;
 			Window = window;
 			Handler = DatabaseHandler.Instance;
 			Users = new List<Uzivatel>();
@@ -379,7 +387,96 @@ namespace Nemocnice.Config
 			Handler.UpdateAdminTable(modelObject, objectProperty, newValue);
 		}
 
-		public void DeleteTableClick()
+        public void AddDataClick()
+        {
+            switch (Window.adminCb.Text) 
+			{
+                case "Adresy":
+                    {
+						AdresaDialog adresaDialog = new AdresaDialog();
+						adresaDialog.ShowDialog();
+                        break;
+                    }
+                case "Budovy":
+                    {
+						BudovaDialog budovaDialog = new BudovaDialog();
+						budovaDialog.ShowDialog();
+                        break;
+                    }
+                case "Diagnózy":
+                    {
+						DiagnozaDialog diagnozaDialog = new DiagnozaDialog();
+						diagnozaDialog.ShowDialog();
+                        break;
+                    }
+
+                case "Léky":
+                    {
+						LekyDialog lekyDialog = new LekyDialog();
+						lekyDialog.ShowDialog();
+                        break;
+                    }
+
+                case "Pomůcky":
+                    {
+						PomuckyDialog pomuckyDialog = new PomuckyDialog();
+						pomuckyDialog.ShowDialog();
+                        break;
+                    }
+
+                case "Zaměstnanci":
+                case "Sestry":
+                    {
+                        ZamestnanciDialog zamestnanciDialog = new ZamestnanciDialog("s");
+                        zamestnanciDialog.ShowDialog();
+                        break;
+                    }
+                case "Doktoři":
+                    {
+						ZamestnanciDialog zamestnanciDialog = new ZamestnanciDialog("d");
+						zamestnanciDialog.ShowDialog();
+                        break;
+                    }
+
+                case "Lůžka": 
+                    {
+						LuzkaDialog luzkaDialog = new LuzkaDialog();
+						luzkaDialog.ShowDialog();
+                        break;
+                    }
+
+                case "Pacienti":
+                    {
+						PacientDialog pacientDialog = new PacientDialog(Handler.Uzivatel);
+						pacientDialog.ShowDialog();
+                        break;
+                    }
+
+                case "Pojišťovny":
+                    {
+						PojistovnyDialog pojistovnyDialog = new PojistovnyDialog();
+						pojistovnyDialog.ShowDialog();
+                        break;
+                    }
+
+                case "Oddělení":
+                    {
+						OddeleniDialog oddeleniDialog = new OddeleniDialog();
+                        oddeleniDialog.ShowDialog();
+                        break;
+                    }
+
+                case "Pokoje":
+                    {
+						PokojeDialog pokojeDialog = new PokojeDialog();
+						pokojeDialog.ShowDialog();
+                        break;
+                    }
+            }
+        }
+
+
+        public void DeleteTableClick()
 		{
             string nazevTabulky = Window.adminCb.Text.Trim();
             Handler.DeleteAdminTable(nazevTabulky, ref Window.adminGrid);
@@ -469,11 +566,6 @@ namespace Nemocnice.Config
 				}
 			}
 		}
-
-
-
-
-
-		#endregion
-	}
+        #endregion
+    }
 }

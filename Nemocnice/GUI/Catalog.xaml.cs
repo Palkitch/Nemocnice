@@ -54,7 +54,7 @@ namespace Nemocnice.GUI
 		{
 			string selectedOption = comboBox.SelectedItem.ToString();
 
-			// Call the appropriate method based on the selected object type
+			// Call the appropriate method based on the selected object PacientDialogType
 			switch (selectedOption)
 			{
 				case "tabulky":
