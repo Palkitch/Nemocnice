@@ -33,13 +33,13 @@ namespace Nemocnice.Config
 		private DatabaseHandler Handler { get; }
 		private List<Uzivatel> Users { get; set; }
 		private Uzivatel? SelectedUser { get; set; }
-		private DatabaseConnection DatabaseConnection { get; }	
+		private DatabaseConnection DatabaseConnection { get; }
 		private OracleConnection Connection { get; }
 
 		public Launcher(MainWindow window)
 		{
 			DatabaseConnection = DatabaseConnection.Instance;
-            Connection = DatabaseConnection.OracleConnection;
+			Connection = DatabaseConnection.OracleConnection;
 			Window = window;
 			Handler = DatabaseHandler.Instance;
 			Users = new List<Uzivatel>();
@@ -387,99 +387,101 @@ namespace Nemocnice.Config
 			Handler.UpdateAdminTable(modelObject, objectProperty, newValue);
 		}
 
-        public void AddDataClick()
-        {
-            switch (Window.adminCb.Text) 
+		public void AddDataClick()
+		{
+			switch (Window.adminCb.Text)
 			{
-                case "Adresy":
-                    {
+				case "Adresy":
+					{
 						AdresaDialog adresaDialog = new AdresaDialog();
 						adresaDialog.ShowDialog();
-                        break;
-                    }
-                case "Budovy":
-                    {
+						break;
+					}
+				case "Budovy":
+					{
 						BudovaDialog budovaDialog = new BudovaDialog();
 						budovaDialog.ShowDialog();
-                        break;
-                    }
-                case "Diagnózy":
-                    {
+						break;
+					}
+				case "Diagnózy":
+					{
 						DiagnozaDialog diagnozaDialog = new DiagnozaDialog();
 						diagnozaDialog.ShowDialog();
-                        break;
-                    }
+						break;
+					}
 
-                case "Léky":
-                    {
+				case "Léky":
+					{
 						LekyDialog lekyDialog = new LekyDialog();
 						lekyDialog.ShowDialog();
-                        break;
-                    }
+						break;
+					}
 
-                case "Pomůcky":
-                    {
+				case "Pomůcky":
+					{
 						PomuckyDialog pomuckyDialog = new PomuckyDialog();
 						pomuckyDialog.ShowDialog();
-                        break;
-                    }
+						break;
+					}
 
-                case "Zaměstnanci":
-                case "Sestry":
-                    {
-                        ZamestnanciDialog zamestnanciDialog = new ZamestnanciDialog("s");
-                        zamestnanciDialog.ShowDialog();
-                        break;
-                    }
-                case "Doktoři":
-                    {
+				case "Zaměstnanci":
+				case "Sestry":
+					{
+						ZamestnanciDialog zamestnanciDialog = new ZamestnanciDialog("s");
+						zamestnanciDialog.ShowDialog();
+						break;
+					}
+				case "Doktoři":
+					{
 						ZamestnanciDialog zamestnanciDialog = new ZamestnanciDialog("d");
 						zamestnanciDialog.ShowDialog();
-                        break;
-                    }
+						break;
+					}
 
-                case "Lůžka": 
-                    {
+				case "Lůžka":
+					{
 						LuzkaDialog luzkaDialog = new LuzkaDialog();
 						luzkaDialog.ShowDialog();
-                        break;
-                    }
+						break;
+					}
 
-                case "Pacienti":
-                    {
+				case "Pacienti":
+					{
 						PacientDialog pacientDialog = new PacientDialog(Handler.Uzivatel);
 						pacientDialog.ShowDialog();
-                        break;
-                    }
+						break;
+					}
 
-                case "Pojišťovny":
-                    {
+				case "Pojišťovny":
+					{
 						PojistovnyDialog pojistovnyDialog = new PojistovnyDialog();
 						pojistovnyDialog.ShowDialog();
-                        break;
-                    }
+						break;
+					}
 
-                case "Oddělení":
-                    {
+				case "Oddělení":
+					{
 						OddeleniDialog oddeleniDialog = new OddeleniDialog();
-                        oddeleniDialog.ShowDialog();
-                        break;
-                    }
+						oddeleniDialog.ShowDialog();
+						break;
+					}
 
-                case "Pokoje":
-                    {
+				case "Pokoje":
+					{
 						PokojeDialog pokojeDialog = new PokojeDialog();
 						pokojeDialog.ShowDialog();
-                        break;
-                    }
-            }
-        }
+						break;
+					}
+
+			}
+			Handler.AdminShowAllTables(ref Window.adminCb, ref Window.adminGrid);
+		}
 
 
-        public void DeleteTableClick()
+		public void DeleteTableClick()
 		{
-            string nazevTabulky = Window.adminCb.Text.Trim();
-            Handler.DeleteAdminTable(nazevTabulky, ref Window.adminGrid);
+			string nazevTabulky = Window.adminCb.Text.Trim();
+			Handler.DeleteAdminTable(nazevTabulky, ref Window.adminGrid, ref Window.adminCb);
 		}
 
 		#endregion
@@ -566,6 +568,6 @@ namespace Nemocnice.Config
 				}
 			}
 		}
-        #endregion
-    }
+		#endregion
+	}
 }

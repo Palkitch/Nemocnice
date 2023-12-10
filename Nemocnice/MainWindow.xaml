@@ -88,9 +88,9 @@
         <TabItem x:Name="employeesTabItem" HorizontalAlignment="Center" Header="Zaměstanci" Width="79" Height="20" VerticalAlignment="Center">
             <Grid Background="#FFE5E5E5">
                 <DataGrid x:Name="employeesGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,0,0,45"/>
-                <Button x:Name="employeesAddEmployee" Content="Přidat" Margin="10,0,0,10" HorizontalAlignment="Left" Width="100" Click="EmployeesAddEmployee" Height="30" VerticalAlignment="Bottom"/>
+                
                 <Button x:Name="employeesShowEmployees" Content="Zobrazit" Margin="0,0,10,10" Height="30" VerticalAlignment="Bottom" Click="EmployeesShowEmployees" HorizontalAlignment="Right" Width="100"/>
-                <Button x:Name="employeesEditEmployee" Content="Upravit" Margin="115,0,0,10" Click="EmployeesEditEmployee" HorizontalAlignment="Left" Width="100" Height="30" VerticalAlignment="Bottom"/>
+                
             </Grid>
         </TabItem>
         <TabItem x:Name="usersTabItem" HorizontalAlignment="Center" Header="Uživatelé" Width="62" Height="20" VerticalAlignment="Center">
